@@ -1,0 +1,4 @@
+pytz
+telegram
+psycopg2
+python-telegram-bot
