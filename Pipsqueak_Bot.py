@@ -46,7 +46,7 @@ def start(bot, update):
 def feedback(bot, update):
     admin_id = 111914928
     sender_id = update.message.from_user.id
-    message_id = update.message.id
+    message_id = update.message.message_id
     bot.forward_message(admin_id, sender_id, message_id)
 
 
