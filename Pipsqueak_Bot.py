@@ -43,13 +43,11 @@ def start(bot, update):
     bot.send_message(user_id, msg)
 
 
-def message_handler(bot, update):
+def feedback(bot, update):
     admin_id = 111914928
     sender_id = update.message.from_user.id
-    sender_name = update.message.from_user.first_name + ' ' + update.message.from_user.last_name
-    text = update.message.text
-    msg = '%s (%d) said "%s"' % (sender_name, sender_id, text)
-    bot.send_message(admin_id, msg)
+    message_id = update.message.id
+    bot.forward_message(admin_id, sender_id, message_id)
 
 
 def main():
@@ -58,7 +56,7 @@ def main():
 
     dispatcher.add_handler(CommandHandler('start', start))
 
-    dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
+    dispatcher.add_handler(MessageHandler(filters.Filters.all, feedback))
 
     updater.start_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
     updater.bot.setWebhook('https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
