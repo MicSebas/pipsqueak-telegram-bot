@@ -46,11 +46,11 @@ def browse_listings(bot, update):
     global db
     user_id = update.message.from_user.id
     items = db.get_items()
-    file_name = 'Pipsqueak SUTD Listing.csv'
+    file_name = 'Pipsqueak_SUTD_Listing.csv'
     f = open(file_name, 'w')
     f.write('Item ID, Item Name, Description, Condition, Price\n')
     for item in items:
-        f.write('%s, %s, %s, %s, %s, %.2f\n' % item)
+        f.write('%s, %s, %s, %s, %s, $%.2f\n' % item)
     f.close()
     msg = 'Here are the items currently listed!'
     bot.send_message(user_id, msg)
@@ -123,6 +123,8 @@ def sell_details(bot, update, item_code, column):
     global db
     user_id = update.message.from_user.id
     text = update.message.text
+    if column == 'price':
+        text = float(text)
     db.update_item(item_code, column, text)
     if column == 'name':
         msg = 'Please send me a short description of the item!'
