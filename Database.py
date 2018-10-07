@@ -54,7 +54,7 @@ class Database(object):
             rows = self.cur.fetchall()
             return rows[0]
         else:
-            stmt = "SELECT item_id, name, description, condition, price FROM logs ORDER BY item_id" % item_id
+            stmt = "SELECT item_id, name, description, condition, price FROM logs ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
