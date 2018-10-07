@@ -178,6 +178,7 @@ def main():
     dispatcher.add_handler(CommandHandler('sell', sell_command))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
+    dispatcher.add_handler(CallbackQueryHandler(callback_query_handler))
 
     updater.start_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
     updater.bot.setWebhook('https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
