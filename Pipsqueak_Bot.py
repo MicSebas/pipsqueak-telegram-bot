@@ -1,37 +1,16 @@
 import telegram
-import psycopg2
 import os
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from Database import Database
 
-DATABASE_URL = 'postgres://oylxidwhboayxg:abdc45f4642fa9f329bef28f8e31f967c91d64c1dae3eab5d30e7b6fb62096be@ec2-174-129-32-37.compute-1.amazonaws.com:5432/d52lcq3tkapjck'
 TOKEN = '666724238:AAF2SyvjZbui0VMbPOlG3op2jgMQFVFM_yg'
 PORT = int(os.environ.get('PORT', '5000'))
 BOT = telegram.Bot(token=TOKEN)
 BOT.setWebhook(url='https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
 
 
-class Database(object):
-
-    def __init__(self):
-        os.environ['DATABASE_URL'] = DATABASE_URL
-        self.conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
-        self.cur = self.conn.cursor()
-        stmt = "CREATE TABLE IF NOT EXISTS ps_database (user_id BIGINT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL)"
-        self.cur.execute(stmt)
-        self.conn.commit()
-
-    def add_new_user(self, user_id, name):
-        stmt = "INSERT INTO ps_database (user_id, name, state) VALUES (%d, '%s', 'home')" % (user_id, name)
-        self.cur.execute(stmt)
-        self.conn.commit()
-
-    def get_users(self):
-        stmt = "SELECT user_id FROM ps_database"
-        self.cur.execute(stmt)
-        rows = self.cur.fetchall()
-        return [x[0] for x in rows]
-
-
+# Commands
 def start(bot, update):
     global db
     user_id = update.message.from_user.id
@@ -43,20 +22,111 @@ def start(bot, update):
     bot.send_message(user_id, msg)
 
 
+def done(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = db.get_state(user_id)
+    if state != 'home':
+        msg = 'Thank you for using Pipsqueak! We look forward to your next visit, %s!' % update.message.from_user.first_name
+        db.update_state(user_id, 'home')
+    else:
+        msg = 'You\'re not in the middle of any operation.'
+    bot.send_message(user_id, msg)
+
+
+def send_feedback(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    db.update_state(user_id, 'feedback')
+    msg = 'You can send in your feedback to me now!'
+    bot.send_message(user_id, msg)
+
+
+def browse_listings(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    items = db.get_items()
+    file_name = 'Pipsqueak SUTD Listing.csv'
+    f = open(file_name, 'w')
+    f.write('Item ID, Item Name, Description, Condition, Price\n')
+    for item in items:
+        f.write('%s, %s, %s, %s, %s, %.2f\n' % item)
+    f.close()
+    msg = 'Here are the items currently listed!'
+    bot.send_message(user_id, msg)
+    bot.send_document(user_id, open(file_name, 'rb'))
+
+
+def admin_reply_command(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    db.update_state(user_id, 'admin_reply')
+    msg = 'Send me the user ID of the person you want to reply to.'
+    bot.send_message(user_id, msg)
+
+
+def sell_command(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    db.update_state(user_id, 'sell')
+    msg = 'What kind of item are you selling?'
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Tools', callback_data='T')],
+                                     [InlineKeyboardButton('Materials', callback_data='M')],
+                                     [InlineKeyboardButton('Electronics', callback_data='E')],
+                                     [InlineKeyboardButton('Mechanical Parts', callback_data='P')],
+                                     [InlineKeyboardButton('Others', callback_data='O')]])
+    bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+# Message handlers
 def feedback(bot, update):
     admin_id = 111914928
     sender_id = update.message.from_user.id
+    sender_name = update.message.from_user.first_name + ' ' + update.message.from_user.last_name
     message_id = update.message.message_id
+    msg = '%s (%d) said:' % (sender_name, sender_id)
+    bot.send_message(admin_id, msg)
     bot.forward_message(admin_id, sender_id, message_id)
+    msg = 'Thank you for your feedback! Anything else you want to say?\nSend /done if you\'re finished with your feedback!'
+    bot.send_message(sender_id, msg)
 
 
+def admin_reply(bot, update, target_id):
+    msg = update.message.text
+    bot.send_message(target_id, msg)
+    admin_id = update.message.from_user.id
+    msg = 'Forwarded! Anything else you want to say?\nSend /done if you\'re finished with your reply!'
+    bot.send_message(admin_id, msg)
+
+
+def message_handler(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = db.get_state(user_id)
+    if state == 'feedback':
+        feedback(bot, update)
+    elif state == 'admin_reply':
+        db.update_state(user_id, state + '_%s' % update.message.text)
+        msg = 'You can send your reply now! I will forward it to your recipient.'
+        bot.send_message(user_id, msg)
+    elif state.startswith('admin_reply_'):
+        target_id = int(state[12:])
+        admin_reply(bot, update, target_id)
+
+
+# Main
 def main():
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('done', done))
+    dispatcher.add_handler(CommandHandler('feedback', send_feedback))
+    dispatcher.add_handler(CommandHandler('admin_reply', admin_reply_command))
+    dispatcher.add_handler(CommandHandler('browse_listings', browse_listings))
+    dispatcher.add_handler(CommandHandler('sell', sell_command))
 
-    dispatcher.add_handler(MessageHandler(filters.Filters.all, feedback))
+    dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
     updater.start_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
     updater.bot.setWebhook('https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
