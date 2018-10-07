@@ -44,20 +44,20 @@ class Database(object):
 
     def get_items(self, item_id=None, user_id=None):
         if not item_id:
-            stmt = "SELECT item_id, name, description, condition, price FROM logs ORDER BY item_id"
-            self.cur.execute(stmt)
-            rows = self.cur.fetchall()
-            return rows
-        elif not user_id:
-            stmt = "SELECT item_id, name FROM logs WHERE user_id = %d" % user_id
-            self.cur.execute(stmt)
-            rows = self.cur.fetchall()
-            return rows
-        else:
             stmt = "SELECT item_id, name, description, condition, price FROM logs WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows[0]
+        elif not user_id:
+            stmt = "SELECT item_id, name FROM logs WHERE user_id = %d" % user_id
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows[0]
+        else:
+            stmt = "SELECT item_id, name, description, condition, price FROM logs ORDER BY item_id" % item_id
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows
 
     def admin_get_items(self):
         stmt = "SELECT * FROM logs ORDER BY item_id"
