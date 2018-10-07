@@ -11,7 +11,7 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS user_database (user_id BIGINT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
-        stmt = "CREATE TABLE IF NOT EXISTS logs (item_id TEXT NOT NULL, item_name TEXT NOT NULL, description TEXT NOT NULL, condition TEXT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL, seller_name TEXT NOT NULL)"
+        stmt = "CREATE TABLE IF NOT EXISTS logs (item_id TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, condition TEXT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL, seller_name TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
 
@@ -44,17 +44,17 @@ class Database(object):
 
     def get_items(self, item_id=None, user_id=None):
         if not item_id:
-            stmt = "SELECT item_id, item_name, description, condition, price FROM logs ORDER BY item_id"
+            stmt = "SELECT item_id, name, description, condition, price FROM logs ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
         elif not user_id:
-            stmt = "SELECT item_id, item_name FROM logs WHERE user_id = %d" % user_id
+            stmt = "SELECT item_id, name FROM logs WHERE user_id = %d" % user_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
         else:
-            stmt = "SELECT item_id, item_name, description, condition, price FROM logs WHERE item_id = '%s'" % item_id
+            stmt = "SELECT item_id, name, description, condition, price FROM logs WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows[0]
@@ -94,5 +94,6 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    print(db.get_users())
-    print(db.get_state(111914928))
+    rows = db.get_items()
+    for item in rows:
+        print(item)
