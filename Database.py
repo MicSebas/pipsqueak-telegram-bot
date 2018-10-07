@@ -74,7 +74,10 @@ class Database(object):
         stmt = "SELECT item_id FROM logs ORDER BY item_id"
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
-        new_item_code = '%s%04d' % (category, max([int(i[0][1:]) for i in rows]))
+        if rows:
+            new_item_code = '%s%04d' % (category, max([int(i[0][1:]) for i in rows]))
+        else:
+            new_item_code = '%s0001' % category
         stmt = "INSERT INTO logs VALUES ('%s', 'name', 'description', 'condition', 0, %d, '%s')" % (new_item_code, user_id, user_name)
         self.cur.execute(stmt)
         self.conn.commit()
@@ -91,3 +94,5 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
+    print(db.get_users())
+    print(db.get_state(111914928))
