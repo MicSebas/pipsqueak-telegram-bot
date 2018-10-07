@@ -50,7 +50,7 @@ def browse_listings(bot, update):
     f = open(file_name, 'w')
     f.write('Item ID, Item Name, Description, Condition, Price\n')
     for item in items:
-        f.write('%s, %s, %s, %s, %s, $%.2f\n' % item)
+        f.write('%s, %s, %s, %s, $%.2f\n' % item)
     f.close()
     msg = 'Here are the items currently listed!'
     bot.send_message(user_id, msg)
