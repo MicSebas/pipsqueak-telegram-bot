@@ -1,7 +1,7 @@
 import telegram
 import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 from Database import Database
 
 TOKEN = '666724238:AAF2SyvjZbui0VMbPOlG3op2jgMQFVFM_yg'
@@ -78,6 +78,26 @@ def sell_command(bot, update):
     bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
+# Callback Query Handler
+def callback_query_handler(bot, update):
+    global db
+    user_id = update.callback_query.from_user.id
+    state = db.get_state(user_id)
+    data = update.callback_query.data
+    if state == 'sell':
+        user_name = update.callback_query.from_user.first_name + ' ' + update.callback_query.from_user.last_name
+        item_code = db.add_new_item(data, user_id, user_name)
+        msg = 'What are you selling?'
+        new_state = 'sell_%s_name' % item_code
+        keyboard = None
+    else:
+        msg = ''
+        new_state = state
+        keyboard = None
+    db.update_state(user_id, new_state)
+    bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
 # Message handlers
 def feedback(bot, update):
     admin_id = 111914928
@@ -99,6 +119,32 @@ def admin_reply(bot, update, target_id):
     bot.send_message(admin_id, msg)
 
 
+def sell_details(bot, update, item_code, column):
+    global db
+    user_id = update.message.from_user.id
+    text = update.message.text
+    db.update_item(item_code, column, text)
+    if column == 'name':
+        msg = 'Please send me a short description of the item!'
+        new_state = 'sell_%s_description' % item_code
+        keyboard = None
+    elif column == 'description':
+        msg = 'Is the item used or unused?'
+        new_state = 'sell_%s_condition' % item_code
+        keyboard = ReplyKeyboardMarkup([['Used', 'Unused']], one_time_keyboard=True)
+    elif column == 'condition':
+        msg = 'How much are you selling this item for?'
+        new_state = 'sell_%s_price'
+        keyboard = None
+    else:
+        msg = 'Your item has been listed! We will contact you as soon as you have a buyer!'
+        new_state = 'home'
+        keyboard = None
+    db.update_state(user_id, new_state)
+    bot.send_message(user_id, msg, reply_markup=keyboard)
+    return new_state
+
+
 def message_handler(bot, update):
     global db
     user_id = update.message.from_user.id
@@ -112,6 +158,11 @@ def message_handler(bot, update):
     elif state.startswith('admin_reply_'):
         target_id = int(state[12:])
         admin_reply(bot, update, target_id)
+    elif state.startswith('sell_'):
+        state_list = state.split('_')
+        item_code = state_list[1]
+        column = state_list[2]
+        sell_details(bot, update, item_code, column)
 
 
 # Main

@@ -42,11 +42,22 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
-    def get_items(self):
-        stmt = "SELECT item_id, item_name, description, condition, price FROM logs ORDER BY item_id"
-        self.cur.execute(stmt)
-        rows = self.cur.fetchall()
-        return rows
+    def get_items(self, item_id=None, user_id=None):
+        if not item_id:
+            stmt = "SELECT item_id, item_name, description, condition, price FROM logs ORDER BY item_id"
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows
+        elif not user_id:
+            stmt = "SELECT item_id, item_name FROM logs WHERE user_id = %d" % user_id
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows
+        else:
+            stmt = "SELECT item_id, item_name, description, condition, price FROM logs WHERE item_id = '%s'" % item_id
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows[0]
 
     def admin_get_items(self):
         stmt = "SELECT * FROM logs ORDER BY item_id"
@@ -67,12 +78,11 @@ class Database(object):
         stmt = "INSERT INTO logs VALUES ('%s', 'name', 'description', 'condition', 0, %d, '%s')" % (new_item_code, user_id, user_name)
         self.cur.execute(stmt)
         self.conn.commit()
+        return new_item_code
 
     def update_item(self, item_id, column, value):
-        if isinstance(value, int):
-            stmt = "UPDATE logs SET %s = %d WHERE item_id = '%s'" % (column, value, item_id)
-        elif isinstance(value, float):
-            stmt = "UPDATE logs SET %s = %.2f WHERE item_id = '%s'" % (column, value, item_id)
+        if column == 'price':
+            stmt = "UPDATE logs SET %s = %.2f WHERE item_id = '%s'" % (column, float(value), item_id)
         else:
             stmt = "UPDATE logs SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
         self.cur.execute(stmt)
