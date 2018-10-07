@@ -174,7 +174,7 @@ def main():
     dispatcher.add_handler(CommandHandler('done', done))
     dispatcher.add_handler(CommandHandler('feedback', send_feedback))
     dispatcher.add_handler(CommandHandler('admin_reply', admin_reply_command))
-    dispatcher.add_handler(CommandHandler('browse_listings', browse_listings))
+    dispatcher.add_handler(CommandHandler('browse', browse_listings))
     dispatcher.add_handler(CommandHandler('sell', sell_command))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
