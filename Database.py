@@ -94,7 +94,7 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    db.update_item('E0001', 'price', '2')
+    print(db.get_state(111914928))
     rows = db.get_items()
     for item in rows:
         print(item)

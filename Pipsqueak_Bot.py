@@ -134,7 +134,7 @@ def sell_details(bot, update, item_code, column):
         keyboard = ReplyKeyboardMarkup([['Used', 'Unused']], one_time_keyboard=True)
     elif column == 'condition':
         msg = 'How much are you selling this item for?'
-        new_state = 'sell_%s_price'
+        new_state = 'sell_%s_price' % item_code
         keyboard = None
     else:
         msg = 'Your item has been listed! We will contact you as soon as you have a buyer!'
@@ -142,7 +142,6 @@ def sell_details(bot, update, item_code, column):
         keyboard = None
     db.update_state(user_id, new_state)
     bot.send_message(user_id, msg, reply_markup=keyboard)
-    return new_state
 
 
 def message_handler(bot, update):
