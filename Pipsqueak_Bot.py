@@ -123,8 +123,6 @@ def sell_details(bot, update, item_code, column):
     global db
     user_id = update.message.from_user.id
     text = update.message.text
-    if column == 'price':
-        text = float(text)
     db.update_item(item_code, column, text)
     if column == 'name':
         msg = 'Please send me a short description of the item!'
