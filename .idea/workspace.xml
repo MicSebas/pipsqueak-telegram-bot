@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot2.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,14 +37,14 @@
           <entry key="Procfile" value="15" />
           <entry key="Python Console" value="103" />
           <entry key="dummy" value="1" />
-          <entry key="py" value="19833" />
+          <entry key="py" value="19930" />
           <entry key="txt" value="13" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="29" />
-          <entry key="Python" value="19936" />
+          <entry key="Python" value="20033" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -75,16 +76,16 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="131" column="34" selection-start-line="131" selection-start-column="34" selection-end-line="131" selection-end-column="34" />
+            <state relative-caret-position="309">
+              <caret line="130" column="42" lean-forward="true" selection-start-line="130" selection-start-column="42" selection-end-line="130" selection-end-column="42" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1539019306438" expanded="true" signature="465:662" ph="..." />
-                <marker date="1539019306438" expanded="true" signature="1982:2144" ph="..." />
-                <marker date="1539019306438" expanded="true" signature="3965:5195" ph="..." />
-                <marker date="1539019306438" expanded="true" signature="8022:9675" ph="..." />
-                <marker date="1539019306438" expanded="true" signature="9686:9691" ph="..." />
-                <marker date="1539019306438" expanded="true" signature="9686:10403" ph="..." />
+                <marker date="1539019478320" expanded="true" signature="465:662" ph="..." />
+                <marker date="1539019478320" expanded="true" signature="1982:2144" ph="..." />
+                <marker date="1539019478320" expanded="true" signature="3965:5195" ph="..." />
+                <marker date="1539019478320" expanded="true" signature="8137:9790" ph="..." />
+                <marker date="1539019478320" expanded="true" signature="9801:9806" ph="..." />
+                <marker date="1539019478320" expanded="true" signature="9801:10518" ph="..." />
               </folding>
             </state>
           </provider>
@@ -143,7 +144,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-10" />
+    <option name="x" value="287" />
+    <option name="y" value="-9" />
     <option name="width" value="1385" />
     <option name="height" value="1040" />
   </component>
@@ -303,16 +305,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="131" column="34" selection-start-line="131" selection-start-column="34" selection-end-line="131" selection-end-column="34" />
+        <state relative-caret-position="309">
+          <caret line="130" column="42" lean-forward="true" selection-start-line="130" selection-start-column="42" selection-end-line="130" selection-end-column="42" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1539019306438" expanded="true" signature="465:662" ph="..." />
-            <marker date="1539019306438" expanded="true" signature="1982:2144" ph="..." />
-            <marker date="1539019306438" expanded="true" signature="3965:5195" ph="..." />
-            <marker date="1539019306438" expanded="true" signature="8022:9675" ph="..." />
-            <marker date="1539019306438" expanded="true" signature="9686:9691" ph="..." />
-            <marker date="1539019306438" expanded="true" signature="9686:10403" ph="..." />
+            <marker date="1539019478320" expanded="true" signature="465:662" ph="..." />
+            <marker date="1539019478320" expanded="true" signature="1982:2144" ph="..." />
+            <marker date="1539019478320" expanded="true" signature="3965:5195" ph="..." />
+            <marker date="1539019478320" expanded="true" signature="8137:9790" ph="..." />
+            <marker date="1539019478320" expanded="true" signature="9801:9806" ph="..." />
+            <marker date="1539019478320" expanded="true" signature="9801:10518" ph="..." />
           </folding>
         </state>
       </provider>
