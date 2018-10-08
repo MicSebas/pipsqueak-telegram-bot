@@ -129,7 +129,8 @@ def callback_query_handler(bot, update):
             msg = 'You requested to sell an item which we may not prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data=True)],
                                              [InlineKeyboardButton('No', callback_data=False)]])
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+            print('editing message')
+            bot.edit_message(msg, user_id, msg_id, reply_markup=keyboard)
             # bot.edit_message_reply_markup(user_id, msg_id, reply_markup=keyboard)
     elif state == 'sell_Others':
         if data:
