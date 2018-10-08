@@ -20,6 +20,9 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS catalog (date TEXT NOT NULL, item_id TEXT NOT NULL, category TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
+        stmt = "CREATE TABLE IF NOT EXISTS requests (user_id BIGINT NOT NULL, name TEXT NOT NULL, item TEXT NOT NULL)"
+        self.cur.execute(stmt)
+        self.conn.commit()
 
     def drop_table(self, table_name):
         stmt = "DROP TABLE %s" % table_name
@@ -62,37 +65,47 @@ class Database(object):
 
     def get_items_dict(self, item_id=None, seller_id=None, category=None):
         if item_id:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE item_id = '%s'" % item_id
+            stmt = "SELECT date, item_id, category, name, description, price, seller_id FROM catalog WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
             item = self.cur.fetchall()[0]
-            item_d = {'date': item[0],
-                      'item_id': item[1],
-                      'category': item[2],
-                      'name': item[3],
-                      'description': item[4],
-                      'price': round(float(item[5]), 2)}
+            if item:
+                item_d = {'date': item[0],
+                          'item_id': item[1],
+                          'category': item[2],
+                          'name': item[3],
+                          'description': item[4],
+                          'price': round(float(item[5]), 2),
+                          'seller_id': item[6]}
+            else:
+                item_d = {}
             return item_d
         elif seller_id:
             stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE seller_id = '%s'" % seller_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
-            items = [{'date': item[0],
-                      'item_id': item[1],
-                      'category': item[2],
-                      'name': item[3],
-                      'description': item[4],
-                      'price': round(float(item[5]), 2)} for item in rows]
+            if rows:
+                items = [{'date': item[0],
+                          'item_id': item[1],
+                          'category': item[2],
+                          'name': item[3],
+                          'description': item[4],
+                          'price': round(float(item[5]), 2)} for item in rows]
+            else:
+                items = []
             return items
         elif category:
             stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s'" % category
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
-            items = [{'date': item[0],
-                      'item_id': item[1],
-                      'category': item[2],
-                      'name': item[3],
-                      'description': item[4],
-                      'price': round(float(item[5]), 2)} for item in rows]
+            if rows:
+                items = [{'date': item[0],
+                          'item_id': item[1],
+                          'category': item[2],
+                          'name': item[3],
+                          'description': item[4],
+                          'price': round(float(item[5]), 2)} for item in rows]
+            else:
+                items = []
             return items
         else:
             stmt = "SELECT date, item_id, category, name, description, price FROM catalog"
@@ -139,6 +152,16 @@ class Database(object):
                 stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
         else:
             stmt = "UPDATE catalog SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def add_request(self, user_id, name, item):
+        stmt = "INSERT INTO requests VALUES (%d, '%s', '%s')" % (user_id, name, item)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def delete_request(self, user_id, item):
+        stmt = "DELETE FROM requests WHERE user_id = %d AND item = '%s'" % (user_id, item)
         self.cur.execute(stmt)
         self.conn.commit()
 
