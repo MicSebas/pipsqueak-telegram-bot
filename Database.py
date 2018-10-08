@@ -60,7 +60,7 @@ class Database(object):
         rows = self.cur.fetchall()
         return rows
 
-    def get_items_dict(self, item_id=None, seller_id=None):
+    def get_items_dict(self, item_id=None, seller_id=None, category=None):
         if item_id:
             stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
@@ -74,6 +74,17 @@ class Database(object):
             return item_d
         elif seller_id:
             stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE seller_id = '%s'" % seller_id
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            items = [{'date': item[0],
+                      'item_id': item[1],
+                      'category': item[2],
+                      'name': item[3],
+                      'description': item[4],
+                      'price': round(float(item[5]), 2)} for item in rows]
+            return items
+        elif category:
+            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s'" % category
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             items = [{'date': item[0],

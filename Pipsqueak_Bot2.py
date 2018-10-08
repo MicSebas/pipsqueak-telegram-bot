@@ -71,7 +71,27 @@ def sell_command(bot, update):
         bot.send_message(user_id, msg)
     else:
         if state == 'home':
-            db.update_state('sell')
+            db.update_state(user_id, 'sell')
+        msg = 'What kind of item are you selling?'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Electronics', callback_data='Electronics')],
+                                         [InlineKeyboardButton('Stationery', callback_data='Stationery')],
+                                         [InlineKeyboardButton('Materials', callback_data='Materials')],
+                                         [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
+                                         [InlineKeyboardButton('Paints', callback_data='Paints')],
+                                         [InlineKeyboardButton('Consumables', callback_data='Consumables')],
+                                         [InlineKeyboardButton('Others', callback_data='Others')]])
+        bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+def buy_command(bot, update):
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name, 'buy')
+    if state != 'home' and state != 'buy':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first.'
+        bot.send_message(user_id, msg)
+    else:
+        if state == 'home':
+            db.update_state(user_id, 'buy')
         msg = 'What kind of item are you selling?'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Electronics', callback_data='Electronics')],
                                          [InlineKeyboardButton('Stationery', callback_data='Stationery')],
