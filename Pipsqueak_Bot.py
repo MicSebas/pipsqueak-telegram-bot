@@ -15,10 +15,10 @@ def start(bot, update):
     global db
     user_id = update.message.from_user.id
     users_list = db.get_users()
+    name = update.message.from_user.name
     if user_id not in users_list:
-        name = update.message.from_user.first_name + ' ' + update.message.from_user.last_name
-        db.add_new_user(user_id, name)
-    msg = 'Hello, @%d! Welcome to Pipsqueak SUTD, a marketplace to buy and sell your spare parts!\n\nYou can send /buy, /sell, or /browse to start trading!' % update.message.from_user.id
+        db.add_new_user(user_id, name, 'home')
+    msg = 'Hello, %s! Welcome to Pipsqueak SUTD, a marketplace to buy and sell your spare parts!\n\nYou can send /buy, /sell, or /browse to start trading!' % name
     bot.send_message(user_id, msg)
 
 

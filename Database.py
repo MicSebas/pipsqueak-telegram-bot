@@ -15,8 +15,8 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
-    def add_new_user(self, user_id, name):
-        stmt = "INSERT INTO user_database (user_id, name, state) VALUES (%d, '%s', 'home')" % (user_id, name)
+    def add_new_user(self, user_id, name, state):
+        stmt = "INSERT INTO user_database (user_id, name, state) VALUES (%d, '%s', '%s')" % (user_id, name, state)
         self.cur.execute(stmt)
         self.conn.commit()
 
@@ -25,6 +25,12 @@ class Database(object):
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         return [x[0] for x in rows]
+
+    def get_all_users(self):
+        stmt = "SELECT * FROM user_database"
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        return rows
 
     def get_state(self, user_id):
         stmt = "SELECT state FROM user_database WHERE user_id = %d" % user_id
@@ -95,6 +101,6 @@ class Database(object):
 if __name__ == '__main__':
     db = Database()
     print(db.get_users())
-    items = db.get_items()
-    for item in items:
-        print(item)
+    # items = db.get_items()
+    # for item in items:
+    #     print(item)
