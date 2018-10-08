@@ -118,6 +118,9 @@ def callback_query_handler(bot, update):
     state = db.get_state(user_id)
     data = update.callback_query.data
     msg_id = update.callback_query.message.message_id
+    print(state)
+    print(data)
+    print(msg_id)
     if state == 'sell':
         if data != 'Others':
             item_id = db.add_new_item(data, user_id)
