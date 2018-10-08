@@ -48,6 +48,14 @@ def done(bot, update):
         bot.send_message(user_id, msg)
 
 
+def force_cancel(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    db.update_state(user_id, 'home')
+    msg = 'Back to home state'
+    bot.send_message(user_id, msg)
+
+
 def browse(bot, update):
     user_id = update.message.from_user.id
     pre_check(user_id, update.message.from_user.name)
@@ -189,6 +197,7 @@ def main():
     dispatcher.add_handler(CommandHandler('done', done))
     dispatcher.add_handler(CommandHandler('browse', browse))
     dispatcher.add_handler(CommandHandler('sell', sell_command))
+    dispatcher.add_handler(CommandHandler('force_cancel', force_cancel))
 
     # dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 

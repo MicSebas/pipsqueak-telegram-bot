@@ -145,7 +145,7 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    print(db.get_users())
+    print(db.get_users(True))
     # items = db.get_items()
     # for item in items:
     #     print(item)
