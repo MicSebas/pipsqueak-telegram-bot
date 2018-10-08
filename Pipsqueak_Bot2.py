@@ -115,7 +115,9 @@ def buy_command(bot, update):
 def callback_query_handler(bot, update):
     global db
     user_id = update.callback_query.from_user.id
+    print('getting state')
     state = db.get_state(user_id)
+    print('got state')
     data = update.callback_query.data
     msg_id = update.callback_query.message.message_id
     print(state)
