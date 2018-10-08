@@ -127,13 +127,13 @@ def callback_query_handler(bot, update):
         else:
             db.update_state(user_id, 'sell_Others')
             msg = 'You requested to sell an item which we may not be prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
-            keyboard = [[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]]
+            keyboard = [[InlineKeyboardButton('Yes', callback_data='Yes'), InlineKeyboardButton('No', callback_data='No')]]
             keyboard = InlineKeyboardMarkup(keyboard)
             print('editing message')
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
             # bot.edit_message_reply_markup(user_id, msg_id, reply_markup=keyboard)
     elif state == 'sell_Others':
-        if data == 'True':
+        if data == 'Yes':
             db.update_state(user_id, 'sell_Others_request')
             msg = 'You requested for approval to sell an item. What item do you want to sell?'
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
