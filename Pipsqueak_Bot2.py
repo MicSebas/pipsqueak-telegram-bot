@@ -123,21 +123,21 @@ def callback_query_handler(bot, update):
             item_id = db.add_new_item(data, user_id)
             db.update_state(user_id, 'sell_%s_name' % item_id)
             msg = 'Selling %s.\nWhat item are you selling?' % data.lower()
-            bot.edit_message_text(msg, message_id=msg_id, reply_markup=None)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         else:
             db.update_state(user_id, 'sell_Others')
             msg = 'You requested to sell an item which we may not prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data=True), InlineKeyboardButton('No', callback_data=False)]])
-            bot.edit_message_text(msg, message_id=msg_id, reply_markup=keyboard)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif state == 'sell_Others':
         if data:
             db.update_state(user_id, 'sell_Others_request')
             msg = 'You requested for approval to sell an item. What item do you want to sell?'
-            bot.edit_message_text(msg, message_id=msg_id, reply_markup=None)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         else:
             db.update_state(user_id, 'home')
             msg = 'You cancelled the operation. Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
-            bot.edit_message_text(msg, message_id=msg_id, reply_markup=None)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif update.callback_query.message.text.startswith('Request: '):
         if data[0]:
             user_id = data[1]
