@@ -94,7 +94,7 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    print(db.get_state(111914928))
-    rows = db.get_items()
-    for item in rows:
+    print(db.get_users())
+    items = db.get_items()
+    for item in items:
         print(item)

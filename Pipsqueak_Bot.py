@@ -18,7 +18,7 @@ def start(bot, update):
     if user_id not in users_list:
         name = update.message.from_user.first_name + ' ' + update.message.from_user.last_name
         db.add_new_user(user_id, name)
-    msg = 'Hello, %s! Welcome to Pipsqueak SUTD, a marketplace to buy and sell your spare parts!\n\nYou can send /buy, /sell, or /browse to start trading!' % update.message.from_user.first_name
+    msg = 'Hello, @%s! Welcome to Pipsqueak SUTD, a marketplace to buy and sell your spare parts!\n\nYou can send /buy, /sell, or /browse to start trading!' % update.message.from_user.name
     bot.send_message(user_id, msg)
 
 
@@ -76,6 +76,14 @@ def sell_command(bot, update):
                                      [InlineKeyboardButton('Mechanical Parts', callback_data='P')],
                                      [InlineKeyboardButton('Others', callback_data='O')]])
     bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+def buy_command(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    db.update_state(user_id, 'buy')
+    msg = 'What are you buying? Please send me the item ID or name.'
+    bot.send_message(user_id, msg)
 
 
 # Callback Query Handler
@@ -142,6 +150,22 @@ def sell_details(bot, update, item_code, column):
         keyboard = None
     db.update_state(user_id, new_state)
     bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+def buy_details(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    items = db.get_items()
+    text = update.message.text
+    hits = []
+    for item in items:
+        if text == item[0]:
+            hits = item
+            break
+        elif text.lower() in item[1].lower():
+            hits.append(item)
+    if isinstance(hits, str):
+        msg = 'You are buying item %s: %s. Is this correct?' % (hits[0], hits[1])
 
 
 def message_handler(bot, update):
