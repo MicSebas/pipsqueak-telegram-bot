@@ -139,7 +139,7 @@ def callback_query_handler(bot, update):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         else:
             db.update_state(user_id, 'home')
-            msg = 'You cancelled the operation. Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
+            msg = 'You cancelled the operation. Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.callback_query.from_user.first_name
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif update.callback_query.message.text.startswith('Request: '):
         if data[0]:
