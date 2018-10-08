@@ -33,6 +33,7 @@ def start(bot, update):
 
 
 def done(bot, update):
+    global db
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state.startswith('sell') or state.startswith('buy'):
@@ -47,7 +48,6 @@ def done(bot, update):
         msg = 'You are no longer connected to the admin. Thank you for using Pipsqueak!'
         bot.send_message(int(seller_id), msg)
     elif state != 'home':
-        global db
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
