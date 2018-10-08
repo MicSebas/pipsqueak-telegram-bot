@@ -14,17 +14,21 @@ BOT.setWebhook(url='https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
 def start(bot, update):
     global db
     user_id = update.message.from_user.id
-    users_list = db.get_users()
     name = update.message.from_user.name
+    users_list = db.get_users()
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
-    msg = 'Hello, %s! Welcome to Pipsqueak SUTD, a marketplace to buy and sell your spare parts!\n\nYou can send /buy, /sell, or /browse to start trading!' % name
+    msg = 'Hello, %s! Welcome to Pipsqueak SUTD, a marketplace to buy and sell your spare parts!\n\nYou can send /buy, /sell, or /browse to start trading!' % update.message.from_user.first_name
     bot.send_message(user_id, msg)
 
 
 def done(bot, update):
     global db
     user_id = update.message.from_user.id
+    users_list = db.get_users()
+    if user_id not in users_list:
+        name = update.message.from_user.name
+        db.add_new_user(user_id, name, 'home')
     state = db.get_state(user_id)
     if state != 'home':
         msg = 'Thank you for using Pipsqueak! We look forward to your next visit, %s!' % update.message.from_user.first_name
@@ -37,7 +41,12 @@ def done(bot, update):
 def send_feedback(bot, update):
     global db
     user_id = update.message.from_user.id
-    db.update_state(user_id, 'feedback')
+    users_list = db.get_users()
+    if user_id not in users_list:
+        name = update.message.from_user.name
+        db.add_new_user(user_id, name, 'send_to_admin')
+    else:
+        db.update_state(user_id, 'send_to_admin')
     msg = 'You can send in your feedback to me now!'
     bot.send_message(user_id, msg)
 
@@ -45,6 +54,10 @@ def send_feedback(bot, update):
 def browse_listings(bot, update):
     global db
     user_id = update.message.from_user.id
+    users_list = db.get_users()
+    if user_id not in users_list:
+        name = update.message.from_user.name
+        db.add_new_user(user_id, name, 'home')
     items = db.get_items()
     file_name = 'Pipsqueak_SUTD_Listing.csv'
     f = open(file_name, 'w')
@@ -60,21 +73,33 @@ def browse_listings(bot, update):
 def admin_reply_command(bot, update):
     global db
     user_id = update.message.from_user.id
-    db.update_state(user_id, 'admin_reply')
-    msg = 'Send me the user ID of the person you want to reply to.'
+    users_list = db.get_users()
+    if user_id not in users_list:
+        name = update.message.from_user.name
+        db.add_new_user(user_id, name, 'admin_reply')
+    else:
+        db.update_state(user_id, 'admin_reply')
+    msg = 'Send me the user ID or username of the person you want to reply to.'
     bot.send_message(user_id, msg)
 
 
 def sell_command(bot, update):
     global db
     user_id = update.message.from_user.id
-    db.update_state(user_id, 'sell')
+    users_list = db.get_users()
+    if user_id not in users_list:
+        name = update.message.from_user.name
+        db.add_new_user(user_id, name, 'sell')
+    else:
+        db.update_state(user_id, 'sell')
     msg = 'What kind of item are you selling?'
-    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Tools', callback_data='T')],
-                                     [InlineKeyboardButton('Materials', callback_data='M')],
-                                     [InlineKeyboardButton('Electronics', callback_data='E')],
-                                     [InlineKeyboardButton('Mechanical Parts', callback_data='P')],
-                                     [InlineKeyboardButton('Others', callback_data='O')]])
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Electronics', callback_data='Electronics')],
+                                     [InlineKeyboardButton('Materials', callback_data='Materials')],
+                                     [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
+                                     [InlineKeyboardButton('Paints', callback_data='Paints')],
+                                     [InlineKeyboardButton('Stationery', callback_data='Stationery')],
+                                     [InlineKeyboardButton('Sundries', callback_data='Sundries')],
+                                     [InlineKeyboardButton('Others', callback_data='Others')]])
     bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
@@ -87,30 +112,44 @@ def buy_command(bot, update):
 
 
 # Callback Query Handler
+def sell_category_callback_query(bot, update):
+    global db
+    user_id = update.callback_query.from_user.id
+    msg_id = update.callback_query.message.message_id
+    data = update.callback_query.data
+    if data != 'Others':
+        new_msg = 'Selling %s. What part are you selling?' % data.lower()
+        item_list = {'Electronics': {'Consumables': ['Solder wire', 'Variable power supply', 'Batteries', 'Wire spools', 'Jumper wires', 'IC chips', 'Transistors', 'LED Strips', 'Breadboard', 'Stripboard'],
+                                     'Controllers': ['Arduino', 'Raspberry Pi', 'Sensors']},
+                     'Materials': {'Laser cutter materials': ['Plywood', 'Acrylic', 'Bristol board', 'Greyboard', 'Art card'],
+                                   'Fabrication materials': ['D-shaft', 'Bearing', 'PLA filament', 'Screws, nuts, or bolts', 'Baby\'s breath', 'Gears', 'Magnets', 'Wood veneer', 'PVC foam']},
+                     'Adhesives': ['Wood glue', 'White glue', 'UHU', 'Blu tac', 'Cyanoacrylate', 'Acrylic glue', 'Epoxy', 'Masking tape'],
+                     'Paints': ['Paints', 'Lacquer', 'Varnish', 'Wood oil'],
+                     'Stationery': ['Penknife blade', 'X-acto knife blade', 'Foam cutter wire', 'Glue applicator', 'Tracing paper'],
+                     'Sundries': ['Instant noodles', 'Biscuits', 'Snacks']}
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(x, callback_data=x)] for x in item_list[data]])
+    else:
+        new_msg = 'You\'re not selling an item that we currently want to offer. Do note that your item might be subject to moderation by the admin. Do you want to continue?'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data=True), InlineKeyboardButton('No', callback_data=False)]])
+    db.update_state(user_id, 'sell_%s' % data)
+    bot.edit_message(new_msg, message_id=msg_id, reply_markup=keyboard)
+
+
 def callback_query_handler(bot, update):
     global db
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
-    data = update.callback_query.data
     if state == 'sell':
-        user_name = update.callback_query.from_user.first_name + ' ' + update.callback_query.from_user.last_name
-        item_code = db.add_new_item(data, user_id, user_name)
-        msg = 'What are you selling?'
-        new_state = 'sell_%s_name' % item_code
-        keyboard = None
-    else:
-        msg = ''
-        new_state = state
-        keyboard = None
-    db.update_state(user_id, new_state)
-    bot.send_message(user_id, msg, reply_markup=keyboard)
+        sell_category_callback_query(bot, update)
+    elif state == 'sell_Electronics':
+        pass
 
 
 # Message handlers
 def feedback(bot, update):
     admin_id = 111914928
     sender_id = update.message.from_user.id
-    sender_name = update.message.from_user.first_name + ' ' + update.message.from_user.last_name
+    sender_name = update.message.from_user.name
     message_id = update.message.message_id
     msg = '%s (%d) said:' % (sender_name, sender_id)
     bot.send_message(admin_id, msg)
@@ -175,8 +214,25 @@ def message_handler(bot, update):
     if state == 'feedback':
         feedback(bot, update)
     elif state == 'admin_reply':
-        db.update_state(user_id, state + '_%s' % update.message.text)
-        msg = 'You can send your reply now! I will forward it to your recipient.'
+        text = update.message.text
+        all_users = db.get_users(True)
+        if int(text) in [user[0] for user in all_users]:
+            target_id = text
+            new_state = state + '_%s' % target_id
+            msg = 'You can send your reply now! I will forward it to your recipient.'
+        elif text in [user[1] for user in all_users] or text[1:] in [user[1] for user in all_users]:
+            try:
+                idx = [user[1] for user in all_users].index(text)
+                target_id = all_users[idx][0]
+            except ValueError:
+                idx = [user[1] for user in all_users].index(text[1:])
+                target_id = all_users[idx][0]
+            new_state = state + '_%d' % target_id
+            msg = 'You can send your reply now! I will forward it to your recipient.'
+        else:
+            msg = 'I can\'t find that user. Can you check again and send me the correct username or user ID?'
+            new_state = state
+        db.update_state(user_id, new_state)
         bot.send_message(user_id, msg)
     elif state.startswith('admin_reply_'):
         target_id = int(state[12:])
