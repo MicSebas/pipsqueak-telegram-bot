@@ -47,6 +47,16 @@ def done(bot, update):
         db.update_state(int(seller_id), 'home')
         msg = 'You are no longer connected to the admin. Thank you for using Pipsqueak!'
         bot.send_message(int(seller_id), msg)
+    elif state == 'feedback':
+        global admin_id
+        admin_state = db.get_state(admin_id)
+        if admin_state.startswith('forward_'):
+            msg = 'The admin is still talking to you. It might be important.'
+            bot.send_message(user_id, msg)
+        else:
+            db.update_state(user_id, 'home')
+            msg = 'Thank you for your feedback! We are always trying to improve Pipsqueak for you!'
+            bot.send_message(user_id, msg)
     elif state != 'home':
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
@@ -119,6 +129,19 @@ def buy_command(bot, update):
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='None')])
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+def feedback(bot, update):
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first.'
+        bot.send_message(user_id, msg)
+    else:
+        global db
+        msg = 'You are now connected to an admin. I will forward everything you say to them.\nUse /done when you\'re finished!'
+        db.update_state(user_id, 'feedback')
+        bot.send_message(user_id, msg)
 
 
 # Callback Query Handlers
@@ -306,6 +329,7 @@ def main():
     dispatcher.add_handler(CommandHandler('sell', sell_command))
     dispatcher.add_handler(CommandHandler('force_cancel', force_cancel))
     dispatcher.add_handler(CommandHandler('buy', buy_command))
+    dispatcher.add_handler(CommandHandler('feedback', feedback))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
