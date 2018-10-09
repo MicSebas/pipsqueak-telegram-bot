@@ -171,6 +171,7 @@ def feedback(bot, update):
 # Callback Query Handlers
 def callback_query_handler(bot, update):
     global db
+    global admin_id
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
     data = update.callback_query.data
@@ -250,7 +251,6 @@ def callback_query_handler(bot, update):
             item = db.get_items_dict(item_id)
             msg = 'Your item listing of %s: %s for $%.2f has been sent for processing! Thank you for using Pipsqueak and we hop to see you again soon!' % (item['name'], item['description'], item['price'])
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            global admin_id
             msg = 'Approval: %s (%d) has requested to list %s: %s for $%.2f.\n\nDo you approve of this listing?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (user_id, item_id)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (user_id, item_id))]])
             bot.send_message(admin_id, msg, reply_markup=keyboard)
@@ -307,7 +307,6 @@ def callback_query_handler(bot, update):
             msg = 'Purchase successful! You have purchased %s: %s for $%.2f!\n\nWe will contact you as soon as possible to arrange for a delivery time that is convenient for you! Thank you for using Pipsqueak!' % (item['name'], item['description'], item['price'])
             db.update_state(user_id, 'home')
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            global admin_id
             users_list = db.get_users(True)
             seller_name = users_list[[user[0] for user in users_list].index(item['seller_id'])][1]
             msg = 'Purchase: %s (%d) has purchased item %s: %s from %s (%d)\n\nWould you like to contact the seller now?' % (update.callback_query.from_user.name, user_id, item['item_id'], item['name'], seller_name, item['seller_id'])
