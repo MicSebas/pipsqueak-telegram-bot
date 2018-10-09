@@ -173,6 +173,7 @@ def buy_command(bot, update):
             bot.send_message(user_id, msg, reply_markup=keyboard)
         else:
             msg = 'We currently don\'t have any items listed. Please come back and check again soon!'
+            db.update_state(user_id, 'home')
             bot.send_message(user_id, msg)
 
 
