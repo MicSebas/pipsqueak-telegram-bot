@@ -351,21 +351,25 @@ def message_handler(bot, update):
     elif state.startswith('sell_') and not state.startswith('sell_Others'):
         [_, item_id, column] = state.split('_')
         text = update.message.text
-        db.update_item(item_id, column, text)
-        if column == 'name':
-            db.update_state(user_id, 'sell_%s_description' % item_id)
-            msg = 'Please send a short description of your item to help potential buyers.'
-            bot.send_message(user_id, msg)
-        elif column == 'description':
-            db.update_state(user_id, 'sell_%s_price' % item_id)
-            msg = 'How much are you selling this item for?'
+        success = db.update_item(item_id, column, text)
+        if not success:
+            msg = 'That is not a valid amount. You wanna try again?'
             bot.send_message(user_id, msg)
         else:
-            db.update_state(user_id, 'sell_%s_confirm' % item_id)
-            item = db.get_items_dict(item_id=item_id)
-            msg = 'You want to sell %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
-            bot.send_message(user_id, msg, reply_markup=keyboard)
+            if column == 'name':
+                db.update_state(user_id, 'sell_%s_description' % item_id)
+                msg = 'Please send a short description of your item to help potential buyers.'
+                bot.send_message(user_id, msg)
+            elif column == 'description':
+                db.update_state(user_id, 'sell_%s_price' % item_id)
+                msg = 'How much are you selling this item for?'
+                bot.send_message(user_id, msg)
+            else:
+                db.update_state(user_id, 'sell_%s_confirm' % item_id)
+                item = db.get_items_dict(item_id=item_id)
+                msg = 'You want to sell %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
+                bot.send_message(user_id, msg, reply_markup=keyboard)
     elif state == 'buy_request_item':
         item = update.message.text
         name = update.message.from_user.name

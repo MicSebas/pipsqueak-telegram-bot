@@ -157,11 +157,15 @@ class Database(object):
             try:
                 stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value), item_id)
             except ValueError:
-                stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
+                try:
+                    stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
+                except ValueError:
+                    return False
         else:
             stmt = "UPDATE catalog SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
         self.cur.execute(stmt)
         self.conn.commit()
+        return True
 
     def add_request(self, user_id, name, item):
         stmt = "INSERT INTO requests VALUES (%d, '%s', '%s')" % (user_id, name, item)
