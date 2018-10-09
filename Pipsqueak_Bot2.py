@@ -513,13 +513,14 @@ def message_handler(bot, update):
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak, %s! We will notify you as soon as the item is available!' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
-    elif state == 'buy':
+    elif state == 'buy' or state.startswith('buy_item'):
         item_id = update.message.text
         item = db.get_items_dict(item_id=item_id)
-        msg = 'You want to buy %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data=False)]])
-        db.update_state(user_id, 'buy_item_%s' % item_id)
-        bot.send_message(user_id, msg, reply_markup=keyboard)
+        if item:
+            msg = 'You want to buy %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
+            db.update_state(user_id, 'buy_item_%s' % item_id)
+            bot.send_message(user_id, msg, reply_markup=keyboard)
     elif state.startswith('forward_'):
         text = update.message.text
         state_list = state.split('_')
