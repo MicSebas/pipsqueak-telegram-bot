@@ -264,7 +264,7 @@ def callback_query_handler(bot, update):
         else:
             item = db.get_items_dict(item_id=data)
             msg = 'You want to buy %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data=False)]])
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
             db.update_state(user_id, 'buy_item_%s' % data)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif state.startswith('buy_item_'):
