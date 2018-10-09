@@ -333,7 +333,7 @@ def callback_query_handler(bot, update):
         bot.send_message(admin_id, msg, reply_markup=None)
     elif update.callback_query.message.text.startswith('Help: '):
         db.update_state(user_id, 'forward_%s' % data)
-        msg = 'You are now connected to %s. Use /done after you\'re finished.'
+        msg = 'You are now connected to %s. Use /done after you\'re finished.' % db.get_name(int(data))
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state == 'delete':
         db.delete_item(data)
