@@ -234,7 +234,7 @@ def callback_query_handler(bot, update):
     elif state.startswith('forward_'):
         if data.startswith('forward_'):
             seller_id = int(state.split('_')[1])
-            db.update_state(seller_id, 'home')
+            db.update_state(seller_id, 'forward_%d' % admin_id)
             msg = 'Thank you for using Pipsqueak! We hope to see you again soon!'
             bot.send_message(seller_id, msg)
             db.update_state(user_id, data)
@@ -368,7 +368,7 @@ def message_handler(bot, update):
         text = update.message.text
         success = db.update_item(item_id, column, text)
         if not success:
-            msg = 'That is not a valid amount. You wanna try again?'
+            msg = 'That is not a valid amount. Pleas try again.'
             bot.send_message(user_id, msg)
         else:
             if column == 'name':
