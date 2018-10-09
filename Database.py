@@ -215,8 +215,14 @@ class Database(object):
 
     def clear_table(self, table_name):
         stmt = "DELETE FROM %s" % table_name
-        self.cur.exacute(stmt)
+        self.cur.execute(stmt)
         self.conn.commit()
+
+    def get_feedback(self):
+        stmt = "SELECT * FROM feedback ORDER BY date, time"
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        return rows
 
 
 if __name__ == '__main__':
