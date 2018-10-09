@@ -521,6 +521,9 @@ def message_handler(bot, update):
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
             db.update_state(user_id, 'buy_item_%s' % item_id)
             bot.send_message(user_id, msg, reply_markup=keyboard)
+        else:
+            msg = 'There is no item with that code. Please try again.'
+            bot.send_message(user_id, msg)
     elif state.startswith('forward_'):
         text = update.message.text
         state_list = state.split('_')
