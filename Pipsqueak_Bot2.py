@@ -40,23 +40,22 @@ def done(bot, update):
         msg = 'You are in the middle of a transaction. Please use /cancel if you want to cancel the transaction.'
         bot.send_message(user_id, msg)
     elif state.startswith('forward_'):
-        [_, seller_id, seller_name] = state.split('_')
-        db.update_state(user_id, 'home')
-        msg = 'You are no longer connected to %s' % seller_name
-        bot.send_message(user_id, msg)
-        db.update_state(int(seller_id), 'home')
-        msg = 'You are no longer connected to the admin. Thank you for using Pipsqueak!'
-        bot.send_message(int(seller_id), msg)
-    elif state == 'feedback':
         global admin_id
-        admin_state = db.get_state(admin_id)
-        if admin_state.startswith('forward_'):
+        if user_id != admin_id:
             msg = 'The admin is still talking to you. It might be important.'
             bot.send_message(user_id, msg)
         else:
-            db.update_state(user_id, 'home')
-            msg = 'Thank you for your feedback! We are always trying to improve Pipsqueak for you!'
-            bot.send_message(user_id, msg)
+            db.update_state(admin_id, 'home')
+            msg = 'You are no longer connected to the buyer.'
+            bot.send_message(admin_id, msg)
+            buyer_id = int(state.split('_')[1])
+            msg = 'You are no longer connected to the admin. We hope to see you again soon!'
+            db.update_state(buyer_id, 'home')
+            bot.send_message(buyer_id, msg)
+    elif state == 'feedback':
+        db.update_state(user_id, 'home')
+        msg = 'Thank you for your feedback! We are always trying to improve Pipsqueak for you!'
+        bot.send_message(user_id, msg)
     elif state != 'home':
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
@@ -219,13 +218,23 @@ def callback_query_handler(bot, update):
             msg = 'Admin has unfortunately rejected your request to sell the following item: %s.\n\nWe have to filter the items that we provide to ensure they follow our company and community guidelines. We hope to see you again soon!' % item['name']
             bot.send_message(seller_id, msg)
     elif update.callback_query.message.text.startswith('Purchase: '):
-        [seller_id, seller_name] = data.split('_')
-        db.update_state(user_id, 'forward_%d' % seller_id)
-        db.update_state(int(seller_id), 'feedback')
-        msg = 'You are now connected to %s! Use /done when you\'re finished.' % seller_name
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        [seller_id, buyer_id] = data.split('_')
+        db.update_state(user_id, 'forward_%s' % seller_id)
+        db.update_state(int(seller_id), 'forward_%d' % admin_id)
+        msg = 'You are now connected to the seller! Contact the buyer when you\'ve set up a time.'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact buyer now', callback_data='forward_' + buyer_id)]])
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         msg = 'Congratulations, someone wants to purchase your item! Please wait for an admin to contact you to set up a time to pick up your item.'
         bot.send_message(int(seller_id), msg)
+    elif state.startswith('forward_'):
+        if data.startswith('forward_'):
+            seller_id = int(state.split('_')[1])
+            db.update_state(seller_id, 'home')
+            msg = 'Thank you for using Pipsqueak! We hope to see you again soon!'
+            bot.send_message(seller_id, msg)
+            db.update_state(user_id, data)
+            msg = 'You are now connected to the buyer! Use /done after you\'re finished!'
+            bot.send_message(user_id, msg)
     elif state == 'sell':
         if data != 'Others':
             item_id = db.add_new_item(data, user_id)
@@ -310,11 +319,12 @@ def callback_query_handler(bot, update):
             item = db.get_items_dict(item_id=state[9:])
             msg = 'Purchase successful! You have purchased %s: %s for $%.2f!\n\nWe will contact you as soon as possible to arrange for a delivery time that is convenient for you! Thank you for using Pipsqueak!' % (item['name'], item['description'], item['price'])
             db.update_state(user_id, 'home')
+            db.delete_item(state[9:])
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
             users_list = db.get_users(True)
             seller_name = users_list[[user[0] for user in users_list].index(item['seller_id'])][1]
             msg = 'Purchase: %s (%d) has purchased item %s: %s from %s (%d)\n\nWould you like to contact the seller now?' % (update.callback_query.from_user.name, user_id, item['item_id'], item['name'], seller_name, item['seller_id'])
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact now', callback_data='%d_%s' % (item['seller_id'], seller_name))]])
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact seller now', callback_data='%d_%d' % (item['seller_id'], user_id))]])
             bot.send_message(admin_id, msg, reply_markup=keyboard)
         else:
             db.update_state(user_id, 'home')
@@ -393,6 +403,7 @@ def message_handler(bot, update):
         bot.send_message(target_id, text)
     elif state == 'feedback':
         msg_id = update.message.message_id
+        db.add_feedback(user_id, update.message.from_user.name, update.message.text)
         bot.forward_message(admin_id, user_id, msg_id)
     else:
         msg = 'Please use /start to begin trading!'

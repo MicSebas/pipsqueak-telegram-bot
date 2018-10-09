@@ -170,6 +170,8 @@ class Database(object):
         return True
 
     def add_request(self, user_id, name, item):
+        if "'" in item:
+            item = ''.join(item.split("'"))
         stmt = "INSERT INTO requests VALUES (%d, '%s', '%s')" % (user_id, name, item)
         self.cur.execute(stmt)
         self.conn.commit()
@@ -180,7 +182,18 @@ class Database(object):
         self.conn.commit()
 
     def add_feedback(self, user_id, name, feedback):
-        pass
+        date = get_date()
+        time = get_time()
+        if "'" in feedback:
+            feedback = ''.join(feedback.split("'"))
+        stmt = "INSERT INTO feedback VALUES ('%s', '%s', %d, '%s', '%s')" % (date, time, user_id, name, feedback)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def clear_table(self, table_name):
+        stmt = "DELETE FROM %s" % table_name
+        self.cur.exacute(stmt)
+        self.conn.commit()
 
 
 if __name__ == '__main__':
