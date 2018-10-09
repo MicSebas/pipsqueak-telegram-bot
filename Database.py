@@ -21,7 +21,7 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS user_database (user_id BIGINT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
-        stmt = "CREATE TABLE IF NOT EXISTS catalog (date TEXT NOT NULL, item_id TEXT NOT NULL, category TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL)"
+        stmt = "CREATE TABLE IF NOT EXISTS catalog (date TEXT NOT NULL, item_id TEXT NOT NULL, category TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL, status TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
         stmt = "CREATE TABLE IF NOT EXISTS requests (user_id BIGINT NOT NULL, name TEXT NOT NULL, item TEXT NOT NULL)"
@@ -53,6 +53,15 @@ class Database(object):
             rows = self.cur.fetchall()
             return [x[0] for x in rows]
 
+    def get_name(self, user_id):
+        stmt = "SELECT name FROM user_database WHERE user_id = %d" % user_id
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        if rows:
+            return rows[0][0]
+        else:
+            return ''
+
     def get_state(self, user_id):
         stmt = "SELECT state FROM user_database WHERE user_id = %d" % user_id
         self.cur.execute(stmt)
@@ -64,15 +73,21 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
-    def get_items_list(self):
-        stmt = "SELECT date, item_id, category, name, description, price FROM catalog ORDER BY item_id"
-        self.cur.execute(stmt)
-        rows = self.cur.fetchall()
-        return rows
+    def get_items_list(self, in_transaction=False):
+        if not in_transaction:
+            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE status = 'Ready' ORDER BY item_id"
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows
+        else:
+            stmt = "SELECT item_id, name, description FROM catalog WHERE status != 'Ready' AND status != 'Pending' ORDER BY item_id"
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows
 
     def get_items_dict(self, item_id=None, seller_id=None, category=None):
         if item_id:
-            stmt = "SELECT date, item_id, category, name, description, price, seller_id FROM catalog WHERE item_id = '%s'" % item_id
+            stmt = "SELECT date, item_id, category, name, description, price, seller_id, status FROM catalog WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
             item = self.cur.fetchall()[0]
             if item:
@@ -82,12 +97,13 @@ class Database(object):
                           'name': item[3],
                           'description': item[4],
                           'price': round(float(item[5]), 2),
-                          'seller_id': item[6]}
+                          'seller_id': item[6],
+                          'status': item[7]}
             else:
                 item_d = {}
             return item_d
         elif seller_id:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE seller_id = '%s'" % seller_id
+            stmt = "SELECT date, item_id, category, name, description, price, status FROM catalog WHERE seller_id = '%s' AND (status = 'Ready' OR status = 'Pending')" % seller_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -96,12 +112,13 @@ class Database(object):
                           'category': item[2],
                           'name': item[3],
                           'description': item[4],
-                          'price': round(float(item[5]), 2)} for item in rows]
+                          'price': round(float(item[5]), 2),
+                          'status': item[6]} for item in rows]
             else:
                 items = []
             return items
         elif category:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s'" % category
+            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s' AND status = 'Ready'" % category
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -115,7 +132,7 @@ class Database(object):
                 items = []
             return items
         else:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog"
+            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE status = 'Ready'"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             items = [{'date': item[0],
@@ -147,7 +164,7 @@ class Database(object):
         else:
             item_id = '%s0001' % category[0]
         date = get_date()
-        stmt = "INSERT INTO catalog VALUES ('%s', '%s', '%s', 'name', 'description', 0.0, %d)" % (date, item_id, category, seller_id)
+        stmt = "INSERT INTO catalog VALUES ('%s', '%s', '%s', 'name', 'description', 0.0, %d, 'Pending')" % (date, item_id, category, seller_id)
         self.cur.execute(stmt)
         self.conn.commit()
         return item_id
@@ -180,6 +197,12 @@ class Database(object):
         stmt = "DELETE FROM requests WHERE user_id = %d AND item = '%s'" % (user_id, item)
         self.cur.execute(stmt)
         self.conn.commit()
+
+    def get_requests(self):
+        stmt = "SELECT * FROM requests"
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        return rows
 
     def add_feedback(self, user_id, name, feedback):
         date = get_date()

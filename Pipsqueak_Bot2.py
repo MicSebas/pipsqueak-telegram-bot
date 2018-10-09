@@ -28,7 +28,7 @@ def start(bot, update):
         msg = 'Hello, %s! Welcome to Pipsqueak, the marketplace by SUTD students for SUTD students!\n\nYou can /buy, /sell, and /browse spare parts and other items.' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
     else:
-        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first.'
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
         bot.send_message(user_id, msg)
 
 
@@ -45,10 +45,10 @@ def done(bot, update):
             msg = 'The admin is still talking to you. It might be important.'
             bot.send_message(user_id, msg)
         else:
+            buyer_id = int(state.split('_')[1])
             db.update_state(admin_id, 'home')
             msg = 'You are no longer connected to the buyer.'
             bot.send_message(admin_id, msg)
-            buyer_id = int(state.split('_')[1])
             msg = 'You are no longer connected to the admin. We hope to see you again soon!'
             db.update_state(buyer_id, 'home')
             bot.send_message(buyer_id, msg)
@@ -76,6 +76,19 @@ def cancel(bot, update):
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
+    elif state.startswith('forward_'):
+        global admin_id
+        if user_id != admin_id:
+            msg = 'The admin is still talking to you. It might be important.'
+            bot.send_message(user_id, msg)
+        else:
+            buyer_id = int(state.split('_')[1])
+            db.update_state(admin_id, 'home')
+            msg = 'You are no longer connected to the buyer.'
+            bot.send_message(admin_id, msg)
+            msg = 'You are no longer connected to the admin. We hope to see you again soon!'
+            db.update_state(buyer_id, 'home')
+            bot.send_message(buyer_id, msg)
     elif state.startswith('sell_'):
         state_list = state.split('_')
         item_id = state_list[1]
@@ -121,7 +134,7 @@ def sell_command(bot, update):
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name, 'sell')
     if state != 'home' and state != 'sell':
-        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first.'
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
         bot.send_message(user_id, msg)
     else:
         if state == 'home':
@@ -141,7 +154,7 @@ def buy_command(bot, update):
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name, 'buy')
     if state != 'home' and state != 'buy':
-        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first.'
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
         bot.send_message(user_id, msg)
     else:
         global db
@@ -167,13 +180,53 @@ def feedback(bot, update):
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state != 'home':
-        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first.'
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
         bot.send_message(user_id, msg)
     else:
         global db
         msg = 'You are now connected to an admin. I will forward everything you say to them.\nUse /done when you\'re finished!'
         db.update_state(user_id, 'feedback')
         bot.send_message(user_id, msg)
+
+
+def delete_listing(bot, update):
+    global db
+    global admin_id
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
+        bot.send_message(user_id, msg)
+    elif user_id == admin_id:
+        items = db.get_items_list(in_transaction=True)
+        if items:
+            msg = 'Which listing do you want to delete?\n\n'
+            keyboard = []
+            for item in items:
+                msg += '(%s) %s: %s\n' % (item[0], item[1], item[2])
+                keyboard.append([InlineKeyboardButton(item[0], callback_data=item[0])])
+            msg = msg.strip()
+            keyboard = InlineKeyboardMarkup(keyboard)
+            db.update_state(user_id, 'delete')
+            bot.send_message(user_id, msg, reply_markup=keyboard)
+        else:
+            msg = 'There are currently no items in transaction.'
+            bot.send_message(user_id, msg)
+    else:
+        items = db.get_items_dict(seller_id=user_id)
+        if items:
+            msg = 'Which listing do you want to delete?\n\n'
+            keyboard = []
+            for item in items:
+                msg += '(%s) %s: %s\n' % (item['item_id'], item['name'], item['description'])
+                keyboard.append([InlineKeyboardButton(item['item_id'], callback_data=item['item_id'])])
+            msg = msg.strip()
+            keyboard = InlineKeyboardMarkup(keyboard)
+            db.update_state(user_id, 'delete')
+            bot.send_message(user_id, msg, reply_markup=keyboard)
+        else:
+            msg = 'You currently don\'t have any items listed.'
+            bot.send_message(user_id, msg)
 
 
 # Callback Query Handlers
@@ -210,6 +263,7 @@ def callback_query_handler(bot, update):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
             seller_id = int(data[1])
             item_id = data[2]
+            db.update_item(item_id, 'status', 'Ready')
             item = db.get_items_dict(item_id=item_id)
             msg = 'Your listing of %s has been approved with item ID %s. We will contact you as soon as you have a buyer for your item! Thank you for using Pipsqueak!' % (item['name'], item_id)
             bot.send_message(seller_id, msg)
@@ -223,23 +277,51 @@ def callback_query_handler(bot, update):
             msg = 'Admin has unfortunately rejected your request to sell the following item: %s.\n\nWe have to filter the items that we provide to ensure they follow our company and community guidelines. We hope to see you again soon!' % item['name']
             bot.send_message(seller_id, msg)
     elif update.callback_query.message.text.startswith('Purchase: '):
-        [seller_id, buyer_id] = data.split('_')
-        db.update_state(user_id, 'forward_%s' % seller_id)
-        db.update_state(int(seller_id), 'forward_%d' % admin_id)
-        msg = 'You are now connected to the seller! Contact the buyer when you\'ve set up a time.'
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact buyer now', callback_data='forward_' + buyer_id)]])
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
-        msg = 'Congratulations, someone wants to purchase your item! Please wait for an admin to contact you to set up a time to pick up your item.'
-        bot.send_message(int(seller_id), msg)
+        [item_id, seller_id] = data.split('_')
+        seller_id = int(seller_id)
+        db.update_state(user_id, 'forward_%d' % seller_id)
+        seller_name = db.get_name(seller_id)
+        msg = 'Connecting to %s.' % seller_name
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        item = db.get_items_dict(item_id=item_id)
+        msg = 'Congratulations, someone wants to purchase your %s (%s)! Do you want to be connected to an admin now to arrange for delivery time?\n\nNote that this will override your current operation.' % (item['name'], item_id)
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data=item_id)]])
+        bot.send_message(seller_id, msg, reply_markup=keyboard)
+    elif update.callback_query.message.text.startswith('Congratulations, '):
+        db.update_state(user_id, 'forward_%d' % admin_id)
+        msg = 'You are now connected to an admin.'
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        msg = '%s is connected!' % update.callback_query.from_user.name
+        item = db.get_items_dict(item_id=data)
+        buyer_id = item['status']
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to buyer', callback_data='forward_%s' % buyer_id)]])
+        bot.send_message(admin_id, msg, reply_markup=keyboard)
+    elif update.callback_query.message.text.startswith('An admin is trying to'):
+        db.update_state(user_id, 'forward_%d' % admin_id)
+        msg = 'You are now connected to an admin.'
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        db.update_state(admin_id, 'forward_%d' % user_id)
+        msg = '%s is connected! Use /done when you\'re finished.' % update.callback_query.from_user.name
+        bot.send_message(admin_id, msg, reply_markup=None)
+    elif state == 'delete':
+        db.delete_item(data)
+        msg = 'Item %s successfully deleted!' % data
+        db.update_state(user_id, 'home')
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state.startswith('forward_'):
-        if data.startswith('forward_'):
+        if data.startswith('forward_') and user_id == admin_id:
             seller_id = int(state.split('_')[1])
-            db.update_state(seller_id, 'forward_%d' % admin_id)
+            db.update_state(seller_id, 'home')
             msg = 'Thank you for using Pipsqueak! We hope to see you again soon!'
             bot.send_message(seller_id, msg)
+            buyer_id = int(data.split('_')[1])
+            buyer_name = db.get_name(buyer_id)
             db.update_state(user_id, data)
-            msg = 'You are now connected to the buyer! Use /done after you\'re finished!'
-            bot.send_message(user_id, msg)
+            msg = 'Connecting to %s.' % buyer_name
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+            msg = 'An admin is trying to contact you to arrange delivery time. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
+            bot.send_message(buyer_id, msg, reply_markup=keyboard)
     elif state == 'sell':
         if data != 'Others':
             item_id = db.add_new_item(data, user_id)
@@ -324,12 +406,12 @@ def callback_query_handler(bot, update):
             item = db.get_items_dict(item_id=state[9:])
             msg = 'Purchase successful! You have purchased %s: %s for $%.2f!\n\nWe will contact you as soon as possible to arrange for a delivery time that is convenient for you! Thank you for using Pipsqueak!' % (item['name'], item['description'], item['price'])
             db.update_state(user_id, 'home')
-            db.delete_item(state[9:])
+            db.update_item(item['item_id'], 'status', str(user_id))
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            users_list = db.get_users(True)
-            seller_name = users_list[[user[0] for user in users_list].index(item['seller_id'])][1]
+            seller_id = item['seller_id']
+            seller_name = db.get_name(seller_id)
             msg = 'Purchase: %s (%d) has purchased item %s: %s from %s (%d)\n\nWould you like to contact the seller now?' % (update.callback_query.from_user.name, user_id, item['item_id'], item['name'], seller_name, item['seller_id'])
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact seller now', callback_data='%d_%d' % (item['seller_id'], user_id))]])
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact seller now', callback_data='%s_%d' % (item['item_id'], seller_id))]])
             bot.send_message(admin_id, msg, reply_markup=keyboard)
         else:
             db.update_state(user_id, 'home')
@@ -427,6 +509,7 @@ def main():
     dispatcher.add_handler(CommandHandler('buy', buy_command))
     dispatcher.add_handler(CommandHandler('feedback', feedback))
     dispatcher.add_handler(CommandHandler('cancel', cancel))
+    dispatcher.add_handler(CommandHandler('delete_listing', delete_listing))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
