@@ -138,7 +138,7 @@ class Database(object):
         self.conn.commit()
 
     def add_new_item(self, category, seller_id):
-        stmt = "SELECT item_id FROM catalog WHERE category = '%s'"
+        stmt = "SELECT item_id FROM catalog WHERE category = '%s'" % category
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         print(rows)
@@ -180,6 +180,7 @@ class Database(object):
 if __name__ == '__main__':
     db = Database()
     print(db.get_users(True))
+    print(db.add_new_item('Adhesives', 123))
     items = db.get_items_list()
     for item in items:
         print(item)
