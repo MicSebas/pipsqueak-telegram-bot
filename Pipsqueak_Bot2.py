@@ -115,9 +115,9 @@ def help_command(bot, update):
         db.update_state(user_id, 'forward_%d' % admin_id)
         msg = 'We are connecting you to an admin to assist you. Please hold.'
         bot.send_message(user_id, msg)
-        msg = 'Help: %s is trying to contact you via the helpline.'
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to %s' % update.message.from_user.id, callback_data=str(user_id))]])
-        bot.send_message(user_id, msg, reply_markup=keyboard)
+        msg = 'Help: %s is trying to contact you via the helpline.' % update.message.from_user.name
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to %s' % update.message.from_user.name, callback_data=str(user_id))]])
+        bot.send_message(admin_id, msg, reply_markup=keyboard)
 
 
 def force_cancel(bot, update):
