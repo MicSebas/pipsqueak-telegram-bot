@@ -66,6 +66,30 @@ def done(bot, update):
         bot.send_message(user_id, msg)
 
 
+def cancel(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state == 'home':
+        msg = 'You\'re not in the middle of any operation. Say /start to begin trading now!'
+        bot.send_message(user_id, msg)
+    elif state == 'sell' or state.startswith('sell_Others'):
+        db.update_state(user_id, 'home')
+        msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
+        bot.send_message(user_id, msg)
+    elif state.startswith('sell_'):
+        state_list = state.split('_')
+        item_id = state_list[1]
+        db.delete_item(item_id)
+        db.update_state(user_id, 'home')
+        msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
+        bot.send_message(user_id, msg)
+    else:
+        db.update_state(user_id, 'home')
+        msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
+        bot.send_message(user_id, msg)
+
+
 def force_cancel(bot, update):
     global db
     user_id = update.message.from_user.id
@@ -214,6 +238,7 @@ def callback_query_handler(bot, update):
                 msg += '(%s) %s: %s [$%.2f]\n' % (item['item_id'], item['name'], item['description'], item['price'])
                 keyboard.append([InlineKeyboardButton(item['item_id'], callback_data=item['item_id'])])
             msg += '\nWhich item would you like to buy?'
+            keyboard.append([InlineKeyboardButton('<< back', callback_data='back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='None')])
             keyboard = InlineKeyboardMarkup(keyboard)
             db.update_state(user_id, 'buy_item')
@@ -223,6 +248,17 @@ def callback_query_handler(bot, update):
             msg = 'Sorry that we don\'t have the item you want. Would you like to be notified as soon as we have the item available?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
             db.update_state(user_id, 'buy_request')
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        elif data == 'back':
+            msg = 'What are you buying? You can either type in the item ID or choose from the buttons below.'
+            categories = []
+            items = db.get_items_list()
+            for category in [item[2] for item in items]:
+                if category not in categories:
+                    categories.append(category)
+            keyboard = [[InlineKeyboardButton(category, callback_data=category)] for category in categories]
+            keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='None')])
+            keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             item = db.get_items_dict(item_id=data)
@@ -330,6 +366,7 @@ def main():
     dispatcher.add_handler(CommandHandler('force_cancel', force_cancel))
     dispatcher.add_handler(CommandHandler('buy', buy_command))
     dispatcher.add_handler(CommandHandler('feedback', feedback))
+    dispatcher.add_handler(CommandHandler('cancel', cancel))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
