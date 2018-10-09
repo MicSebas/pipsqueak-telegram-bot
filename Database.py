@@ -180,7 +180,6 @@ class Database(object):
 if __name__ == '__main__':
     db = Database()
     print(db.get_users(True))
-    print(db.add_new_item('Adhesives', 123))
     items = db.get_items_list()
     for item in items:
         print(item)

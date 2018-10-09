@@ -146,13 +146,17 @@ def buy_command(bot, update):
         msg = 'What are you buying? You can either type in the item ID or choose from the buttons below.'
         categories = []
         items = db.get_items_list()
-        for category in [item[2] for item in items]:
-            if category not in categories:
-                categories.append(category)
-        keyboard = [[InlineKeyboardButton(category, callback_data=category)] for category in categories]
-        keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='None')])
-        keyboard = InlineKeyboardMarkup(keyboard)
-        bot.send_message(user_id, msg, reply_markup=keyboard)
+        if items:
+            for category in [item[2] for item in items]:
+                if category not in categories:
+                    categories.append(category)
+            keyboard = [[InlineKeyboardButton(category, callback_data=category)] for category in categories]
+            keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='None')])
+            keyboard = InlineKeyboardMarkup(keyboard)
+            bot.send_message(user_id, msg, reply_markup=keyboard)
+        else:
+            msg = 'We currently don\'t have any items listed. Please come back and check again soon!'
+            bot.send_message(user_id, msg)
 
 
 def feedback(bot, update):
