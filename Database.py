@@ -177,6 +177,8 @@ class Database(object):
                     stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
                 except ValueError:
                     return False
+        elif column == 'seller_id':
+            stmt = "UPDATE catalog SET seller_id = %d WHERE item_id = '%s'" % (value, item_id)
         else:
             if "'" in value:
                 value = ''.join(value.split("'"))
@@ -232,7 +234,12 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    print(db.get_users(True))
-    items = db.get_items_list()
-    for item in items:
-        print(item)
+    users = db.get_users(True)
+    print(len(users))
+    print(users)
+    items = db.get_items_dict(seller_id=255484909)
+    for item_id in [item['item_id'] for item in items]:
+        db.update_item(item_id, 'seller_id', 180346262)
+    # items = db.get_items_list()
+    # for item in items:
+    #     print(item)
