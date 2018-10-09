@@ -162,8 +162,8 @@ class Database(object):
                 except ValueError:
                     return False
         else:
-            while "'" in value:
-                value = value.translate(None, "'")
+            if "'" in value:
+                value = ''.join(value.split("'"))
             stmt = "UPDATE catalog SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
         self.cur.execute(stmt)
         self.conn.commit()
