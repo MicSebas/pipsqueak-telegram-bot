@@ -100,15 +100,20 @@ def force_cancel(bot, update):
 def browse(bot, update):
     user_id = update.message.from_user.id
     pre_check(user_id, update.message.from_user.name)
-    filename = 'Pipsqueak_catalog.csv'
-    f = open(filename, 'w')
-    f.write('Date Listed, Item ID, Category, Item, Description, Price\n')
     items = db.get_items_list()
-    for item in items:
-        f.write('%s, %s, %s, %s, %s, $%.2f\n' % item)
-    f.close()
-    msg = 'Here are the items currently listed at Pipsqueak!'
-    bot.send_document(user_id, open(filename, 'rb'), caption=msg)
+    if items:
+        filename = 'Pipsqueak_catalog.csv'
+        f = open(filename, 'w')
+        f.write('Date Listed, Item ID, Category, Item, Description, Price\n')
+        items = db.get_items_list()
+        for item in items:
+            f.write('%s, %s, %s, %s, %s, $%.2f\n' % item)
+        f.close()
+        msg = 'Here are the items currently listed at Pipsqueak!'
+        bot.send_document(user_id, open(filename, 'rb'), caption=msg)
+    else:
+        msg = 'We currently don\'t have any items listed. Please come back and check again soon!'
+        bot.send_message(user_id, msg)
 
 
 def sell_command(bot, update):
