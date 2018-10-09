@@ -7,6 +7,9 @@ from datetime import datetime
 def get_date():
     return str(datetime.now(pytz.timezone('Asia/Singapore')).date())
 
+def get_time():
+    return str(datetime.now(pytz.timezone('Asia/Singapore')).time())[:8]
+
 
 class Database(object):
 
@@ -21,6 +24,9 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
         stmt = "CREATE TABLE IF NOT EXISTS requests (user_id BIGINT NOT NULL, name TEXT NOT NULL, item TEXT NOT NULL)"
+        self.cur.execute(stmt)
+        self.conn.commit()
+        stmt = "CREATE TABLE IF NOT EXISTS feedback (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, name TEXT NOT NULL, feedback TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
 
@@ -135,7 +141,7 @@ class Database(object):
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         if rows:
-            item_id = '%s%04d' % (category[0], int(rows[-1][0][1:]) + 1)
+            item_id = '%s%04d' % (category[0], int(rows[-1][1][1:]) + 1)
         else:
             item_id = '%s0001' % category[0]
         date = get_date()
@@ -165,10 +171,13 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
+    def add_feedback(self, user_id, name, feedback):
+        pass
+
 
 if __name__ == '__main__':
     db = Database()
     print(db.get_users(True))
-    # items = db.get_items()
-    # for item in items:
-    #     print(item)
+    items = db.get_items_list()
+    for item in items:
+        print(item)

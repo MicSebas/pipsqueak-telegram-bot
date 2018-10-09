@@ -250,6 +250,7 @@ def callback_query_handler(bot, update):
             db.update_state(user_id, 'buy_request')
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         elif data == 'back':
+            db.update_state(user_id, 'buy')
             msg = 'What are you buying? You can either type in the item ID or choose from the buttons below.'
             categories = []
             items = db.get_items_list()
