@@ -141,6 +141,7 @@ class Database(object):
         stmt = "SELECT item_id FROM catalog WHERE category = '%s'"
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
+        print(rows)
         if rows:
             item_id = '%s%04d' % (category[0], max([int(item[0][1:]) for item in rows]) + 1)
         else:

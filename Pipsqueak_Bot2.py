@@ -248,10 +248,10 @@ def callback_query_handler(bot, update):
             db.update_state(user_id, 'home')
             state_list = state.split('_')
             item_id = state_list[1]
-            item = db.get_items_dict(item_id)
-            msg = 'Your item listing of %s: %s for $%.2f has been sent for processing! Thank you for using Pipsqueak and we hop to see you again soon!' % (item['name'], item['description'], item['price'])
+            item = db.get_items_dict(item_id=item_id)
+            msg = 'Your item listing of %s: %s for $%.2f has been sent for processing! Thank you for using Pipsqueak and we hope to see you again soon!' % (item['name'], item['description'], item['price'])
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            msg = 'Approval: %s (%d) has requested to list %s: %s for $%.2f.\n\nDo you approve of this listing?'
+            msg = 'Approval: %s (%d) has requested to list %s: %s for $%.2f.\n\nDo you approve of this listing?' % (update.callback_query.from_user.name, user_id, item['name'], item['description'], item['price'])
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (user_id, item_id)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (user_id, item_id))]])
             bot.send_message(admin_id, msg, reply_markup=keyboard)
         else:
