@@ -47,7 +47,8 @@ def done(bot, update):
         else:
             buyer_id = int(state.split('_')[1])
             db.update_state(admin_id, 'home')
-            msg = 'You are no longer connected to the buyer.'
+            name = db.get_name(buyer_id)
+            msg = 'You are no longer connected to %s.' % name
             bot.send_message(admin_id, msg)
             msg = 'You are no longer connected to the admin. We hope to see you again soon!'
             db.update_state(buyer_id, 'home')
@@ -100,6 +101,23 @@ def cancel(bot, update):
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
+
+
+def help_command(bot, update):
+    global db
+    global admin_id
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
+        bot.send_message(user_id, msg)
+    else:
+        db.update_state(user_id, 'forward_%d' % admin_id)
+        msg = 'We are connecting you to an admin to assist you. Please hold.'
+        bot.send_message(user_id, msg)
+        msg = 'Help: %s is trying to contact you via the helpline.'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to %s' % update.message.from_user.id, callback_data=str(user_id))]])
+        bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
 def force_cancel(bot, update):
@@ -313,6 +331,10 @@ def callback_query_handler(bot, update):
         db.update_state(admin_id, 'forward_%d' % user_id)
         msg = '%s is connected! Use /done when you\'re finished.' % update.callback_query.from_user.name
         bot.send_message(admin_id, msg, reply_markup=None)
+    elif update.callback_query.message.text.startswith('Help: '):
+        db.update_state(user_id, 'forward_%s' % data)
+        msg = 'You are now connected to %s. Use /done after you\'re finished.'
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state == 'delete':
         db.delete_item(data)
         msg = 'Item %s successfully deleted!' % data
@@ -526,6 +548,7 @@ def main():
     dispatcher.add_handler(CommandHandler('cancel', cancel))
     dispatcher.add_handler(CommandHandler('delete_listing', delete_listing))
     dispatcher.add_handler(CommandHandler('_delete', admin_delete))
+    dispatcher.add_handler(CommandHandler('help', help_command))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
