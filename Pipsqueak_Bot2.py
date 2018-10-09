@@ -401,9 +401,9 @@ def callback_query_handler(bot, update):
             msg = 'We have these items in that category:\n\n'
             keyboard = []
             for item in items:
-                msg += '(%s) %s: %s [$%.2f]\n' % (item['item_id'], item['name'], item['description'], item['price'])
+                msg += '(%s) %s: %s [$%.2f]\n\n' % (item['item_id'], item['name'], item['description'], item['price'])
                 keyboard.append([InlineKeyboardButton(item['item_id'], callback_data=item['item_id'])])
-            msg += '\nWhich item would you like to buy?'
+            msg += 'Which item would you like to buy?'
             keyboard.append([InlineKeyboardButton('<< back', callback_data='back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='None')])
             keyboard = InlineKeyboardMarkup(keyboard)
