@@ -191,27 +191,27 @@ def feedback(bot, update):
 
 def delete_listing(bot, update):
     global db
-    global admin_id
+    # global admin_id
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state != 'home':
         msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
         bot.send_message(user_id, msg)
-    elif user_id == admin_id:
-        items = db.get_items_list(in_transaction=True)
-        if items:
-            msg = 'Which listing do you want to delete?\n\n'
-            keyboard = []
-            for item in items:
-                msg += '(%s) %s: %s\n' % (item[0], item[1], item[2])
-                keyboard.append([InlineKeyboardButton(item[0], callback_data=item[0])])
-            msg = msg.strip()
-            keyboard = InlineKeyboardMarkup(keyboard)
-            db.update_state(user_id, 'delete')
-            bot.send_message(user_id, msg, reply_markup=keyboard)
-        else:
-            msg = 'There are currently no items in transaction.'
-            bot.send_message(user_id, msg)
+    # elif user_id == admin_id:
+    #     items = db.get_items_list(in_transaction=True)
+    #     if items:
+    #         msg = 'Which listing do you want to delete?\n\n'
+    #         keyboard = []
+    #         for item in items:
+    #             msg += '(%s) %s: %s\n' % (item[0], item[1], item[2])
+    #             keyboard.append([InlineKeyboardButton(item[0], callback_data=item[0])])
+    #         msg = msg.strip()
+    #         keyboard = InlineKeyboardMarkup(keyboard)
+    #         db.update_state(user_id, 'delete')
+    #         bot.send_message(user_id, msg, reply_markup=keyboard)
+    #     else:
+    #         msg = 'There are currently no items in transaction.'
+    #         bot.send_message(user_id, msg)
     else:
         items = db.get_items_dict(seller_id=user_id)
         if items:
@@ -226,6 +226,34 @@ def delete_listing(bot, update):
             bot.send_message(user_id, msg, reply_markup=keyboard)
         else:
             msg = 'You currently don\'t have any items listed.'
+            bot.send_message(user_id, msg)
+
+
+def admin_delete(bot, update):
+    global db
+    global admin_id
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if user_id != admin_id:
+        msg = 'You don\'t have access to this command.'
+        bot.send_message(user_id, msg)
+    elif state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
+        bot.send_message(user_id, msg)
+    else:
+        items = db.get_items_list(in_transaction=True)
+        if items:
+            msg = 'Which listing do you want to delete?\n\n'
+            keyboard = []
+            for item in items:
+                msg += '(%s) %s: %s\n' % (item[0], item[1], item[2])
+                keyboard.append([InlineKeyboardButton(item[0], callback_data=item[0])])
+            msg = msg.strip()
+            keyboard = InlineKeyboardMarkup(keyboard)
+            db.update_state(user_id, 'delete')
+            bot.send_message(user_id, msg, reply_markup=keyboard)
+        else:
+            msg = 'There are currently no items in transaction.'
             bot.send_message(user_id, msg)
 
 
@@ -510,11 +538,12 @@ def main():
     dispatcher.add_handler(CommandHandler('done', done))
     dispatcher.add_handler(CommandHandler('browse', browse))
     dispatcher.add_handler(CommandHandler('sell', sell_command))
-    dispatcher.add_handler(CommandHandler('force_cancel', force_cancel))
+    dispatcher.add_handler(CommandHandler('_cancel', force_cancel))
     dispatcher.add_handler(CommandHandler('buy', buy_command))
     dispatcher.add_handler(CommandHandler('feedback', feedback))
     dispatcher.add_handler(CommandHandler('cancel', cancel))
     dispatcher.add_handler(CommandHandler('delete_listing', delete_listing))
+    dispatcher.add_handler(CommandHandler('_delete', admin_delete))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
