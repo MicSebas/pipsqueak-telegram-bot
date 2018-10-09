@@ -7,6 +7,7 @@ from datetime import datetime
 def get_date():
     return str(datetime.now(pytz.timezone('Asia/Singapore')).date())
 
+
 def get_time():
     return str(datetime.now(pytz.timezone('Asia/Singapore')).time())[:8]
 
@@ -137,11 +138,11 @@ class Database(object):
         self.conn.commit()
 
     def add_new_item(self, category, seller_id):
-        stmt = "SELECT item_id FROM catalog WHERE category = '%s' ORDER BY item_id"
+        stmt = "SELECT item_id FROM catalog WHERE category = '%s'"
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         if rows:
-            item_id = '%s%04d' % (category[0], int(rows[-1][1][1:]) + 1)
+            item_id = '%s%04d' % (category[0], max([int(item[0][1:]) for item in rows]) + 1)
         else:
             item_id = '%s0001' % category[0]
         date = get_date()
