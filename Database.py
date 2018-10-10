@@ -229,9 +229,9 @@ class Database(object):
 if __name__ == '__main__':
     db = Database()
     users = db.get_users(True)
-    print(len(users))
     for user in users:
         print(user)
     items = db._get_items_admin()
     for item in items:
         print(item)
+    print(len(users))

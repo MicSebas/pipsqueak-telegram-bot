@@ -168,6 +168,7 @@ def sell_command(bot, update):
         if state == 'home':
             db.update_state(user_id, 'sell')
         msg = 'What kind of item are you selling?'
+        msg += '\n\nPlease note that due to company policy, we will not list any item that can be acquired from the Fab Lab for free. We seek your kind understanding on this matter.'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Electronics', callback_data='Electronics')],
                                          [InlineKeyboardButton('Stationery', callback_data='Stationery')],
                                          [InlineKeyboardButton('Materials', callback_data='Materials')],
@@ -288,38 +289,7 @@ def callback_query_handler(bot, update):
     state = db.get_state(user_id)
     data = update.callback_query.data
     msg_id = update.callback_query.message.message_id
-    if update.callback_query.message.text.startswith('Request: '):
-        data = data.split('_')
-        if data[0] == 'True':
-            msg = 'Request approved.'
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            seller_id = int(data[1])
-            item = data[2]
-            item_id = db.add_new_item('Others', seller_id)
-            db.update_item(item_id, 'name', item)
-            db.update_state(seller_id, 'sell_%s_description' % item_id)
-            msg = 'Admin has APPROVED your request to sell the following item: %s.\n\nPlease send a short description to help potential buyers.' % item
-            bot.send_message(seller_id, msg)
-        elif data[0] == 'False':
-            msg = 'Request denied.'
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            seller_id = int(data[1])
-            item = data[2]
-            msg = 'Admin has unfortunately rejected your request to sell the following item: %s.\n\nWe have to filter the items that we provide to ensure they follow our company and community guidelines. We hope to see you again soon!' % item
-            bot.send_message(seller_id, msg)
-        else:
-            seller_id = int(data[1])
-            item = data[2]
-            name = db.get_name(seller_id)
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (seller_id, item)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (seller_id, item))]])
-            bot.edit_message_reply_markup(user_id, msg_id, reply_markup=keyboard)
-            msg = 'Connecting to %s.' % name
-            db.update_state(user_id, 'forward_%d' % seller_id)
-            bot.send_message(user_id, msg)
-            msg = 'An admin is trying to contact you regarding your item. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
-            bot.send_message(seller_id, msg, reply_markup=keyboard)
-    elif update.callback_query.message.text.startswith('Approval: '):
+    if update.callback_query.message.text.startswith('Approval: '):
         data = data.split('_')
         if data[0] == 'True':
             msg = 'Request approved.'
@@ -337,7 +307,7 @@ def callback_query_handler(bot, update):
             item_id = data[2]
             item = db.get_items_dict(item_id=item_id)
             db.delete_item(item_id)
-            msg = 'Admin has unfortunately rejected your request to sell the following item: %s.\n\nWe have to filter the items that we provide to ensure they follow our company and community guidelines. We hope to see you again soon!' % item['name']
+            msg = 'Admin has unfortunately rejected your request to sell the following item: %s.\n\nWe have to filter the items that we provide to ensure they follow our company and community guidelines (e.g. not selling things you can get from the Fab Lab for free). We seek your kind understanding on this matter.' % item['name']
             bot.send_message(seller_id, msg)
         else:
             seller_id = int(data[1])
@@ -351,6 +321,37 @@ def callback_query_handler(bot, update):
             msg = 'An admin is trying to contact you regarding your item. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
             bot.send_message(seller_id, msg, reply_markup=keyboard)
+    # elif update.callback_query.message.text.startswith('Request: '):
+    #     data = data.split('_')
+    #     if data[0] == 'True':
+    #         msg = 'Request approved.'
+    #         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+    #         seller_id = int(data[1])
+    #         item = data[2]
+    #         item_id = db.add_new_item('Others', seller_id)
+    #         db.update_item(item_id, 'name', item)
+    #         db.update_state(seller_id, 'sell_%s_description' % item_id)
+    #         msg = 'Admin has APPROVED your request to sell the following item: %s.\n\nPlease send a short description to help potential buyers.' % item
+    #         bot.send_message(seller_id, msg)
+    #     elif data[0] == 'False':
+    #         msg = 'Request denied.'
+    #         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+    #         seller_id = int(data[1])
+    #         item = data[2]
+    #         msg = 'Admin has unfortunately rejected your request to sell the following item: %s.\n\nWe have to filter the items that we provide to ensure they follow our company and community guidelines (e.g. not selling things you can get from the Fab Lab for free). We seek your kind understanding on this matter.' % item
+    #         bot.send_message(seller_id, msg)
+    #     else:
+    #         seller_id = int(data[1])
+    #         item = data[2]
+    #         name = db.get_name(seller_id)
+    #         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (seller_id, item)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (seller_id, item))]])
+    #         bot.edit_message_reply_markup(user_id, msg_id, reply_markup=keyboard)
+    #         msg = 'Connecting to %s.' % name
+    #         db.update_state(user_id, 'forward_%d' % seller_id)
+    #         bot.send_message(user_id, msg)
+    #         msg = 'An admin is trying to contact you regarding your item. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
+    #         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
+    #         bot.send_message(seller_id, msg, reply_markup=keyboard)
     elif update.callback_query.message.text.startswith('Purchase: '):
         [item_id, seller_id] = data.split('_')
         seller_id = int(seller_id)
@@ -403,17 +404,22 @@ def callback_query_handler(bot, update):
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
             bot.send_message(buyer_id, msg, reply_markup=keyboard)
     elif state == 'sell':
+        # if data != 'Others':
+        item_id = db.add_new_item(data, user_id)
+        db.update_state(user_id, 'sell_%s_name' % item_id)
         if data != 'Others':
-            item_id = db.add_new_item(data, user_id)
-            db.update_state(user_id, 'sell_%s_name' % item_id)
             msg = 'What %s are you selling?' % data.lower()
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         else:
-            db.update_state(user_id, 'sell_Others')
-            msg = 'You requested to sell an item which we may not be prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
-            keyboard = [[InlineKeyboardButton('Yes', callback_data='Yes'), InlineKeyboardButton('No', callback_data='No')]]
-            keyboard = InlineKeyboardMarkup(keyboard)
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+            msg = 'What item are you selling?'
+        if data == 'Electronics':
+            msg += '\n\nPlease note that due to company policy, we will not list any item that can be acquired from the Fab Lab for free. We seek your kind understanding on this matter.'
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        # else:
+        #     db.update_state(user_id, 'sell_Others')
+        #     msg = 'You requested to sell an item which we may not be prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
+        #     keyboard = [[InlineKeyboardButton('Yes', callback_data='Yes'), InlineKeyboardButton('No', callback_data='No')]]
+        #     keyboard = InlineKeyboardMarkup(keyboard)
+        #     bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif state == 'sell_Others':
         if data == 'Yes':
             db.update_state(user_id, 'sell_Others_request')
