@@ -257,6 +257,19 @@ def admin_delete(bot, update):
             bot.send_message(user_id, msg)
 
 
+def admin_forward(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
+        bot.send_message(user_id, msg)
+    else:
+        msg = 'Who do you want to connect to?'
+        db.update_state(user_id, 'forward')
+        bot.send_message(user_id, msg)
+
+
 # Callback Query Handlers
 def callback_query_handler(bot, update):
     global db
@@ -333,7 +346,8 @@ def callback_query_handler(bot, update):
         seller_id = int(seller_id)
         db.update_state(user_id, 'forward_%d' % seller_id)
         seller_name = db.get_name(seller_id)
-        msg = 'Connecting to %s.' % seller_name
+        msg = update.callback_query.message.text
+        msg += '\n\nConnecting to %s.' % seller_name
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         item = db.get_items_dict(item_id=item_id)
         msg = 'Congratulations, someone wants to purchase your %s (%s)! Do you want to be connected to an admin now to arrange for delivery time?\n\nNote that this will override your current operation.' % (item['name'], item_id)
@@ -548,6 +562,16 @@ def message_handler(bot, update):
         else:
             msg = 'There is no item with that code. Please try again.'
             bot.send_message(user_id, msg)
+    elif state == 'forward':
+        users = db.get_users(True)
+        text = update.message.text
+        users = {user[1]: user[0] for user in users}
+        if text in users:
+            db.update_state(user_id, 'forward_%d' % users[text])
+            msg = 'Connecting tp %s.' % users[text]
+        else:
+            msg = 'There are no users with that name. Please try again.'
+        bot.send_message(user_id, msg)
     elif state.startswith('forward_'):
         text = update.message.text
         state_list = state.split('_')
@@ -577,6 +601,7 @@ def main():
     dispatcher.add_handler(CommandHandler('delete_listing', delete_listing))
     dispatcher.add_handler(CommandHandler('_delete', admin_delete))
     dispatcher.add_handler(CommandHandler('help', help_command))
+    dispatcher.add_handler(CommandHandler('_forward', admin_forward))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
