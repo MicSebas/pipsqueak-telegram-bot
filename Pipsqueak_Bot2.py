@@ -286,11 +286,13 @@ def callback_query_handler(bot, update):
             bot.send_message(seller_id, msg)
         else:
             seller_id = int(data[1])
+            item = data[2]
             name = db.get_name(seller_id)
-            msg = update.callback_query.message.text
-            msg += '\n\nConnecting to %s.' % name
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (seller_id, item)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (seller_id, item))]])
+            bot.edit_message_reply_markup(user_id, msg_id, reply_markup=keyboard)
+            msg = 'Connecting to %s.' % name
             db.update_state(user_id, 'forward_%d' % seller_id)
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+            bot.send_message(user_id, msg)
             msg = 'An admin is trying to contact you regarding your item. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
             bot.send_message(seller_id, msg, reply_markup=keyboard)
@@ -316,11 +318,13 @@ def callback_query_handler(bot, update):
             bot.send_message(seller_id, msg)
         else:
             seller_id = int(data[1])
+            item_id = data[2]
             name = db.get_name(seller_id)
-            msg = update.callback_query.message.text
-            msg += '\n\nConnecting to %s.' % name
+            keyboard = InlineKeyboardButton([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (seller_id, item_id)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (seller_id, item_id))]])
+            bot.edit_message_reply_markup(user_id, msg_id, reply_markup=keyboard)
+            msg = 'Connecting to %s.' % name
             db.update_state(user_id, 'forward_%d' % seller_id)
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+            bot.send_message(user_id, msg)
             msg = 'An admin is trying to contact you regarding your item. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
             bot.send_message(seller_id, msg, reply_markup=keyboard)

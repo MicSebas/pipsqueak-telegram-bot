@@ -236,10 +236,8 @@ if __name__ == '__main__':
     db = Database()
     users = db.get_users(True)
     print(len(users))
-    print(users)
-    items = db.get_items_dict(seller_id=255484909)
-    for item_id in [item['item_id'] for item in items]:
-        db.update_item(item_id, 'seller_id', 180346262)
-    # items = db.get_items_list()
-    # for item in items:
-    #     print(item)
+    for user in users:
+        print(user)
+    items = db._get_items_admin()
+    for item in items:
+        print(item)
