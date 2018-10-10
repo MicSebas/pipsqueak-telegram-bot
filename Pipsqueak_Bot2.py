@@ -565,13 +565,20 @@ def message_handler(bot, update):
     elif state == 'forward':
         users = db.get_users(True)
         text = update.message.text
-        users = {user[1]: user[0] for user in users}
-        if text in users:
-            db.update_state(user_id, 'forward_%d' % users[text])
-            msg = 'Connecting tp %s.' % users[text]
-        else:
-            msg = 'There are no users with that name. Please try again.'
-        bot.send_message(user_id, msg)
+        found = False
+        for user in users:
+            if text.lower() == user[1].lower() or '@' + text.lower() == user[1].lower():
+                db.update_state(user_id, 'forward_%d' % user[0])
+                msg = 'Connecting to %s.' % user[1]
+                bot.send_message(user_id, msg)
+                msg = 'An admin is trying to contact you. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % user_id)]])
+                bot.send_message(user[0], msg, reply_markup=keyboard)
+                found = True
+                break
+        if not found:
+            msg = 'There is no user with that name. Please try again.'
+            bot.send_message(user_id, msg)
     elif state.startswith('forward_'):
         text = update.message.text
         state_list = state.split('_')
