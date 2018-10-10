@@ -414,21 +414,21 @@ def callback_query_handler(bot, update):
         if data == 'Electronics':
             msg += '\n\nPlease note that due to company policy, we will not list any item that can be acquired from the Fab Lab for free. We seek your kind understanding on this matter.'
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-        # else:
-        #     db.update_state(user_id, 'sell_Others')
-        #     msg = 'You requested to sell an item which we may not be prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
-        #     keyboard = [[InlineKeyboardButton('Yes', callback_data='Yes'), InlineKeyboardButton('No', callback_data='No')]]
-        #     keyboard = InlineKeyboardMarkup(keyboard)
-        #     bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
-    elif state == 'sell_Others':
-        if data == 'Yes':
-            db.update_state(user_id, 'sell_Others_request')
-            msg = 'You requested for approval to sell an item. What item do you want to sell?'
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-        else:
-            db.update_state(user_id, 'home')
-            msg = 'You cancelled the operation. Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.callback_query.from_user.first_name
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+    #     else:
+    #         db.update_state(user_id, 'sell_Others')
+    #         msg = 'You requested to sell an item which we may not be prepared to host.\n\nBefore proceeding, please note that your request may be moderated and subject to approval. Do you want to continue?'
+    #         keyboard = [[InlineKeyboardButton('Yes', callback_data='Yes'), InlineKeyboardButton('No', callback_data='No')]]
+    #         keyboard = InlineKeyboardMarkup(keyboard)
+    #         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    # elif state == 'sell_Others':
+    #     if data == 'Yes':
+    #         db.update_state(user_id, 'sell_Others_request')
+    #         msg = 'You requested for approval to sell an item. What item do you want to sell?'
+    #         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+    #     else:
+    #         db.update_state(user_id, 'home')
+    #         msg = 'You cancelled the operation. Thank you for using Pipsqueak! We hope to see you again soon, %s!' % update.callback_query.from_user.first_name
+    #         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state.startswith('sell_') and state.endswith('_confirm'):
         if data == 'True':
             db.update_state(user_id, 'home')
@@ -528,15 +528,7 @@ def message_handler(bot, update):
     global admin_id
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
-    if state == 'sell_Others_request':
-        text = update.message.text
-        msg = 'Request: %s (%d) has requested to sell the following item: %s.\n\nDo you approve of this listing?' % (update.message.from_user.name, user_id, text)
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (user_id, text)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (user_id, text)), InlineKeyboardButton('Contact', callback_data='Contact_%d_%s' % (user_id, text))]])
-        bot.send_message(admin_id, msg, reply_markup=keyboard)
-        msg = 'We have sent your request to an admin. We will get back to you as soon as possible. Thank you for using Pipsqueak!'
-        db.update_state(user_id, 'home')
-        bot.send_message(user_id, msg)
-    elif state.startswith('sell_') and not state.startswith('sell_Others'):
+    if state.startswith('sell_') and not state.startswith('sell_Others'):
         [_, item_id, column] = state.split('_')
         text = update.message.text
         success = db.update_item(item_id, column, text)
@@ -558,6 +550,14 @@ def message_handler(bot, update):
                 msg = 'You want to sell %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
                 bot.send_message(user_id, msg, reply_markup=keyboard)
+    # elif state == 'sell_Others_request':
+    #     text = update.message.text
+    #     msg = 'Request: %s (%d) has requested to sell the following item: %s.\n\nDo you approve of this listing?' % (update.message.from_user.name, user_id, text)
+    #     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (user_id, text)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (user_id, text)), InlineKeyboardButton('Contact', callback_data='Contact_%d_%s' % (user_id, text))]])
+    #     bot.send_message(admin_id, msg, reply_markup=keyboard)
+    #     msg = 'We have sent your request to an admin. We will get back to you as soon as possible. Thank you for using Pipsqueak!'
+    #     db.update_state(user_id, 'home')
+    #     bot.send_message(user_id, msg)
     elif state == 'buy_request_item':
         item = update.message.text
         name = update.message.from_user.name
