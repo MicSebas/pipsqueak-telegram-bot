@@ -138,7 +138,17 @@ def browse(bot, update):
         f.write('Date Listed, Item ID, Category, Item, Description, Price\n')
         items = db.get_items_list()
         for item in items:
-            f.write('%s, %s, %s, %s, %s, $%.2f\n' % item)
+            date = item[0]
+            item_id = item[1]
+            category = item[2]
+            name = item[3]
+            if ',' in name:
+                name = ' '.join(name.split(','))
+            description = item[4]
+            if ',' in description:
+                description = ' '.join(description.split(','))
+            price = item[5]
+            f.write('%s, %s, %s, %s, %s, $%.2f\n' % (date, item_id, category, name, description, price))
         f.close()
         msg = 'Here are the items currently listed at Pipsqueak!'
         bot.send_document(user_id, open(filename, 'rb'), caption=msg)

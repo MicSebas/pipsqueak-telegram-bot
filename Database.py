@@ -182,8 +182,6 @@ class Database(object):
         else:
             if "'" in value:
                 value = ''.join(value.split("'"))
-            if ',' in value:
-                value = ' '.join(value.split(','))
             stmt = "UPDATE catalog SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
         self.cur.execute(stmt)
         self.conn.commit()
@@ -192,8 +190,6 @@ class Database(object):
     def add_request(self, user_id, name, item):
         if "'" in item:
             item = ''.join(item.split("'"))
-        if ',' in item:
-            item = ' '.join(item.split(','))
         stmt = "INSERT INTO requests VALUES (%d, '%s', '%s')" % (user_id, name, item)
         self.cur.execute(stmt)
         self.conn.commit()
@@ -214,8 +210,6 @@ class Database(object):
         time = get_time()
         if "'" in feedback:
             feedback = ''.join(feedback.split("'"))
-        if ',' in feedback:
-            feedback = ' '.join(feedback.split(','))
         stmt = "INSERT INTO feedback VALUES ('%s', '%s', %d, '%s', '%s')" % (date, time, user_id, name, feedback)
         self.cur.execute(stmt)
         self.conn.commit()
