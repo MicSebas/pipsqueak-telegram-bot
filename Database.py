@@ -30,6 +30,22 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS feedback (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, name TEXT NOT NULL, feedback TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
+        stmt = "CREATE TABLE IF NOT EXISTS mascot_names (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, submission TEXT NOT NULL)"
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def add_mascot_name(self, user_id, user_name, submission):
+        date = get_date()
+        time = get_time()
+        stmt = "INSERT INTO mascot_names VALUES ('%s', '%s', %d, '%s', '%s')" % (date, time, user_id, user_name, submission)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def get_mascot_names(self):
+        stmt = "SELECT * FROM mascot_names ORDER BY date, time"
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        return rows
 
     def drop_table(self, table_name):
         stmt = "DROP TABLE %s" % table_name

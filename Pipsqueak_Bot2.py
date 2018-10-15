@@ -294,6 +294,19 @@ def admin_broadcast(bot, update):
         bot.send_message(user_id, msg)
 
 
+def name_mascot(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
+        bot.send_message(user_id, msg)
+    else:
+        db.update_state(user_id, 'name')
+        msg = 'What name do you want to give to our new mascot?'
+        bot.send_message(user_id, msg)
+
+
 # Callback Query Handlers
 def callback_query_handler(bot, update):
     global db
@@ -625,6 +638,13 @@ def message_handler(bot, update):
             bot.send_message(user, text)
         msg = 'Message broadcast successful!'
         bot.send_message(user_id, msg)
+    elif state == 'name':
+        text = update.message.text
+        name = update.message.from_user.name
+        db.add_mascot_name(user_id, name, text)
+        db.update_state(user_id, 'home')
+        msg = 'Your submission has been received! Thank you for using Pipsqueak!'
+        bot.send_message(user_id, msg)
     else:
         msg = 'Please use /start to begin trading!'
         bot.send_message(user_id, msg)
@@ -647,6 +667,7 @@ def main():
     dispatcher.add_handler(CommandHandler('help', help_command))
     dispatcher.add_handler(CommandHandler('_forward', admin_forward))
     dispatcher.add_handler(CommandHandler('_broadcast', admin_broadcast))
+    dispatcher.add_handler(CommandHandler('name_mascot', name_mascot))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
