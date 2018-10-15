@@ -177,8 +177,8 @@ class Database(object):
                     stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
                 except ValueError:
                     return False
-        elif column == 'seller_id':
-            stmt = "UPDATE catalog SET seller_id = %d WHERE item_id = '%s'" % (value, item_id)
+        elif column == 'seller_id' or column == 'quantity':
+            stmt = "UPDATE catalog SET %s = %d WHERE item_id = '%s'" % (column, value, item_id)
         else:
             if "'" in value:
                 value = ''.join(value.split("'"))

@@ -281,6 +281,19 @@ def admin_forward(bot, update):
         bot.send_message(user_id, msg)
 
 
+def admin_broadcast(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = pre_check(user_id, update.message.from_user.name)
+    if state != 'home':
+        msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
+        bot.send_message(user_id, msg)
+    else:
+        db.update_state(user_id, 'broadcast')
+        msg = 'Send the message you want to broadcast.'
+        bot.send_message(user_id, msg)
+
+
 # Callback Query Handlers
 def callback_query_handler(bot, update):
     global db
@@ -528,7 +541,7 @@ def message_handler(bot, update):
     global admin_id
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
-    if state.startswith('sell_') and not state.startswith('sell_Others'):
+    if state.startswith('sell_'):  # and not state.startswith('sell_Others'):
         [_, item_id, column] = state.split('_')
         text = update.message.text
         success = db.update_item(item_id, column, text)
@@ -604,6 +617,14 @@ def message_handler(bot, update):
         msg_id = update.message.message_id
         db.add_feedback(user_id, update.message.from_user.name, update.message.text)
         bot.forward_message(admin_id, user_id, msg_id)
+    elif state == 'broadcast':
+        text = 'BROADCAST MESSAGE FROM ADMIN:\n\n' + update.message.text
+        db.update_state(user_id, 'home')
+        all_users = db.get_users()
+        for user in all_users:
+            bot.send_message(user, text)
+        msg = 'Message broadcast successful!'
+        bot.send_message(user_id, msg)
     else:
         msg = 'Please use /start to begin trading!'
         bot.send_message(user_id, msg)
@@ -625,6 +646,7 @@ def main():
     dispatcher.add_handler(CommandHandler('_delete', admin_delete))
     dispatcher.add_handler(CommandHandler('help', help_command))
     dispatcher.add_handler(CommandHandler('_forward', admin_forward))
+    dispatcher.add_handler(CommandHandler('_broadcast', admin_broadcast))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.all, message_handler))
 
