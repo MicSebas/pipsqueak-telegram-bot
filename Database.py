@@ -250,4 +250,7 @@ if __name__ == '__main__':
     items = db._get_items_admin()
     for item in items:
         print(item)
+    items = db.get_mascot_names()
+    for item in items:
+        print(item)
     print(len(users))

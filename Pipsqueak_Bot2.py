@@ -25,7 +25,7 @@ def start(bot, update):
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state == 'home':
-        msg = 'Hello, %s! Welcome to Pipsqueak, the marketplace by SUTD students for SUTD students!\n\nYou can /buy, /sell, and /browse spare parts and other items.\n\nYou can use /feedback to help us improve this platform for you!' % update.message.from_user.first_name
+        msg = 'Hello, %s! Welcome to Pipsqueak, the marketplace by SUTD students for SUTD students!\n\nYou can /buy, /sell, and /browse spare parts and other items.\n\nYou can use /feedback to help us improve this platform for you!\n\nUse /name_mascot to enter the competition to name our new mascot!' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
     else:
         msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
