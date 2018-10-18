@@ -112,12 +112,10 @@ def help_command(bot, update):
         msg = 'You\'re in the middle of an operation. Please finish what you are currently doing first or /cancel.'
         bot.send_message(user_id, msg)
     else:
-        db.update_state(user_id, 'forward_%d' % admin_id)
-        msg = 'We are connecting you to an admin to assist you. Please hold.'
-        bot.send_message(user_id, msg)
-        msg = 'Help: %s is trying to contact you via the helpline.' % update.message.from_user.name
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to %s' % update.message.from_user.name, callback_data=str(user_id))]])
-        bot.send_message(admin_id, msg, reply_markup=keyboard)
+        db.update_state(user_id, 'help')
+        msg = 'I can connect you to an admin to help you better. Should I do that for you?'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
+        bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
 def force_cancel(bot, update):
@@ -415,6 +413,18 @@ def callback_query_handler(bot, update):
         msg = 'Item %s successfully deleted!' % data
         db.update_state(user_id, 'home')
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+    elif state == 'help':
+        if data == 'True':
+            db.update_state(user_id, 'forward_%d' % admin_id)
+            msg = 'We are connecting you to an admin to assist you. Please hold.'
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+            msg = 'Help: %s is trying to contact you via the helpline.' % update.message.from_user.name
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to %s' % update.message.from_user.name, callback_data=str(user_id))]])
+            bot.send_message(admin_id, msg, reply_markup=keyboard)
+        else:
+            db.update_state(user_id, 'home')
+            msg = 'Command cancelled.'
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state.startswith('forward_'):
         if data.startswith('forward_') and user_id == admin_id:
             seller_id = int(state.split('_')[1])
