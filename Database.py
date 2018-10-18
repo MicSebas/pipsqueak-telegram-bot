@@ -119,7 +119,7 @@ class Database(object):
                 item_d = {}
             return item_d
         elif seller_id:
-            stmt = "SELECT date, item_id, category, name, description, price, status FROM catalog WHERE seller_id = '%s' AND (status = 'Ready' OR status = 'Pending')" % seller_id
+            stmt = "SELECT date, item_id, category, name, description, price, status FROM catalog WHERE seller_id = '%s' AND (status = 'Ready' OR status = 'Pending') ORDER BY item_id" % seller_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -134,7 +134,7 @@ class Database(object):
                 items = []
             return items
         elif category:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s' AND status = 'Ready'" % category
+            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s' AND status = 'Ready' ORDER BY item_id" % category
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -148,7 +148,7 @@ class Database(object):
                 items = []
             return items
         else:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE status = 'Ready'"
+            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE status = 'Ready' ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             items = [{'date': item[0],
