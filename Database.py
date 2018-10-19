@@ -179,7 +179,7 @@ class Database(object):
         else:
             item_id = '%s0001' % category[0]
         date = get_date()
-        stmt = "INSERT INTO catalog VALUES ('%s', '%s', '%s', 'name', 'description', 0.0, %d, 'Pending')" % (date, item_id, category, seller_id)
+        stmt = "INSERT INTO catalog VALUES ('%s', '%s', '%s', 'name', 'description', 0.0, %d, 'Pending', 1)" % (date, item_id, category, seller_id)
         self.cur.execute(stmt)
         self.conn.commit()
         return item_id
@@ -244,6 +244,7 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
+    # db.update_state(111914928, 'forward_162837897')
     users = db.get_users(True)
     for user in users:
         print(user)
