@@ -103,7 +103,7 @@ class Database(object):
 
     def get_items_dict(self, item_id=None, seller_id=None, category=None):
         if item_id:
-            stmt = "SELECT date, item_id, category, name, description, price, seller_id, status FROM catalog WHERE item_id = '%s'" % item_id
+            stmt = "SELECT date, item_id, category, name, description, quantity, price, seller_id, status FROM catalog WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
             item = self.cur.fetchall()[0]
             if item:
@@ -112,9 +112,10 @@ class Database(object):
                           'category': item[2],
                           'name': item[3],
                           'description': item[4],
-                          'price': round(float(item[5]), 2),
-                          'seller_id': item[6],
-                          'status': item[7]}
+                          'quantity': item[5],
+                          'price': round(float(item[6]), 2),
+                          'seller_id': item[7],
+                          'status': item[8]}
             else:
                 item_d = {}
             return item_d
@@ -261,7 +262,7 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    # db.update_state(111914928, 'forward_162837897')
+    db.update_state(111914928, 'home')
     users = db.get_users(True)
     for user in users:
         print(user)

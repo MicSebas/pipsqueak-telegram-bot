@@ -525,7 +525,7 @@ def callback_query_handler(bot, update):
                 db.update_state(user_id, 'home')
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
             else:
-                msg = 'Buying %s: %s.\n\nHow many do you want to buy?'
+                msg = 'Buying %s: %s.\n\nHow many do you want to buy?' % (item['name'], item['description'])
                 db.update_state(user_id, 'buy_item_%s' % data)
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state.startswith('confirm_buy_item_'):
