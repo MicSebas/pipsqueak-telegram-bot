@@ -133,7 +133,7 @@ def browse(bot, update):
     if items:
         filename = 'Pipsqueak_catalog.csv'
         f = open(filename, 'w')
-        f.write('Date Listed, Item ID, Category, Item, Description, Price\n')
+        f.write('Date Listed, Item ID, Category, Item, Description, Quantity, Price\n')
         items = db.get_items_list()
         for item in items:
             date = item[0]
@@ -145,8 +145,9 @@ def browse(bot, update):
             description = item[4]
             if ',' in description:
                 description = ' '.join(description.split(','))
-            price = item[5]
-            f.write('%s, %s, %s, %s, %s, $%.2f\n' % (date, item_id, category, name, description, price))
+            quantity = item[5]
+            price = item[6]
+            f.write('%s, %s, %s, %s, %s, %d, $%.2f\n' % (date, item_id, category, name, description, quantity, price))
         f.close()
         msg = 'Here are the items currently listed at Pipsqueak!'
         bot.send_document(user_id, open(filename, 'rb'), caption=msg)
@@ -316,10 +317,10 @@ def callback_query_handler(bot, update):
     if update.callback_query.message.text.startswith('Approval: '):
         data = data.split('_')
         if data[0] == 'True':
-            msg = 'Request approved.'
+            item_id = data[2]
+            msg = 'Request approved: item %s.' % item_id
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
             seller_id = int(data[1])
-            item_id = data[2]
             db.update_item(item_id, 'status', 'Ready')
             item = db.get_items_dict(item_id=item_id)
             msg = 'Your listing of %s has been approved with item ID %s. We will contact you as soon as you have a buyer for your item! Thank you for using Pipsqueak!' % (item['name'], item_id)
@@ -491,7 +492,7 @@ def callback_query_handler(bot, update):
             msg = 'We have these items in that category:\n\n'
             keyboard = []
             for item in items:
-                msg += '(%s) %s: %s [$%.2f]\n\n' % (item['item_id'], item['name'], item['description'], item['price'])
+                msg += '(%s) %s: %s [$%.2f each, %d available]\n\n' % (item['item_id'], item['name'], item['description'], item['price'], item['quantity'])
                 keyboard.append([InlineKeyboardButton(item['item_id'], callback_data=item['item_id'])])
             msg += 'Which item would you like to buy?'
             keyboard.append([InlineKeyboardButton('<< back', callback_data='back')])
@@ -524,14 +525,13 @@ def callback_query_handler(bot, update):
                 db.update_state(user_id, 'home')
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
             else:
-                msg = 'You want to buy %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
-                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
+                msg = 'Buying %s: %s.\n\nHow many do you want to buy?'
                 db.update_state(user_id, 'buy_item_%s' % data)
-                bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
-    elif state.startswith('buy_item_'):
+                bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+    elif state.startswith('confirm_buy_item_'):
         if data == 'True':
             item = db.get_items_dict(item_id=state[9:])
-            msg = 'Purchase successful! You have purchased %s: %s for $%.2f!\n\nWe will contact you as soon as possible to arrange for a delivery time that is convenient for you! Thank you for using Pipsqueak!' % (item['name'], item['description'], item['price'])
+            msg = 'Purchase successful! You have purchased %s: %s, %d for $%.2f!\n\nWe will contact you as soon as possible to arrange for a delivery time that is convenient for you! Thank you for using Pipsqueak!' % (item['name'], item['description'], item['quantity'], item['price']*item['quantity'])
             db.update_state(user_id, 'home')
             db.update_item(item['item_id'], 'status', str(user_id))
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
@@ -577,13 +577,17 @@ def message_handler(bot, update):
                 msg = 'Please send a short description of your item to help potential buyers.'
                 bot.send_message(user_id, msg)
             elif column == 'description':
+                db.update_state(user_id, 'sell_%s_quantity' % item_id)
+                msg = 'How many of this item are you selling?'
+                bot.send_message(user_id, msg)
+            elif column == 'quantity':
                 db.update_state(user_id, 'sell_%s_price' % item_id)
-                msg = 'How much are you selling this item for?'
+                msg = 'How much are you selling each item for?'
                 bot.send_message(user_id, msg)
             else:
                 db.update_state(user_id, 'sell_%s_confirm' % item_id)
                 item = db.get_items_dict(item_id=item_id)
-                msg = 'You want to sell %s: %s for $%.2f.\n\nIs this correct?' % (item['name'], item['description'], item['price'])
+                msg = 'You want to sell %s: %s, %d for $%.2f each.\n\nIs this correct?' % (item['name'], item['description'], item['quantity'], item['price'])
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
                 bot.send_message(user_id, msg, reply_markup=keyboard)
     # elif state == 'sell_Others_request':
@@ -603,7 +607,7 @@ def message_handler(bot, update):
         db.update_state(user_id, 'home')
         msg = 'Thank you for using Pipsqueak, %s! We will notify you as soon as the item is available!' % update.message.from_user.first_name
         bot.send_message(user_id, msg)
-    elif state == 'buy' or state.startswith('buy_item'):
+    elif state == 'buy' or state == 'buy_item':
         item_id = update.message.text
         item = db.get_items_dict(item_id=item_id)
         if item:
@@ -614,6 +618,15 @@ def message_handler(bot, update):
         else:
             msg = 'There is no item with that code. Please try again.'
             bot.send_message(user_id, msg)
+    elif state.startswith('buy_item_'):
+        quantity = int(update.message.text)
+        item_id = state.split('_')[-1]
+        db.update_item(item_id, 'quantity', quantity)
+        item = db.get_items_dict(item_id=item_id)
+        msg = 'You want to buy %s: %s\nPurchase quantity: %d\nTotal price: $%.2f\n\nIs this correct?' % (item['name'], item['description'], quantity, item['price'])
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
+        db.update_state(user_id, 'confirm_buy_item_%s' % item_id)
+        bot.send_message(user_id, msg, reply_markup=keyboard)
     elif state == 'forward':
         users = db.get_users(True)
         text = update.message.text

@@ -91,7 +91,7 @@ class Database(object):
 
     def get_items_list(self, in_transaction=False):
         if not in_transaction:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE status = 'Ready' ORDER BY item_id"
+            stmt = "SELECT date, item_id, category, name, description, quantity, price FROM catalog WHERE status = 'Ready' ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
@@ -134,7 +134,7 @@ class Database(object):
                 items = []
             return items
         elif category:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE category = '%s' AND status = 'Ready' ORDER BY item_id" % category
+            stmt = "SELECT date, item_id, category, name, description, quantity, price FROM catalog WHERE category = '%s' AND status = 'Ready' ORDER BY item_id" % category
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -143,7 +143,8 @@ class Database(object):
                           'category': item[2],
                           'name': item[3],
                           'description': item[4],
-                          'price': round(float(item[5]), 2)} for item in rows]
+                          'quantity': item[5],
+                          'price': round(float(item[6]), 2)} for item in rows]
             else:
                 items = []
             return items
@@ -184,6 +185,15 @@ class Database(object):
         self.conn.commit()
         return item_id
 
+    def get_quantity(self, item_id):
+        stmt = "SELECT quantity FROM catalog WHERE item_id = '%s'" % item_id
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        if rows[0]:
+            return rows[0][0]
+        else:
+            return 0
+
     def update_item(self, item_id, column, value):
         if column == 'price':
             try:
@@ -193,8 +203,15 @@ class Database(object):
                     stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
                 except ValueError:
                     return False
-        elif column == 'seller_id' or column == 'quantity':
-            stmt = "UPDATE catalog SET %s = %d WHERE item_id = '%s'" % (column, value, item_id)
+        elif column == 'seller_id':
+            stmt = "UPDATE catalog SET seller_id = %d WHERE item_id = '%s'" % (value, item_id)
+        elif column == 'quantity':
+            try:
+                stmt = "UPDATE catalog SET quantity = %d WHERE item_id = '%s'" % (int(value), item_id)
+                if int(value) <= 0:
+                    return False
+            except ValueError:
+                return False
         else:
             if "'" in value:
                 value = ''.join(value.split("'"))
