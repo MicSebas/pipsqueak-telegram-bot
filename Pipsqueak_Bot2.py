@@ -1,7 +1,7 @@
 import telegram
 import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, TelegramError
 from Database import Database
 from time import sleep
 
@@ -665,13 +665,19 @@ def message_handler(bot, update):
         bot.send_message(user_id, 'Broadcasting message...')
         all_users = db.get_users()
         for user in sent_alr:
-            all_users.remove(user)
+            try:
+                all_users.remove(user)
+            except ValueError:
+                pass
         print(all_users)
         for user in all_users:
             if user not in sent_alr:
-                bot.send_message(user, text)
-                sleep(1)
-                print('sent to %d' % user)
+                try:
+                    bot.send_message(user, text)
+                    sleep(1)
+                    print('sent to %d' % user)
+                except TelegramError:
+                    pass
         msg = 'Message broadcast successful!'
         bot.send_message(user_id, msg)
     elif state == 'name':
