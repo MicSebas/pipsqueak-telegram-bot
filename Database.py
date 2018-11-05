@@ -2,6 +2,8 @@ import os
 import psycopg2
 import pytz
 from datetime import datetime
+import json
+import requests
 
 
 def get_date():
@@ -12,16 +14,23 @@ def get_time():
     return str(datetime.now(pytz.timezone('Asia/Singapore')).time())[:8]
 
 
+def print_json(d):
+    if d:
+        s = json.dumps(d, sort_keys=True, indent=4, separators=(',', ': '))
+        print(s)
+
+
 class Database(object):
 
     def __init__(self):
+        self.url = 'http://phpstack-212261-643485.cloudwaysapps.com'
         os.environ['DATABASE_URL'] = 'postgres://oylxidwhboayxg:abdc45f4642fa9f329bef28f8e31f967c91d64c1dae3eab5d30e7b6fb62096be@ec2-174-129-32-37.compute-1.amazonaws.com:5432/d52lcq3tkapjck'
         self.conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
         self.cur = self.conn.cursor()
         stmt = "CREATE TABLE IF NOT EXISTS user_database (user_id BIGINT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
-        stmt = "CREATE TABLE IF NOT EXISTS catalog (date TEXT NOT NULL, item_id TEXT NOT NULL, category TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL, status TEXT NOT NULL)"
+        stmt = "CREATE TABLE IF NOT EXISTS c2c_inventory (date TEXT NOT NULL, item_id TEXT NOT NULL, category TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, quantity INT NOT NULL, price REAL NOT NULL, seller_id BIGINT NOT NULL, status TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
         stmt = "CREATE TABLE IF NOT EXISTS requests (user_id BIGINT NOT NULL, name TEXT NOT NULL, item TEXT NOT NULL)"
@@ -33,6 +42,37 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS mascot_names (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, submission TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
+        stmt = "CREATE TABLE IF NOT EXISTS food (item_id BIGINT NOT NULL, item_name TEXT NOT NULL, quantity BIGINT NOT NULL, price REAL NOT NULL)"
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def get_items(self, category=None, page=0, item_id=None):
+        if category and item_id:
+            print('Please only input one argument.')
+            return False
+        if category:
+            url = self.url + '/ajax/items?category=%s&page=%d' % (category, page)
+        elif item_id:
+            url = self.url + '/ajax/itemDetails?item=' + str(item_id)
+        else:
+            url = self.url + '/ajax/items'
+        r = requests.get(url)
+        r = json.loads(r.text)
+        return r
+
+    def get_items_marketplace(self, category=None, page=0, item_id=None):
+        if category and item_id:
+            print('Please only input one argument.')
+            return False
+        if category:
+            url = self.url + '/ajax/items?category=%s&page=%d' % (category, page)
+        elif item_id:
+            url = self.url + '/ajax/itemDetails?item=' + str(item_id)
+        else:
+            url = self.url + '/ajax/items'
+        r = requests.get(url)
+        r = json.loads(r.text)
+        return r
 
     def add_mascot_name(self, user_id, user_name, submission):
         date = get_date()
@@ -57,9 +97,9 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
-    def get_users(self, with_name=False):
-        if with_name:
-            stmt = "SELECT user_id, name FROM user_database"
+    def get_users(self, admin=False):
+        if admin:
+            stmt = "SELECT * FROM user_database"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
@@ -91,19 +131,19 @@ class Database(object):
 
     def get_items_list(self, in_transaction=False):
         if not in_transaction:
-            stmt = "SELECT date, item_id, category, name, description, quantity, price FROM catalog WHERE status = 'Ready' ORDER BY item_id"
+            stmt = "SELECT date, item_id, category, name, description, quantity, price FROM c2c_inventory WHERE status = 'Ready' ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
         else:
-            stmt = "SELECT item_id, name, description FROM catalog WHERE status != 'Ready' AND status != 'Pending' ORDER BY item_id"
+            stmt = "SELECT item_id, name, description FROM c2c_inventory WHERE status != 'Ready' AND status != 'Pending' ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             return rows
 
     def get_items_dict(self, item_id=None, seller_id=None, category=None):
         if item_id:
-            stmt = "SELECT date, item_id, category, name, description, quantity, price, seller_id, status FROM catalog WHERE item_id = '%s'" % item_id
+            stmt = "SELECT * FROM c2c_inventory WHERE item_id = '%s'" % item_id
             self.cur.execute(stmt)
             item = self.cur.fetchall()[0]
             if item:
@@ -120,7 +160,7 @@ class Database(object):
                 item_d = {}
             return item_d
         elif seller_id:
-            stmt = "SELECT date, item_id, category, name, description, price, status FROM catalog WHERE seller_id = '%s' AND (status = 'Ready' OR status = 'Pending') ORDER BY item_id" % seller_id
+            stmt = "SELECT date, item_id, category, name, description, price, status FROM c2c_inventory WHERE seller_id = '%s' AND (status = 'Ready' OR status = 'Pending') ORDER BY item_id" % seller_id
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -135,7 +175,7 @@ class Database(object):
                 items = []
             return items
         elif category:
-            stmt = "SELECT date, item_id, category, name, description, quantity, price FROM catalog WHERE category = '%s' AND status = 'Ready' ORDER BY item_id" % category
+            stmt = "SELECT date, item_id, category, name, description, quantity, price FROM c2c_inventory WHERE category = '%s' AND status = 'Ready' ORDER BY item_id" % category
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             if rows:
@@ -150,7 +190,7 @@ class Database(object):
                 items = []
             return items
         else:
-            stmt = "SELECT date, item_id, category, name, description, price FROM catalog WHERE status = 'Ready' ORDER BY item_id"
+            stmt = "SELECT date, item_id, category, name, description, price FROM c2c_inventory WHERE status = 'Ready' ORDER BY item_id"
             self.cur.execute(stmt)
             rows = self.cur.fetchall()
             items = [{'date': item[0],
@@ -162,18 +202,18 @@ class Database(object):
             return items
 
     def _get_items_admin(self):
-        stmt = "SELECT * FROM catalog ORDER BY item_id"
+        stmt = "SELECT * FROM c2c_inventory ORDER BY item_id"
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         return rows
 
     def delete_item(self, item_id):
-        stmt = "DELETE FROM catalog WHERE item_id = '%s'" % item_id
+        stmt = "DELETE FROM c2c_inventory WHERE item_id = '%s'" % item_id
         self.cur.execute(stmt)
         self.conn.commit()
 
     def add_new_item(self, category, seller_id):
-        stmt = "SELECT item_id FROM catalog WHERE category = '%s'" % category
+        stmt = "SELECT item_id FROM c2c_inventory WHERE category = '%s'" % category
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         if rows:
@@ -181,13 +221,13 @@ class Database(object):
         else:
             item_id = '%s0001' % category[0]
         date = get_date()
-        stmt = "INSERT INTO catalog VALUES ('%s', '%s', '%s', 'name', 'description', 0.0, %d, 'Pending', 1)" % (date, item_id, category, seller_id)
+        stmt = "INSERT INTO c2c_inventory VALUES ('%s', '%s', '%s', 'name', 'description', 0.0, %d, 'Pending', 1)" % (date, item_id, category, seller_id)
         self.cur.execute(stmt)
         self.conn.commit()
         return item_id
 
     def get_quantity(self, item_id):
-        stmt = "SELECT quantity FROM catalog WHERE item_id = '%s'" % item_id
+        stmt = "SELECT quantity FROM c2c_inventory WHERE item_id = '%s'" % item_id
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         if rows[0]:
@@ -198,17 +238,17 @@ class Database(object):
     def update_item(self, item_id, column, value):
         if column == 'price':
             try:
-                stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value), item_id)
+                stmt = "UPDATE c2c_inventory SET price = %.2f WHERE item_id = '%s'" % (float(value), item_id)
             except ValueError:
                 try:
-                    stmt = "UPDATE catalog SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
+                    stmt = "UPDATE c2c_inventory SET price = %.2f WHERE item_id = '%s'" % (float(value[1:]), item_id)
                 except ValueError:
                     return False
         elif column == 'seller_id':
-            stmt = "UPDATE catalog SET seller_id = %d WHERE item_id = '%s'" % (value, item_id)
+            stmt = "UPDATE c2c_inventory SET seller_id = %d WHERE item_id = '%s'" % (value, item_id)
         elif column == 'quantity':
             try:
-                stmt = "UPDATE catalog SET quantity = %d WHERE item_id = '%s'" % (int(value), item_id)
+                stmt = "UPDATE c2c_inventory SET quantity = %d WHERE item_id = '%s'" % (int(value), item_id)
                 if int(value) <= 0:
                     return False
             except ValueError:
@@ -216,7 +256,7 @@ class Database(object):
         else:
             if "'" in value:
                 value = ''.join(value.split("'"))
-            stmt = "UPDATE catalog SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
+            stmt = "UPDATE c2c_inventory SET %s = '%s' WHERE item_id = '%s'" % (column, value, item_id)
         self.cur.execute(stmt)
         self.conn.commit()
         return True
@@ -259,10 +299,29 @@ class Database(object):
         rows = self.cur.fetchall()
         return rows
 
+    def get_food(self, item_id=None):
+        if item_id:
+            stmt = "SELECT * FROM food WHERE item_id = %d" % item_id
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows[0]
+        else:
+            stmt = "SELECT * FROM food WHERE quantity > 0 ORDER BY item_id"
+            self.cur.execute(stmt)
+            rows = self.cur.fetchall()
+            return rows
+
+    def bought_food(self, item_id, quantity):
+        food = self.get_food(item_id)
+        q = food[2]
+        stmt = "UPDATE food SET quantity = %d WHERE item_id = %d" % (q - quantity, item_id)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
 
 if __name__ == '__main__':
     db = Database()
-    db.update_state(111914928, 'home')
+    # db.update_state(111914928, 'home')
     users = db.get_users(True)
     for user in users:
         print(user)
@@ -270,6 +329,12 @@ if __name__ == '__main__':
     for item in items:
         print(item)
     items = db.get_mascot_names()
+    for item in items:
+        print(item)
+    items = db.get_requests()
+    for item in items:
+        print(item)
+    items = db.get_food()
     for item in items:
         print(item)
     print(len(users))

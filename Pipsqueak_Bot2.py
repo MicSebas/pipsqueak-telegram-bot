@@ -34,6 +34,7 @@ def start(bot, update):
 
 def done(bot, update):
     global db
+    global admins
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state.startswith('sell') or state.startswith('buy'):
@@ -41,15 +42,15 @@ def done(bot, update):
         bot.send_message(user_id, msg)
     elif state.startswith('forward_'):
         global admin_id
-        if user_id != admin_id:
+        if user_id not in admins:
             msg = 'The admin is still talking to you. It might be important.'
             bot.send_message(user_id, msg)
         else:
             buyer_id = int(state.split('_')[1])
-            db.update_state(admin_id, 'home')
+            db.update_state(user_id, 'home')
             name = db.get_name(buyer_id)
             msg = 'You are no longer connected to %s.' % name
-            bot.send_message(admin_id, msg)
+            bot.send_message(user_id, msg)
             msg = 'You are no longer connected to the admin. We hope to see you again soon!'
             db.update_state(buyer_id, 'home')
             bot.send_message(buyer_id, msg)
@@ -105,7 +106,6 @@ def cancel(bot, update):
 
 def help_command(bot, update):
     global db
-    global admin_id
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state != 'home':
@@ -220,7 +220,6 @@ def feedback(bot, update):
 
 def delete_listing(bot, update):
     global db
-    # global admin_id
     user_id = update.message.from_user.id
     state = pre_check(user_id, update.message.from_user.name)
     if state != 'home':
@@ -344,7 +343,7 @@ def callback_query_handler(bot, update):
             db.update_state(user_id, 'forward_%d' % seller_id)
             bot.send_message(user_id, msg)
             msg = 'An admin is trying to contact you regarding your item. Do you want to be connected to an admin now?\n\nNote that this will override your current operation.'
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % admin_id)]])
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect me now', callback_data='forward_%d' % user_id)]])
             bot.send_message(seller_id, msg, reply_markup=keyboard)
     # elif update.callback_query.message.text.startswith('Request: '):
     #     data = data.split('_')
@@ -407,8 +406,13 @@ def callback_query_handler(bot, update):
         bot.send_message(admin_id, msg, reply_markup=None)
     elif update.callback_query.message.text.startswith('Help: '):
         db.update_state(user_id, 'forward_%s' % data)
-        msg = 'You are now connected to %s. Use /done after you\'re finished.' % db.get_name(int(data))
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        msg = '%s is now connected to %s.' % (db.get_name(user_id), db.get_name(int(data)))
+        bot.edit_message_text(msg, admin_id, msg_id, reply_markup=None)
+        msg = 'You are now connected to %s. Use /done when you\'re finished.' % db.get_name(int(data))
+        bot.send_message(user_id, msg)
+        db.update_state(int(data), 'forward_%d' % user_id)
+        msg = 'You are now connected to an admin.'
+        bot.send_message(int(data), msg)
     elif state == 'delete':
         db.delete_item(data)
         msg = 'Item %s successfully deleted!' % data
@@ -416,7 +420,7 @@ def callback_query_handler(bot, update):
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
     elif state == 'help':
         if data == 'True':
-            db.update_state(user_id, 'forward_%d' % admin_id)
+            db.update_state(user_id, 'home')
             msg = 'We are connecting you to an admin to assist you. Please hold.'
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
             msg = 'Help: %s is trying to contact you via the helpline.' % update.message.from_user.name
@@ -703,5 +707,6 @@ def main():
 
 if __name__ == '__main__':
     db = Database()
-    admin_id = 111914928
+    admin_id = -258851839
+    admins = (111914928, 230937024, 255484909, 42010966)
     main()
