@@ -665,7 +665,7 @@ def message_handler(bot, update):
         bot.send_message(user_id, 'Broadcasting message...')
         all_users = db.get_users()
         for user in sent_alr:
-            all_users.pop(user)
+            all_users.remove(user)
         print(all_users)
         for user in all_users:
             if user not in sent_alr:
