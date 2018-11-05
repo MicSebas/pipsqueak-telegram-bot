@@ -595,14 +595,6 @@ def message_handler(bot, update):
                 msg = 'You want to sell %s: %s, %d for $%.2f each.\n\nIs this correct?' % (item['name'], item['description'], item['quantity'], item['price'])
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True'), InlineKeyboardButton('No', callback_data='False')]])
                 bot.send_message(user_id, msg, reply_markup=keyboard)
-    # elif state == 'sell_Others_request':
-    #     text = update.message.text
-    #     msg = 'Request: %s (%d) has requested to sell the following item: %s.\n\nDo you approve of this listing?' % (update.message.from_user.name, user_id, text)
-    #     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Yes', callback_data='True_%d_%s' % (user_id, text)), InlineKeyboardButton('No', callback_data='False_%d_%s' % (user_id, text)), InlineKeyboardButton('Contact', callback_data='Contact_%d_%s' % (user_id, text))]])
-    #     bot.send_message(admin_id, msg, reply_markup=keyboard)
-    #     msg = 'We have sent your request to an admin. We will get back to you as soon as possible. Thank you for using Pipsqueak!'
-    #     db.update_state(user_id, 'home')
-    #     bot.send_message(user_id, msg)
     elif state == 'buy_request_item':
         item = update.message.text
         name = update.message.from_user.name
@@ -659,25 +651,16 @@ def message_handler(bot, update):
         db.add_feedback(user_id, update.message.from_user.name, update.message.text)
         bot.forward_message(admin_id, user_id, msg_id)
     elif state == 'broadcast':
-        global sent_alr
         text = 'BROADCAST MESSAGE FROM ADMIN:\n\n' + update.message.text
         db.update_state(user_id, 'home')
         bot.send_message(user_id, 'Broadcasting message...')
         all_users = db.get_users()
-        for user in sent_alr:
-            try:
-                all_users.remove(user)
-            except ValueError:
-                pass
-        print(all_users)
         for user in all_users:
-            if user not in sent_alr:
-                try:
-                    bot.send_message(user, text)
-                    sleep(1)
-                    print('sent to %d' % user)
-                except TelegramError:
-                    pass
+            try:
+                bot.send_message(user, text)
+                print('Sent to %d' % user)
+            except TelegramError:
+                print('Failed sending to %d' % user)
         msg = 'Message broadcast successful!'
         bot.send_message(user_id, msg)
     elif state == 'name':
@@ -724,5 +707,4 @@ if __name__ == '__main__':
     db = Database()
     admin_id = -258851839
     admins = (111914928, 230937024, 255484909, 42010966)
-    sent_alr = [69739747, 126036523, 218669073, 537593134, 228628429, 178843722, 39966583, 330557085, 291246154, 50670740, 256772265, 215339371, 166859253, 199548822, 678631728, 274281545, 147237262, 515359123, 85916752, 126251973, 74284074, 562755897, 352828276, 61215935, 512116869, 215370555, 193907147, 422476452, 373891777, 347347756, 380818530, 193248223, 215965162, 227080377, 324266525, 58503580, 14326411, 69739747, 126036523, 218669073, 537593134, 228628429, 178843722, 39966583, 330557085, 291246154, 50670740, 256772265, 215339371, 166859253, 199548822, 678631728, 274281545, 147237262, 515359123, 85916752, 126251973, 74284074, 562755897, 352828276, 61215935, 512116869, 215370555, 193907147, 422476452, 373891777, 347347756, 380818530, 193248223, 215965162, 324266525, 58503580, 14326411, 543221997, 210651942, 183753003, 117297353, 328534672, 267898510, 159610070, 179428673, 285264560, 125345100, 506996919, 37817669, 276269485, 384646754, 441441200, 592698316, 69440054, 42010966, 395118014, 103271576, 224722875, 217809823, 25619236, 227792784, 226487732, 329982661, 231820196, 136862006, 209081187, 227080377, 250434617, 629871577, 255484909, 43347760, 230937024, 269505918, 267348806, 188452196, 58799778, 309662678, 24234360]
     main()
