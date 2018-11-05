@@ -3,6 +3,7 @@ import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from Database import Database
+from time import sleep
 
 TOKEN = '666724238:AAF2SyvjZbui0VMbPOlG3op2jgMQFVFM_yg'
 PORT = int(os.environ.get('PORT', '5000'))
@@ -658,14 +659,17 @@ def message_handler(bot, update):
         db.add_feedback(user_id, update.message.from_user.name, update.message.text)
         bot.forward_message(admin_id, user_id, msg_id)
     elif state == 'broadcast':
+        global sent_alr
         text = 'BROADCAST MESSAGE FROM ADMIN:\n\n' + update.message.text
         db.update_state(user_id, 'home')
         bot.send_message(user_id, 'Broadcasting message...')
         all_users = db.get_users()
         print(all_users)
         for user in all_users:
-            print(user)
-            bot.send_message(user, text)
+            if user not in sent_alr:
+                bot.send_message(user, text)
+                sleep(1)
+                print('sent to %d' % user)
         msg = 'Message broadcast successful!'
         bot.send_message(user_id, msg)
     elif state == 'name':
@@ -712,4 +716,5 @@ if __name__ == '__main__':
     db = Database()
     admin_id = -258851839
     admins = (111914928, 230937024, 255484909, 42010966)
+    sent_alr = [69739747, 126036523, 218669073, 537593134, 228628429, 178843722, 39966583, 330557085, 291246154, 50670740, 256772265, 215339371, 166859253, 199548822, 678631728, 274281545, 147237262, 515359123, 85916752, 126251973, 74284074, 562755897, 352828276, 61215935, 512116869, 215370555, 193907147, 422476452, 373891777, 347347756, 380818530, 193248223, 215965162, 227080377, 324266525, 58503580, 14326411]
     main()
