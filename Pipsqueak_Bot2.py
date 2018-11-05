@@ -662,6 +662,7 @@ def message_handler(bot, update):
         db.update_state(user_id, 'home')
         all_users = db.get_users()
         for user in all_users:
+            print(user)
             bot.send_message(user, text)
         msg = 'Message broadcast successful!'
         bot.send_message(user_id, msg)

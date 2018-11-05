@@ -53,7 +53,7 @@ class Database(object):
         if category:
             url = self.url + '/ajax/items?category=%s&page=%d' % (category, page)
         elif item_id:
-            url = self.url + '/ajax/itemDetails?item=' + str(item_id)
+            url = self.url + '/ajax/items?item=' + str(item_id)
         else:
             url = self.url + '/ajax/items'
         r = requests.get(url)
