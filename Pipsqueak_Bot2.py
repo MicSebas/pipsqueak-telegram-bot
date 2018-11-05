@@ -660,7 +660,9 @@ def message_handler(bot, update):
     elif state == 'broadcast':
         text = 'BROADCAST MESSAGE FROM ADMIN:\n\n' + update.message.text
         db.update_state(user_id, 'home')
+        bot.send_message(user_id, 'Broadcasting message...')
         all_users = db.get_users()
+        print(all_users)
         for user in all_users:
             print(user)
             bot.send_message(user, text)

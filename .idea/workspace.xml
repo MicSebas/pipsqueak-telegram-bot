@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot3.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,14 +40,14 @@
           <entry key="Procfile" value="15" />
           <entry key="Python Console" value="2244" />
           <entry key="dummy" value="1" />
-          <entry key="py" value="82587" />
+          <entry key="py" value="82639" />
           <entry key="txt" value="22" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="38" />
-          <entry key="Python" value="84831" />
+          <entry key="Python" value="84883" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -60,11 +58,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="664" column="23" lean-forward="true" selection-start-line="664" selection-start-column="23" selection-end-line="664" selection-end-column="23" />
+            <state relative-caret-position="173">
+              <caret line="662" column="58" selection-start-line="662" selection-start-column="58" selection-end-line="662" selection-end-column="58" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1541428694638" expanded="true" signature="465:662" ph="..." />
+                <marker date="1541428779706" expanded="true" signature="465:662" ph="..." />
               </folding>
             </state>
           </provider>
@@ -325,11 +323,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="664" column="23" lean-forward="true" selection-start-line="664" selection-start-column="23" selection-end-line="664" selection-end-column="23" />
+        <state relative-caret-position="173">
+          <caret line="662" column="58" selection-start-line="662" selection-start-column="58" selection-end-line="662" selection-end-column="58" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1541428694638" expanded="true" signature="465:662" ph="..." />
+            <marker date="1541428779706" expanded="true" signature="465:662" ph="..." />
           </folding>
         </state>
       </provider>
