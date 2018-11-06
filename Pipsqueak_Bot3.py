@@ -589,7 +589,11 @@ def buy_quantity_message(bot, update):
                     price = float(item['items']['price'][1:])
             msg = 'You want to buy %s: ' % item['itemName']
             msg += ', '.join(json.loads(options))
-            msg += '. We are currently selling this item for $%.2f each, $%.2f total for %d items.\n\n' % (price, quantity * price, quantity)
+            msg += '. We are currently selling this item for $%.2f' % price
+            if quantity > 1:
+                msg += 'each, $%.2f total for %d items.\n\n' % (quantity * price, quantity)
+            else:
+                msg += '.\n\n'
             msg += 'Alternatively, you can check the marketplace for student-listed items. Please note that we will not be issuing receipts for marketplace purchases.\n\nWould you like to buy now?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Buy now', callback_data='confirm')],
                                              [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
@@ -620,19 +624,20 @@ def buy_confirm(bot, update, state):
         global admin_id
         db.update_state(user_id, 'home')
         item = db.get_items({'item': item_id})
-        if options:
+        print(item)
+        if options != 'null':
             msg = 'Purchase successful!\n\n%s: ' % item['itemName']
             msg += ', '.join(json.loads(options))
-            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * item['items'][options]['price'])
+            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * float(item['items'][options]['price']))
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         else:
             msg = 'Purchase successful: %s!\n\n' % item['itemName']
-            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * item['items'][options]['price'])
+            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * float(item['items'][options]['price']))
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         args = {'item': item_id, 'quantity': quantity, 'telegramId': user_id}
-        if options:
+        if options != 'null':
             args['properties'] = options
         msg = 'Purchase: %s (%d) has purchased the following item: %s (itemId: %d) (quantity: %d)' % (update.callback_query.from_user.name, user_id, item['itemName'], item_id, quantity)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
