@@ -3,7 +3,6 @@ import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, TelegramError
 from Database import Database
-from time import sleep
 
 TOKEN = '666724238:AAF2SyvjZbui0VMbPOlG3op2jgMQFVFM_yg'
 PORT = int(os.environ.get('PORT', '5000'))

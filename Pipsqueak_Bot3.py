@@ -13,23 +13,25 @@ BOT.setWebhook(url='https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
 
 def pre_check(bot, update):
     global db
+    global admins
     if update.callback_query is not None:
         user_id = update.callback_query.from_user.id
         name = update.callback_query.from_user.name
     else:
         user_id = update.message.from_user.id
         name = update.message.from_user.name
-    users_list = db.get_users()
-    if user_id not in users_list:
-        db.add_new_user(user_id, name, 'home')
-        return True
-    else:
-        if db.get_state(user_id).startswith('home'):
+    if user_id in admins:
+        users_list = db.get_users()
+        if user_id not in users_list:
+            db.add_new_user(user_id, name, 'home')
             return True
         else:
-            msg = 'You\'re in the middle of an operation. Please finish what you\'re doing first or use /cancel.'
-            bot.send_message(user_id, msg)
-            return False
+            if db.get_state(user_id).startswith('home'):
+                return True
+            else:
+                msg = 'You\'re in the middle of an operation. Please finish what you\'re doing first or use /cancel.'
+                bot.send_message(user_id, msg)
+                return False
 
 
 # General Commands
