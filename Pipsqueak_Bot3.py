@@ -560,15 +560,16 @@ def buy_quantity_message(bot, update):
         state = db.get_state(user_id)
         state_list = state.split('_')
         item_id = int(state_list[2])
-        try:
-            options = json.loads(state_list[3])
-        except json.decoder.JSONDecodeError:
-            options = None
+        options = state_list[3]
+        # try:
+        #     options = json.loads(state_list[3])
+        # except json.decoder.JSONDecodeError:
+        #     options = None
         item = db.get_items({'item': item_id})
         print(item)
         print(options)
         if options:
-            options = json.dumps(options, separators=(',', ':'))  # TODO: Ray Y U do dis
+            # options = json.dumps(options)  # TODO: Ray Y U do dis
             stock = int(item['items'][options]['quantity'])
         else:
             stock = int(item['items']['quantity'])
@@ -580,9 +581,18 @@ def buy_quantity_message(bot, update):
             bot.send_message(user_id, msg)
         else:
             db.update_state(user_id, '_'.join(state_list[-1]) + '_confirm')
-            price = item['items'][options]['price']
+            try:
+                if options:
+                    price = float(item['items'][options]['price'])
+                else:
+                    price = float(item['items']['price'])
+            except ValueError:
+                if options:
+                    price = float(item['items'][options]['price'][1:])
+                else:
+                    price = float(item['items']['price'][1:])
             msg = 'You want to buy %s: ' % item['itemName']
-            msg += ', '.join(options)
+            msg += ', '.join(json.loads(options))
             msg += '. We are currently selling this item for $%.2f each, $%.2f total for %d items.\n\n' % (price, quantity * price, quantity)
             msg += 'Alternatively, you can check the marketplace for student-listed items. Please note that we will not be issuing receipts for marketplace purchases.\n\nWould you like to buy now?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Buy now', callback_data='confirm')],
