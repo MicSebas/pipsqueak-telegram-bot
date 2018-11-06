@@ -1534,7 +1534,6 @@ def food_confirm(bot, update):
 def message_handler(bot, update):
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
-    print(state)
     if state.startswith('buy'):
         if state.endswith('_quantity'):
             buy_quantity_message(bot, update)
@@ -1575,13 +1574,13 @@ def message_handler(bot, update):
     else:
         msg = 'Please use /start to begin trading!'
         bot.send_message(user_id, msg)
+    print(state)
 
 
 def callback_query_handler(bot, update):
     global db
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
-    print(state)
     text = update.callback_query.message.text
     if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: '):
         connect(bot, update)
@@ -1679,6 +1678,7 @@ def callback_query_handler(bot, update):
         query_id = update.callback_query.id
         msg = 'Please use /start to begin trading!'
         bot.answer_callback_query(query_id, msg)
+    print(state)
 
 
 # Main
