@@ -435,6 +435,7 @@ def buy_options(bot, update, item_id, options_state):
         i = int(data_l[0])
         option = data_l[1]
         options_state[i] = option
+        print('hi')
         print(options_state)
         print(i)
         if i < len(options_state) - 1:
