@@ -365,6 +365,8 @@ def buy_item(bot, update):
         category = db.get_state(user_id).split('_')[1]
         item = db.get_items({'item': item_id})
         options = item['options']
+        print(options)
+        print(type(options))
         if options:
             option_state = [list(d.keys())[0] for d in options]
             db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
@@ -375,7 +377,7 @@ def buy_item(bot, update):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            quantity = item['items']['quantity']
+            quantity = int(item['items']['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
                 msg = 'You want to buy %s' % item['itemName']
@@ -449,7 +451,7 @@ def buy_options(bot, update, item_id, options_state):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             item = db.get_items({'item': item_id})
-            quantity = item['items'][options_state]['quantity']
+            quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
                 msg = 'You want to buy %s: ' % item['itemName']
@@ -555,7 +557,7 @@ def buy_quantity_message(bot, update):
         item_id = int(state_list[2])
         options = json.loads(state_list[3])
         item = db.get_items({'item': item_id})
-        stock = item['items'][options]['quantity']
+        stock = int(item['items'][options]['quantity'])
         if quantity <= 0:
             msg = 'That\'s not a valid quantity. Please try again.'
             bot.send_message(user_id, msg)
