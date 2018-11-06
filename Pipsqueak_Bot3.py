@@ -289,7 +289,6 @@ def buy_category(bot, update):
     else:
         args = {'category': data, 'page': 0}
         items = db.get_items(args)
-        print(items)
         if items:
             db.update_state(user_id, 'buy_%s_0_item' % data)
             msg = 'What %s do you want to buy?' % data.lower()
@@ -319,12 +318,13 @@ def buy_item(bot, update):
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'category':
+        db.update_state(user_id, 'home')
         buy(bot, update)
     elif data == 'prev':
         state = db.get_state(user_id)
         state_list = state.split('_')
         page = int(state_list[2])
-        if state_list[2] == 0:
+        if page == 0:
             callback_query_id = update.callback_query.id
             msg = 'There is no previous page!'
             bot.answer_callback_query(callback_query_id, msg)
@@ -346,11 +346,7 @@ def buy_item(bot, update):
         page = int(state_list[2])
         args = {'category': state_list[1], 'page': page + 1}
         items = db.get_items(args)
-        if items == 'No results':
-            callback_query_id = update.callback_query.id
-            msg = 'There is no next page!'
-            bot.answer_callback_query(callback_query_id, msg)
-        else:
+        if items:
             db.update_state(user_id, 'buy_%s_%d_item' % (state_list[1], page + 1))
             msg = 'What %s do you want to buy?' % state_list[1].lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
@@ -360,6 +356,10 @@ def buy_item(bot, update):
             keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            callback_query_id = update.callback_query.id
+            msg = 'There is no next page!'
+            bot.answer_callback_query(callback_query_id, msg)
     else:
         item_id = int(data)
         category = db.get_state(user_id).split('_')[1]
@@ -1601,8 +1601,9 @@ def callback_query_handler(bot, update):
         elif update.callback_query.data == 'feedback':
             feedback(bot, update)
         else:
+            query_id = update.callback_query.id
             msg = 'Please use /start to begin trading!'
-            bot.send_message(user_id, msg)
+            bot.answer_callback_query(query_id, msg)
     else:
         query_id = update.callback_query.id
         msg = 'Please use /start to begin trading!'
