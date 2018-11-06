@@ -628,7 +628,7 @@ def buy_confirm(bot, update, state):
         if options != 'null':
             msg = 'Purchase successful!\n\n%s: ' % item['itemName']
             msg += ', '.join(json.loads(options))
-            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * float(item['items'][options]['price']))
+            msg += '\nQuantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * float(item['items'][options]['price']))
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         else:
             msg = 'Purchase successful: %s!\n\n' % item['itemName']
