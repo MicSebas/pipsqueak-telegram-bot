@@ -452,7 +452,8 @@ def buy_options(bot, update, item_id, options_state):
             print(options_state)
             print(type(options_state))
             item = db.get_items({'item': item_id})
-            options_state = json.dumps(options_state.reverse())  # TODO: Delete this line later and complain to Ray
+            options_state.reverse()
+            options_state = json.dumps(options_state)  # TODO: Delete this line later and complain to Ray
             print(options_state)
             print(type(options_state))
             quantity = int(item['items'][options_state]['quantity'])
@@ -567,7 +568,8 @@ def buy_quantity_message(bot, update):
         print(item)
         print(options)
         if options:
-            options = json.dumps(options.reverse())  # TODO: Ray Y U do dis
+            options.reverse()
+            options = json.dumps(options)  # TODO: Ray Y U do dis
             stock = int(item['items'][options]['quantity'])
         else:
             stock = int(item['items']['quantity'])
