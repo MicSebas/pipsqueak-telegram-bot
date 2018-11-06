@@ -735,6 +735,7 @@ def sell_item(bot, update):
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'category':
+        db.update_state(user_id, 'home')
         sell(bot, update)
     elif data == 'prev':
         state = db.get_state(user_id)
@@ -1689,7 +1690,6 @@ def callback_query_handler(bot, update):
         query_id = update.callback_query.id
         msg = 'Please use /start to begin trading!'
         bot.answer_callback_query(query_id, msg)
-    print(state)
 
 
 # Main
