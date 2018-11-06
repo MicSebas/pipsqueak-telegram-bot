@@ -61,11 +61,7 @@ class Database(object):
     def bought_item(self, args):
         url = self.url + '/ajax/b-cbuy?' + urlencode(args)
         r = requests.get(url)
-        try:
-            r = json.loads(r.text)
-            return r
-        except json.decoder.JSONDecodeError:
-            return []
+        return r.text
 
     def get_listings(self, args=None):
         url = self.url + '/ajax/items'
@@ -81,11 +77,7 @@ class Database(object):
     def bought_listing(self, args):
         url = self.url + '/ajax/c-cbuy?' + urlencode(args)
         r = requests.get(url)
-        try:
-            r = json.loads(r.text)
-            return r
-        except json.decoder.JSONDecodeError:
-            return []
+        return r.text
 
     def add_mascot_name(self, user_id, user_name, submission):
         date = get_date()

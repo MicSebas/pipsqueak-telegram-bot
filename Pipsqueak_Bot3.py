@@ -564,7 +564,7 @@ def buy_quantity_message(bot, update):
         print('hi')
         print(item)
         print(options)
-        if options:
+        if options != 'null':
             # options = json.dumps(options)  # TODO: Ray Y U do dis
             stock = int(item['items'][options]['quantity'])
         else:
@@ -578,7 +578,7 @@ def buy_quantity_message(bot, update):
         else:
             db.update_state(user_id, '_'.join(state_list[:-1]) + '_%d_confirm' % quantity)
             try:
-                if options:
+                if options != 'null':
                     price = float(item['items'][options]['price'])
                 else:
                     price = float(item['items']['price'])
@@ -639,6 +639,12 @@ def buy_confirm(bot, update, state):
         args = {'item': item_id, 'quantity': quantity, 'telegramId': user_id}
         if options != 'null':
             args['properties'] = options
+        text = db.bought_item(args)
+        text_list = text.split(' ')
+        msg = ' '.join(text_list[2:-1])
+        url = text_list[-1][:-1] + str(user_id)
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Complete registration', url=url)]])
+        bot.send_message(user_id, msg, reply_markup=keyboard)
         msg = 'Purchase: %s (%d) has purchased the following item: %s (itemId: %d) (quantity: %d)' % (update.callback_query.from_user.name, user_id, item['itemName'], item_id, quantity)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
         bot.send_message(admin_id, msg, reply_markup=keyboard)
