@@ -174,23 +174,23 @@ def feedback(bot, update):
 
 
 def request(bot, update):
-    if pre_check(bot, update):
-        global db
-        if update.callback_query is not None:
-            user_id = update.callback_query.from_user.id
-            msg_id = update.callback_query.message.message_id
-            data = update.callback_query.data
-            if data == 'true':
-                db.update_state(user_id, 'request_item')
-                msg = 'Alright, what item do you want to be notified about?'
-                bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
-            elif data == 'buy':
-                buy(bot, update)
-            elif data == 'marketplace':
-                marketplace(bot, update)
-            else:
-                cancel(bot, update)
+    global db
+    if update.callback_query is not None:
+        user_id = update.callback_query.from_user.id
+        msg_id = update.callback_query.message.message_id
+        data = update.callback_query.data
+        if data == 'true':
+            db.update_state(user_id, 'request_item')
+            msg = 'Alright, what item do you want to be notified about?'
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
+        elif data == 'buy':
+            buy(bot, update)
+        elif data == 'marketplace':
+            marketplace(bot, update)
         else:
+            cancel(bot, update)
+    else:
+        if pre_check(bot, update):
             user_id = update.message.from_user.id
             msg = 'You can request to be notified when an item becomes available. What item do you want to be notified about?'
             bot.send_message(user_id, msg)
