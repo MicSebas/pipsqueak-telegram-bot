@@ -4,7 +4,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryH
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from Database import Database
 import json
-from urllib.parse import urlencode
 
 TOKEN = '666724238:AAF2SyvjZbui0VMbPOlG3op2jgMQFVFM_yg'
 PORT = int(os.environ.get('PORT', '5000'))
@@ -277,7 +276,12 @@ def buy_category(bot, update):
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
-        items = json.loads(db.get_items(category=data, page=0))
+        args = {'category': data, 'page': 0}
+        items = json.loads(db.get_items(args))
+        if items == 'No results':
+            query_id = update.callback_query.id
+            msg = 'There are currently no %s in stock.' % data.lower()
+            bot.answer_callback_query(query_id, msg)
         db.update_state(user_id, 'buy_%s_0_item' % data)
         msg = 'What %s do you want to buy?' % data.lower()
         keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]

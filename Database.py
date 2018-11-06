@@ -55,7 +55,13 @@ class Database(object):
         r = json.loads(r.text)
         return r
 
-    def get_items_marketplace(self, args=None):
+    def bought_item(self, args):
+        url = self.url + '/ajax/b-cbuy?' + urlencode(args)
+        r = requests.get(url)
+        r = json.loads(r.text)
+        return r
+
+    def get_listings(self, args=None):
         url = self.url + '/ajax/items'
         if args:
             url += '?' + urlencode(args)
@@ -63,10 +69,8 @@ class Database(object):
         r = json.loads(r.text)
         return r
 
-    def bought_item(self, args=None):
-        url = self.url + '/ajax/b-cbuy'
-        if args:
-            url += '?' + urlencode(args)
+    def bought_listing(self, args):
+        url = self.url + '/ajax/c-cbuy?' + urlencode(args)
         r = requests.get(url)
         r = json.loads(r.text)
         return r
