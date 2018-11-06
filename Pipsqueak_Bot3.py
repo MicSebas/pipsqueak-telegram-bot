@@ -82,6 +82,14 @@ def cancel(bot, update):
             bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
+def force_cancel(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    db.update_state(user_id, 'home')
+    msg = 'Back to home state'
+    bot.send_message(user_id, msg)
+
+
 def done(bot, update):
     global db
     user_id = update.message.from_user.id
@@ -1608,6 +1616,7 @@ def main():
     dispatcher.add_handler(CommandHandler('request', request))
     dispatcher.add_handler(CommandHandler('help', help_command))
     dispatcher.add_handler(CommandHandler('food', food))
+    dispatcher.add_handler(CommandHandler('_cancel', force_cancel))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
 
