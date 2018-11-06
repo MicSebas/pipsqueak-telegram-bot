@@ -50,7 +50,7 @@ class Database(object):
     def get_items(self, args=None):
         url = self.url + '/ajax/items'
         if args:
-            url += urlencode(args)
+            url += '?' + urlencode(args)
         r = requests.get(url)
         r = json.loads(r.text)
         return r
