@@ -397,6 +397,8 @@ def buy_item(bot, update):
 
 def buy_options(bot, update, item_id, options_state):
     global db
+    print(options_state)
+    print(type(options_state))
     user_id = update.callback_query.from_user.id
     msg_id = update.callback_query.message.message_id
     data = update.callback_query.data
@@ -537,7 +539,7 @@ def buy_quantity_callback_query(bot, update):
         else:
             items = db.get_items({'category': category, 'page': 0})
             db.update_state(user_id, 'buy_%s_0_item' % data)
-            msg = 'What %s do you want to buy?' % data.lower()
+            msg = 'What %s do you want to buy?' % category.lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
