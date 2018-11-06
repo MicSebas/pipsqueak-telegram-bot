@@ -302,7 +302,7 @@ def buy_category(bot, update):
         else:
             query_id = update.callback_query.id
             msg = 'There are currently no %s in stock.' % data.lower()
-            bot.answer_callback_query(query_id, msg)
+            bot.answer_callback_query(query_id, msg, cache_time=5)
 
 
 def buy_item(bot, update):
