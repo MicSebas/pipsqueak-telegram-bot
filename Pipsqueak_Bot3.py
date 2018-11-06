@@ -587,8 +587,9 @@ def buy_quantity_message(bot, update):
                     price = float(item['items'][options]['price'][1:])
                 else:
                     price = float(item['items']['price'][1:])
-            msg = 'You want to buy %s: ' % item['itemName']
-            msg += ', '.join(json.loads(options))
+            msg = 'You want to buy %s' % item['itemName']
+            if options != 'null':
+                msg += ': ' + ', '.join(json.loads(options))
             msg += '. We are currently selling this item for $%.2f' % price
             if quantity > 1:
                 msg += 'each, $%.2f total for %d items.\n\n' % (quantity * price, quantity)
