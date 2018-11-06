@@ -1487,6 +1487,7 @@ def message_handler(bot, update):
 
 def callback_query_handler(bot, update):
     if pre_check(bot, update):
+        global db
         user_id = update.callback_query.from_user.id
         state = db.get_state(user_id)
         text = update.callback_query.message.text
@@ -1499,7 +1500,6 @@ def callback_query_handler(bot, update):
             else:
                 review_request(bot, update)
         elif text.startswith('An admin is connecting to you.'):
-            global db
             msg_id = update.callback_query.message.message_id
             data = update.callback_query.data
             target_id = int(data.split('_')[1])
