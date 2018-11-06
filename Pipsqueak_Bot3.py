@@ -458,9 +458,9 @@ def buy_options(bot, update, item_id, options_state):
             print(type(options_state))
             quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
-                db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
+                db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, options_state))
                 msg = 'You want to buy %s: ' % item['itemName']
-                msg += ', '.join(options_state)
+                msg += ', '.join(json.loads(options_state))
                 msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
@@ -568,8 +568,7 @@ def buy_quantity_message(bot, update):
         print(item)
         print(options)
         if options:
-            options.reverse()
-            options = json.dumps(options)  # TODO: Ray Y U do dis
+            options = json.dumps(options, separators=(',', ':'))  # TODO: Ray Y U do dis
             stock = int(item['items'][options]['quantity'])
         else:
             stock = int(item['items']['quantity'])
