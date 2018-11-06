@@ -282,15 +282,16 @@ def buy_category(bot, update):
             query_id = update.callback_query.id
             msg = 'There are currently no %s in stock.' % data.lower()
             bot.answer_callback_query(query_id, msg)
-        db.update_state(user_id, 'buy_%s_0_item' % data)
-        msg = 'What %s do you want to buy?' % data.lower()
-        keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
-        keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
-                         InlineKeyboardButton('Next >>', callback_data='next')])
-        keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
-        keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
-        keyboard = InlineKeyboardMarkup(keyboard)
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            db.update_state(user_id, 'buy_%s_0_item' % data)
+            msg = 'What %s do you want to buy?' % data.lower()
+            keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
+            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
+                             InlineKeyboardButton('Next >>', callback_data='next')])
+            keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
+            keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
+            keyboard = InlineKeyboardMarkup(keyboard)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
 
 def buy_item(bot, update):
