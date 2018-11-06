@@ -4,6 +4,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryH
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from Database import Database
 import json
+from urllib.parse import urlencode
 
 TOKEN = '666724238:AAF2SyvjZbui0VMbPOlG3op2jgMQFVFM_yg'
 PORT = int(os.environ.get('PORT', '5000'))
@@ -268,22 +269,23 @@ def buy_category(bot, update):
     user_id = update.callback_query.from_user.id
     msg_id = update.callback_query.message.message_id
     data = update.callback_query.data
-    if data != 'none':
-        items = json.loads(db.get_items(category=data, page=0))
-        db.update_state(user_id, 'buy_%s_0_item' % data)
-        msg = 'What %s do you want to buy?' % data.lower()
-        keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
-        keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
-        keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
-        keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
-        keyboard = InlineKeyboardMarkup(keyboard)
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
-    else:
+    if data == 'none':
         db.update_state(user_id, 'buy_request')
         msg = 'We\'re sorry you couldn\'t find what you want. You can check the marketplace for student-listed items. Please note that we will not be issuing receipts for marketplace purchases. Alternatively, would you like to be notified if your item becomes available?'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Notify me', callback_data='true')],
                                          [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    else:
+        items = json.loads(db.get_items(category=data, page=0))
+        db.update_state(user_id, 'buy_%s_0_item' % data)
+        msg = 'What %s do you want to buy?' % data.lower()
+        keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
+        keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
+                         InlineKeyboardButton('Next >>', callback_data='next')])
+        keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
+        keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
+        keyboard = InlineKeyboardMarkup(keyboard)
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
 
@@ -1365,7 +1367,7 @@ def food_quantity_callback_query(bot, update):
         db.update_state(user_id, 'food')
         msg = 'What do you want?'
         foods = db.get_food()
-        keyboard = [[InlineKeyboardButton(item[2], callback_data=str(item[0]))] for item in foods]
+        keyboard = [[InlineKeyboardButton(item[1], callback_data=str(item[0]))] for item in foods]
         keyboard.append([InlineKeyboardButton('/cancel', callback_data='cancel')])
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.send_message(msg, user_id, msg_id, reply_markup=keyboard)

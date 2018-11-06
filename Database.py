@@ -4,6 +4,7 @@ import pytz
 from datetime import datetime
 import json
 import requests
+from urllib.parse import urlencode
 
 
 def get_date():
@@ -46,30 +47,26 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
-    def get_items(self, category=None, page=0, item_id=None):
-        if category and item_id:
-            print('Please only input one argument.')
-            return False
-        if category:
-            url = self.url + '/ajax/items?category=%s&page=%d' % (category, page)
-        elif item_id:
-            url = self.url + '/ajax/items?item=' + str(item_id)
-        else:
-            url = self.url + '/ajax/items'
+    def get_items(self, args=None):
+        url = self.url + '/ajax/items'
+        if args:
+            url += urlencode(args)
         r = requests.get(url)
         r = json.loads(r.text)
         return r
 
-    def get_items_marketplace(self, category=None, page=0, item_id=None):
-        if category and item_id:
-            print('Please only input one argument.')
-            return False
-        if category:
-            url = self.url + '/ajax/items?category=%s&page=%d' % (category, page)
-        elif item_id:
-            url = self.url + '/ajax/itemDetails?item=' + str(item_id)
-        else:
-            url = self.url + '/ajax/items'
+    def get_items_marketplace(self, args=None):
+        url = self.url + '/ajax/items'
+        if args:
+            url += '?' + urlencode(args)
+        r = requests.get(url)
+        r = json.loads(r.text)
+        return r
+
+    def bought_item(self, args=None):
+        url = self.url + '/ajax/b-cbuy'
+        if args:
+            url += '?' + urlencode(args)
         r = requests.get(url)
         r = json.loads(r.text)
         return r
