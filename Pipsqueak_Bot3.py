@@ -435,9 +435,6 @@ def buy_options(bot, update, item_id, options_state):
         i = int(data_l[0])
         option = data_l[1]
         options_state[i] = option
-        print('hi')
-        print(options_state)
-        print(i)
         if i < len(options_state) - 1:
             item = db.get_items({'item': item_id})
             options = item['options']
@@ -451,8 +448,13 @@ def buy_options(bot, update, item_id, options_state):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
+            print('hi')
+            print(options_state)
+            print(type(options_state))
             item = db.get_items({'item': item_id})
             options_state = json.dumps(options_state.reverse())  # TODO: Delete this line later and complain to Ray
+            print(options_state)
+            print(type(options_state))
             quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
