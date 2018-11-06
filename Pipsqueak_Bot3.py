@@ -501,7 +501,7 @@ def buy_nostock(bot, update, state):
         item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
-        db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
+        db.update_state(user_id, 'buy_%s_%d_%s_options' % (state_list[1], item_id, json.dumps(option_state)))
         msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
@@ -535,7 +535,7 @@ def buy_quantity_callback_query(bot, update):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             items = db.get_items({'category': category, 'page': 0})
-            db.update_state(user_id, 'buy_%s_0_item' % data)
+            db.update_state(user_id, 'buy_%s_0_item' % category)
             msg = 'What %s do you want to buy?' % category.lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
@@ -633,7 +633,7 @@ def buy_confirm(bot, update, state):
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         else:
             msg = 'Purchase successful: %s!\n\n' % item['itemName']
-            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * float(item['items'][options]['price']))
+            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * float(item['items']['price']))
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
