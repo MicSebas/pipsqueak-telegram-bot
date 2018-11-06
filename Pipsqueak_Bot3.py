@@ -451,6 +451,7 @@ def buy_options(bot, update, item_id, options_state):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             item = db.get_items({'item': item_id})
+            options_state = json.dumps(options_state.reverse())  # TODO: Delete this line later and complain to Ray
             quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
@@ -555,9 +556,16 @@ def buy_quantity_message(bot, update):
         state = db.get_state(user_id)
         state_list = state.split('_')
         item_id = int(state_list[2])
-        options = json.loads(state_list[3])
+        try:
+            options = json.loads(state_list[3])
+        except json.decoder.JSONDecodeError:
+            options = None
         item = db.get_items({'item': item_id})
-        stock = int(item['items'][options]['quantity'])
+        if options:
+            options = json.dumps(options.reverse())  # TODO: Ray Y U do dis
+            stock = int(item['items'][options]['quantity'])
+        else:
+            stock = int(item['items']['quantity'])
         if quantity <= 0:
             msg = 'That\'s not a valid quantity. Please try again.'
             bot.send_message(user_id, msg)
