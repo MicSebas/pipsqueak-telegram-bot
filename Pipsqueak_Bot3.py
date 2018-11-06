@@ -162,14 +162,16 @@ def feedback(bot, update):
     if pre_check(bot, update):
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
+            name = update.callback_query.from_user.name
             msg_id = update.callback_query.message.message_id
             bot.edit_message_reply_markup(user_id, msg_id, reply_markup=None)
         else:
             user_id = update.message.from_user.id
+            name = update.message.from_user.name
         db.update_state(user_id, 'feedback')
         msg = 'Your feedback is very valuable to us! Please tell us how we can improve to serve you better, be as specific as you like!\n\nUse /done when you\'re finished.'
         bot.send_message(user_id, msg)
-        msg = 'Feedback from %s:' % update.message.from_user.name
+        msg = 'Feedback from %s:' % name
         bot.send_message(admin_id, msg)
 
 
@@ -1499,106 +1501,113 @@ def message_handler(bot, update):
         bot.send_message(user_id, msg)
 
 
+# def callback_query_handler(bot, update):
+#     global db
+#     user_id = update.callback_query.from_user.id
+#     state = db.get_state(user_id)
+#     text = update.callback_query.message.text
+#     if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: '):
+#         connect(bot, update)
+#     elif text.startswith('Request: '):
+#         data = update.callback_query.data
+#         if data.startswith('forward_'):
+#             connect(bot, update)
+#         else:
+#             review_request(bot, update)
+#     elif text.startswith('An admin is connecting to you.'):
+#         msg_id = update.callback_query.message.message_id
+#         data = update.callback_query.data
+#         target_id = int(data.split('_')[1])
+#         db.update_state(user_id, data)
+#         msg = 'You are now connected to an admin. Please use /done when you\'re finished!'
+#         bot.edit_message_text(msg, user_id, msg_id)
+#         name = db.get_name(user_id)
+#         msg = 'You are now connected to %s. Please use /done when you\'re finished!' % name
+#         bot.send_message(target_id, msg)
+#     elif state.startswith('buy'):
+#         if state.endswith('_item'):
+#             buy_item(bot, update)
+#         elif state.endswith('_options'):
+#             state_list = state.split('_')
+#             item_id = int(state_list[2])
+#             options = json.loads(state_list[3])
+#             buy_options(bot, update, item_id, options)
+#         elif state.endswith('_quantity'):
+#             buy_quantity_callback_query(bot, update)
+#         elif state.endswith('_nostock'):
+#             buy_nostock(bot, update, state)
+#         elif state.endswith('_confirm'):
+#             buy_confirm(bot, update, state)
+#         elif state.endswith('_request'):
+#             request(bot, update)
+#         else:
+#             buy_category(bot, update)
+#     elif state.startswith('sell'):
+#         if state.endswith('_item'):
+#             sell_item(bot, update)
+#         elif state.endswith('_options'):
+#             state_list = state.split('_')
+#             item_id = int(state_list[2])
+#             options = json.loads(state_list[3])
+#             sell_options(bot, update, item_id, options)
+#         elif state.endswith('_quantity'):
+#             sell_quantity_callback_query(bot, update)
+#         elif state.endswith('_price'):
+#             sell_price_callback_query(bot, update)
+#         elif state.endswith('_confirm'):
+#             sell_confirm(bot, update, state)
+#         elif state.endswith('_request'):
+#             sell_request(bot, update)
+#         else:
+#             sell_category(bot, update)
+#     elif state.startswith('marketplace'):
+#         if state.endswith('_item'):
+#             marketplace_item(bot, update)
+#         elif state.endswith('_options'):
+#             state_list = state.split('_')
+#             item_id = int(state_list[2])
+#             options = json.loads(state_list[3])
+#             marketplace_options(bot, update, item_id, options)
+#         elif state.endswith('_seller'):
+#             marketplace_seller(bot, update, state)
+#         elif state.endswith('_quantity'):
+#             marketplace_quantity_callback_query(bot, update)
+#         elif state.endswith('_nostock'):
+#             marketplace_nostock(bot, update, state)
+#         elif state.endswith('_confirm'):
+#             marketplace_confirm(bot, update, state)
+#         elif state.endswith('_request'):
+#             request(bot, update)
+#         else:
+#             marketplace_category(bot, update)
+#     elif state.startswith('food'):
+#         if state.endswith('_quantity'):
+#             food_quantity_callback_query(bot, update)
+#         elif state.endswith('_confirm'):
+#             food_confirm(bot, update)
+#         else:
+#             food_item(bot, update)
+#     elif state == 'home':
+#         if update.callback_query.data == 'buy':
+#             buy(bot, update)
+#         elif update.callback_query.data == 'sell':
+#             sell(bot, update)
+#         elif update.callback_query.data == 'feedback':
+#             feedback(bot, update)
+#         else:
+#             msg = 'Please use /start to begin trading!'
+#             bot.send_message(user_id, msg)
+#     else:
+#         query_id = update.callback_query.id
+#         msg = 'Please use /start to begin trading!'
+#         bot.answer_callback_query(query_id, msg)
+
+
 def callback_query_handler(bot, update):
-    global db
     user_id = update.callback_query.from_user.id
-    state = db.get_state(user_id)
-    text = update.callback_query.message.text
-    if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: '):
-        connect(bot, update)
-    elif text.startswith('Request: '):
-        data = update.callback_query.data
-        if data.startswith('forward_'):
-            connect(bot, update)
-        else:
-            review_request(bot, update)
-    elif text.startswith('An admin is connecting to you.'):
-        msg_id = update.callback_query.message.message_id
-        data = update.callback_query.data
-        target_id = int(data.split('_')[1])
-        db.update_state(user_id, data)
-        msg = 'You are now connected to an admin. Please use /done when you\'re finished!'
-        bot.edit_message_text(msg, user_id, msg_id)
-        name = db.get_name(user_id)
-        msg = 'You are now connected to %s. Please use /done when you\'re finished!' % name
-        bot.send_message(target_id, msg)
-    elif state.startswith('buy'):
-        if state.endswith('_item'):
-            buy_item(bot, update)
-        elif state.endswith('_options'):
-            state_list = state.split('_')
-            item_id = int(state_list[2])
-            options = json.loads(state_list[3])
-            buy_options(bot, update, item_id, options)
-        elif state.endswith('_quantity'):
-            buy_quantity_callback_query(bot, update)
-        elif state.endswith('_nostock'):
-            buy_nostock(bot, update, state)
-        elif state.endswith('_confirm'):
-            buy_confirm(bot, update, state)
-        elif state.endswith('_request'):
-            request(bot, update)
-        else:
-            buy_category(bot, update)
-    elif state.startswith('sell'):
-        if state.endswith('_item'):
-            sell_item(bot, update)
-        elif state.endswith('_options'):
-            state_list = state.split('_')
-            item_id = int(state_list[2])
-            options = json.loads(state_list[3])
-            sell_options(bot, update, item_id, options)
-        elif state.endswith('_quantity'):
-            sell_quantity_callback_query(bot, update)
-        elif state.endswith('_price'):
-            sell_price_callback_query(bot, update)
-        elif state.endswith('_confirm'):
-            sell_confirm(bot, update, state)
-        elif state.endswith('_request'):
-            sell_request(bot, update)
-        else:
-            sell_category(bot, update)
-    elif state.startswith('marketplace'):
-        if state.endswith('_item'):
-            marketplace_item(bot, update)
-        elif state.endswith('_options'):
-            state_list = state.split('_')
-            item_id = int(state_list[2])
-            options = json.loads(state_list[3])
-            marketplace_options(bot, update, item_id, options)
-        elif state.endswith('_seller'):
-            marketplace_seller(bot, update, state)
-        elif state.endswith('_quantity'):
-            marketplace_quantity_callback_query(bot, update)
-        elif state.endswith('_nostock'):
-            marketplace_nostock(bot, update, state)
-        elif state.endswith('_confirm'):
-            marketplace_confirm(bot, update, state)
-        elif state.endswith('_request'):
-            request(bot, update)
-        else:
-            marketplace_category(bot, update)
-    elif state.startswith('food'):
-        if state.endswith('_quantity'):
-            food_quantity_callback_query(bot, update)
-        elif state.endswith('_confirm'):
-            food_confirm(bot, update)
-        else:
-            food_item(bot, update)
-    elif state == 'home':
-        if update.callback_query.data == 'buy':
-            buy(bot, update)
-        elif update.callback_query.data == 'sell':
-            sell(bot, update)
-        elif update.callback_query.data == 'feedback':
-            feedback(bot, update)
-        else:
-            msg = 'Please use /start to begin trading!'
-            bot.send_message(user_id, msg)
-    else:
-        query_id = update.callback_query.id
-        msg = 'Please use /start to begin trading!'
-        bot.answer_callback_query(query_id, msg)
+    query_id = update.callback_query.id
+    print(query_id)
+    print(bot.answer_callback_query(query_id, 'test'))
 
 
 # Main
