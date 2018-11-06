@@ -561,6 +561,8 @@ def buy_quantity_message(bot, update):
         except json.decoder.JSONDecodeError:
             options = None
         item = db.get_items({'item': item_id})
+        print(item)
+        print(options)
         if options:
             options = json.dumps(options.reverse())  # TODO: Ray Y U do dis
             stock = int(item['items'][options]['quantity'])
