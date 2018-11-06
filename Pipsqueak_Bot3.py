@@ -592,7 +592,7 @@ def buy_quantity_message(bot, update):
                 msg += ': ' + ', '.join(json.loads(options))
             msg += '. We are currently selling this item for $%.2f' % price
             if quantity > 1:
-                msg += 'each, $%.2f total for %d items.\n\n' % (quantity * price, quantity)
+                msg += ' each, $%.2f total for %d items.\n\n' % (quantity * price, quantity)
             else:
                 msg += '.\n\n'
             msg += 'Alternatively, you can check the marketplace for student-listed items. Please note that we will not be issuing receipts for marketplace purchases.\n\nWould you like to buy now?'
@@ -663,8 +663,9 @@ def buy_confirm(bot, update, state):
     elif data == 'back':
         item = db.get_items({'item': item_id})
         db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (category, item_id, options))
-        msg = 'You want to buy %s: ' % item['itemName']
-        msg += ', '.join(json.loads(options))
+        msg = 'You want to buy %s' % item['itemName']
+        if options != 'null':
+            msg += ': ' + ', '.join(json.loads(options))
         msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
