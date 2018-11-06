@@ -261,6 +261,7 @@ def buy(bot, update):
                                          [InlineKeyboardButton('Electronics', callback_data='Electronics')],
                                          [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
                                          [InlineKeyboardButton('Stationery', callback_data='Stationery')],
+                                         [InlineKeyboardButton('Amenities', callback_data='Amenities')],
                                          [InlineKeyboardButton('I can\'t find my item', callback_data='none')]])
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
@@ -301,8 +302,8 @@ def buy_category(bot, update):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             query_id = update.callback_query.id
-            msg = 'There are currently no %s in stock.' % data.lower()
-            bot.answer_callback_query(query_id, msg, cache_time=5)
+            msg = 'There are currently no %s in stock!' % data.lower()
+            bot.answer_callback_query(query_id, msg)
 
 
 def buy_item(bot, update):
@@ -604,6 +605,7 @@ def sell(bot, update):
                                          [InlineKeyboardButton('Electronics', callback_data='Electronics')],
                                          [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
                                          [InlineKeyboardButton('Stationery', callback_data='Stationery')],
+                                         [InlineKeyboardButton('Amenities', callback_data='Amenities')],
                                          [InlineKeyboardButton('I can\'t find my item', callback_data='none')]])
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
@@ -946,6 +948,7 @@ def marketplace(bot, update):
                                          [InlineKeyboardButton('Electronics', callback_data='Electronics')],
                                          [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
                                          [InlineKeyboardButton('Stationery', callback_data='Stationery')],
+                                         [InlineKeyboardButton('Amenities', callback_data='Amenities')],
                                          [InlineKeyboardButton('I can\'t find my item', callback_data='none')]])
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
