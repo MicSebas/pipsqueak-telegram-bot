@@ -453,7 +453,7 @@ def buy_options(bot, update, item_id, options_state):
             print(type(options_state))
             item = db.get_items({'item': item_id})
             options_state.reverse()
-            options_state = json.dumps(options_state)  # TODO: Delete this line later and complain to Ray
+            options_state = json.dumps(options_state, separators=(',',))  # TODO: Delete this line later and complain to Ray
             print(options_state)
             print(type(options_state))
             quantity = int(item['items'][options_state]['quantity'])
