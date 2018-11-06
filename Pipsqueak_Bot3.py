@@ -666,7 +666,10 @@ def buy_confirm(bot, update, state):
         msg = 'You want to buy %s' % item['itemName']
         if options != 'null':
             msg += ': ' + ', '.join(json.loads(options))
-        msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
+            stock = item['items'][options]['quantity']
+        else:
+            stock = item['items']['quantity']
+        msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % stock
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
