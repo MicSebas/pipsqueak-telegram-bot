@@ -363,16 +363,34 @@ def buy_item(bot, update):
     else:
         item_id = int(data)
         category = db.get_state(user_id).split('_')[1]
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
-        option_state = [list(d.keys())[0] for d in options]
-        db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
-        msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
-        keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
-        keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
-        keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
-        keyboard = InlineKeyboardMarkup(keyboard)
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        if options:
+            option_state = [list(d.keys())[0] for d in options]
+            db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
+            msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+            keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
+            keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
+            keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+            keyboard = InlineKeyboardMarkup(keyboard)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            quantity = item['items']['quantity']
+            if quantity > 0:
+                db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
+                msg = 'You want to buy %s' % item['itemName']
+                msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
+                                                  InlineKeyboardButton('/cancel', callback_data='cancel')]])
+                bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+            else:
+                db.update_state(user_id, 'buy_%s_%d_nostock' % (db.get_state(user_id).split('_')[1], item_id))
+                msg = 'I\'m sorry, but we currently don\'t have that item in stock. You can check the marketplace for student-listed items. Please note that we will not be issuing receipts for marketplace purchases. Alternatively, would you like to be notified if your item becomes available?'
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Notify me', callback_data='true')],
+                                                 [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
+                                                 [InlineKeyboardButton('<< back', callback_data='back'),
+                                                  InlineKeyboardButton('/cancel', callback_data='cancel')]])
+                bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
 
 def buy_options(bot, update, item_id, options_state):
@@ -395,7 +413,7 @@ def buy_options(bot, update, item_id, options_state):
     elif data == 'back':
         state = db.get_state(user_id)
         item_id = int(state.split('_')[2])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
@@ -418,7 +436,7 @@ def buy_options(bot, update, item_id, options_state):
         option = data_l[1]
         options_state[i] = option
         if i < len(options_state) - 1:
-            item = db.get_items({'itemId': item_id})
+            item = db.get_items({'item': item_id})
             options = item['options']
             d = options[i + 1]
             k = list(d.keys())[0]
@@ -430,7 +448,7 @@ def buy_options(bot, update, item_id, options_state):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            item = db.get_items({'itemId': item_id})
+            item = db.get_items({'item': item_id})
             quantity = item['items'][options_state]['quantity']
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
@@ -462,7 +480,7 @@ def buy_nostock(bot, update, state):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         name = update.callback_query.from_user.name
-        item = db.get_items({'itemId': item_id})['itemName']
+        item = db.get_items({'item': item_id})['itemName']
         msg = '%s (%d) has requested to be notified for the following item: %s.' % (name, user_id, item)
         bot.send_message(admin_id, msg)
     elif data == 'marketplace':
@@ -478,7 +496,7 @@ def buy_nostock(bot, update, state):
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'back':
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
@@ -502,16 +520,27 @@ def buy_quantity_callback_query(bot, update):
         state_list = state.split('_')
         category = state_list[1]
         item_id = int(state_list[2])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
-        option_state = [list(d.keys())[0] for d in options]
-        db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
-        msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
-        keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
-        keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
-        keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
-        keyboard = InlineKeyboardMarkup(keyboard)
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        if options:
+            option_state = [list(d.keys())[0] for d in options]
+            db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
+            msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+            keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
+            keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
+            keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+            keyboard = InlineKeyboardMarkup(keyboard)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            items = db.get_items({'category': category, 'page': 0})
+            db.update_state(user_id, 'buy_%s_0_item' % data)
+            msg = 'What %s do you want to buy?' % data.lower()
+            keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
+            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
+            keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
+            keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
+            keyboard = InlineKeyboardMarkup(keyboard)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
         cancel(bot, update)
 
@@ -525,7 +554,7 @@ def buy_quantity_message(bot, update):
         state_list = state.split('_')
         item_id = int(state_list[2])
         options = json.loads(state_list[3])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         stock = item['items'][options]['quantity']
         if quantity <= 0:
             msg = 'That\'s not a valid quantity. Please try again.'
@@ -556,20 +585,30 @@ def buy_confirm(bot, update, state):
     state_list = state.split('_')
     category = state_list[1]
     item_id = int(state_list[2])
-    options = json.loads(state_list[3])
+    try:
+        options = json.loads(state_list[3])
+    except json.decoder.JSONDecodeError:
+        options = None
     quantity = int(state_list[4])
     data = update.callback_query.data
     if data == 'confirm':
         global admin_id
         db.update_state(user_id, 'home')
-        item = db.get_items({'itemId': item_id})
-        msg = 'Purchase successful!\n\n%s: ' % item['itemName']
-        msg += ', '.join(options)
-        msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * item['items'][options]['price'])
-        msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
+        item = db.get_items({'item': item_id})
+        if options:
+            msg = 'Purchase successful!\n\n%s: ' % item['itemName']
+            msg += ', '.join(options)
+            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * item['items'][options]['price'])
+            msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
+        else:
+            msg = 'Purchase successful: %s!\n\n' % item['itemName']
+            msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * item['items'][options]['price'])
+            msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
-        # TODO: Update database item quantity
+        args = {'item': item_id, 'quantity': quantity, 'telegramId': user_id}
+        if options:
+            args['properties'] = options
         msg = 'Purchase: %s (%d) has purchased the following item: %s (itemId: %d) (quantity: %d)' % (update.callback_query.from_user.name, user_id, item['itemName'], item_id, quantity)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
         bot.send_message(admin_id, msg, reply_markup=keyboard)
@@ -585,7 +624,7 @@ def buy_confirm(bot, update, state):
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'back':
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (category, item_id, json.dumps(options)))
         msg = 'You want to buy %s: ' % item['itemName']
         msg += ', '.join(options)
@@ -697,7 +736,7 @@ def sell_item(bot, update):
     else:
         item_id = int(data)
         category = db.get_state(user_id).split('_')[1]
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'sell_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
@@ -729,7 +768,7 @@ def sell_options(bot, update, item_id, options_state):
     elif data == 'back':
         state = db.get_state(user_id)
         item_id = int(state.split('_')[2])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'sell_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
@@ -752,7 +791,7 @@ def sell_options(bot, update, item_id, options_state):
         option = data_l[1]
         options_state[i] = option
         if i < len(options_state) - 1:
-            item = db.get_items({'itemId': item_id})
+            item = db.get_items({'item': item_id})
             options = item['options']
             d = options[i + 1]
             k = list(d.keys())[0]
@@ -783,7 +822,7 @@ def sell_quantity_callback_query(bot, update):
         state_list = state.split('_')
         category = state_list[1]
         item_id = int(state_list[2])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'sell_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
@@ -806,7 +845,7 @@ def sell_quantity_message(bot, update):
         state_list = state.split('_')
         item_id = int(state_list[2])
         options = json.loads(state_list[3])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         if quantity <= 0:
             msg = 'That\'s not a valid quantity. Please try again.'
             bot.send_message(user_id, msg)
@@ -834,7 +873,7 @@ def sell_price_callback_query(bot, update):
         category = state_list[1]
         item_id = int(state_list[2])
         options = json.loads(state_list[3])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         db.update_state(user_id, 'sell_%s_%d_%s_quantity' % (category, item_id, json.dumps(options)))
         msg = 'You want to sell %s: ' % item['itemName']
         msg += ', '.join(options)
@@ -855,7 +894,7 @@ def sell_price_message(bot, update):
         item_id = int(state_list[2])
         options = json.loads(state_list[3])
         quantity = int(state_list[4])
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         if price <= 0:
             msg = 'That\'s not a valid amount. Please try again.'
             bot.send_message(user_id, msg)
@@ -886,7 +925,7 @@ def sell_confirm(bot, update, state):
     if data == 'confirm':
         global admin_id
         db.update_state(user_id, 'home')
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         msg = 'Listing successful!\n\n%s: ' % item['itemName']
         msg += ', '.join(options)
         msg += 'Quantity: %d\nPrice: $%.2f each\n\n' % (quantity, price)
@@ -898,7 +937,7 @@ def sell_confirm(bot, update, state):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
         bot.send_message(admin_id, msg, reply_markup=keyboard)
     elif data == 'back':
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         db.update_state(user_id, 'sell_%s_%d_%s_quantity' % (category, item_id, json.dumps(options)))
         msg = 'You want to sell %s: ' % item['itemName']
         msg += ', '.join(options)
@@ -1148,7 +1187,7 @@ def marketplace_nostock(bot, update, state):
         msg = '%s (%d) has requested to be notified for the following item: %s.' % (name, user_id, item)
         bot.send_message(admin_id, msg)
     elif data == 'buy':
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
@@ -1304,7 +1343,7 @@ def marketplace_confirm(bot, update, state):
                                          [InlineKeyboardButton('Contact %s' % seller_name, callback_data='forward_%d' % seller_id)]])
         bot.send_message(admin_id, msg, reply_markup=keyboard)
     elif data == 'buy':
-        item = db.get_items({'itemId': item_id})
+        item = db.get_items({'item': item_id})
         quantity = item['items'][options]['quantity']
         if quantity > 0:
             db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options)))
