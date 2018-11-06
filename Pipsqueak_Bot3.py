@@ -576,7 +576,7 @@ def buy_quantity_message(bot, update):
             msg = 'That\'s more than the stock we currently have. Please try again.'
             bot.send_message(user_id, msg)
         else:
-            db.update_state(user_id, '_'.join(state_list[:-1]) + '_confirm')
+            db.update_state(user_id, '_'.join(state_list[:-1]) + '_%d_confirm' % quantity)
             try:
                 if options:
                     price = float(item['items'][options]['price'])
@@ -614,6 +614,8 @@ def buy_confirm(bot, update, state):
     #     options = None
     quantity = int(state_list[4])
     data = update.callback_query.data
+    print(options)
+    print(type(options))
     if data == 'confirm':
         global admin_id
         db.update_state(user_id, 'home')
