@@ -641,9 +641,9 @@ def buy_confirm(bot, update, state):
         if options != 'null':
             args['properties'] = options
         text = db.bought_item(args)
-        text_list = text.split(' ')
-        msg = ' '.join(text_list[2:-1])
-        url = text_list[-1][:-1] + str(user_id)
+        text_list = text.split('\n')
+        msg = text_list[1]
+        url = 'phpstack-212261-643485.cloudwaysapps.com/logon/register?telegramId=' + str(user_id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Complete registration', url=url)]])
         bot.send_message(user_id, msg, reply_markup=keyboard)
         msg = 'Purchase: %s (%d) has purchased the following item: %s (itemId: %d) (quantity: %d)' % (update.callback_query.from_user.name, user_id, item['itemName'], item_id, quantity)
