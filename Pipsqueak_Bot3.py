@@ -778,7 +778,7 @@ def sell_item(bot, update):
         category = db.get_state(user_id).split('_')[1]
         item = db.get_items({'item': item_id})
         options = item['options']
-        if options != 'null':
+        if options:
             option_state = [list(d.keys())[0] for d in options]
             db.update_state(user_id, 'sell_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
             msg = 'Selling a %s\n\nWhat %s is it?' % (item['itemName'].lower(), option_state[0].lower())
