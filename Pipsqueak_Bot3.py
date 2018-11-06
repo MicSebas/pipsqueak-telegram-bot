@@ -607,10 +607,11 @@ def buy_confirm(bot, update, state):
     state_list = state.split('_')
     category = state_list[1]
     item_id = int(state_list[2])
-    try:
-        options = json.loads(state_list[3])
-    except json.decoder.JSONDecodeError:
-        options = None
+    options = state_list[3]
+    # try:
+    #     options = json.loads(state_list[3])
+    # except json.decoder.JSONDecodeError:
+    #     options = None
     quantity = int(state_list[4])
     data = update.callback_query.data
     if data == 'confirm':
@@ -619,7 +620,7 @@ def buy_confirm(bot, update, state):
         item = db.get_items({'item': item_id})
         if options:
             msg = 'Purchase successful!\n\n%s: ' % item['itemName']
-            msg += ', '.join(options)
+            msg += ', '.join(json.loads(options))
             msg += 'Quantity: %d\nTotal price: $%.2f\n\n' % (quantity, quantity * item['items'][options]['price'])
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
         else:
@@ -647,9 +648,9 @@ def buy_confirm(bot, update, state):
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'back':
         item = db.get_items({'item': item_id})
-        db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (category, item_id, json.dumps(options)))
+        db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (category, item_id, options))
         msg = 'You want to buy %s: ' % item['itemName']
-        msg += ', '.join(options)
+        msg += ', '.join(json.loads(options))
         msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
