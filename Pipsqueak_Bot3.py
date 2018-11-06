@@ -334,8 +334,7 @@ def buy_item(bot, update):
             items = db.get_items(args)
             msg = 'What %s do you want to buy?' % state_list[1].lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
-            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
-                             InlineKeyboardButton('Next >>', callback_data='next')])
+            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
             keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
             keyboard = InlineKeyboardMarkup(keyboard)
@@ -350,8 +349,7 @@ def buy_item(bot, update):
             db.update_state(user_id, 'buy_%s_%d_item' % (state_list[1], page + 1))
             msg = 'What %s do you want to buy?' % state_list[1].lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
-            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
-                             InlineKeyboardButton('Next >>', callback_data='next')])
+            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
             keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
             keyboard = InlineKeyboardMarkup(keyboard)
@@ -390,8 +388,7 @@ def buy_item(bot, update):
                 msg = 'I\'m sorry, but we currently don\'t have that item in stock. You can check the marketplace for student-listed items. Please note that we will not be issuing receipts for marketplace purchases. Alternatively, would you like to be notified if your item becomes available?'
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Notify me', callback_data='true')],
                                                  [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
-                                                 [InlineKeyboardButton('<< back', callback_data='back'),
-                                                  InlineKeyboardButton('/cancel', callback_data='cancel')]])
+                                                 [InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
 
@@ -408,8 +405,7 @@ def buy_options(bot, update, item_id, options_state):
         db.update_state(user_id, 'buy_%s_0_item' % category)
         msg = 'What %s do you want to buy?' % category.lower()
         keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
-        keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
-                         InlineKeyboardButton('Next >>', callback_data='next')])
+        keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
         keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
         keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
         keyboard = InlineKeyboardMarkup(keyboard)
@@ -439,6 +435,8 @@ def buy_options(bot, update, item_id, options_state):
         i = int(data_l[0])
         option = data_l[1]
         options_state[i] = option
+        print(options_state)
+        print(i)
         if i < len(options_state) - 1:
             item = db.get_items({'item': item_id})
             options = item['options']
@@ -1564,6 +1562,7 @@ def callback_query_handler(bot, update):
     global db
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
+    print(state)
     text = update.callback_query.message.text
     if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: '):
         connect(bot, update)
