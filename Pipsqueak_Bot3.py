@@ -448,14 +448,9 @@ def buy_options(bot, update, item_id, options_state):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            print('hi')
-            print(options_state)
-            print(type(options_state))
             item = db.get_items({'item': item_id})
             options_state.reverse()
             options_state = json.dumps(options_state, separators=(',', ':'))  # TODO: Delete this line later and complain to Ray
-            print(options_state)
-            print(type(options_state))
             quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, options_state))
@@ -566,6 +561,7 @@ def buy_quantity_message(bot, update):
         # except json.decoder.JSONDecodeError:
         #     options = None
         item = db.get_items({'item': item_id})
+        print('hi')
         print(item)
         print(options)
         if options:
@@ -580,7 +576,7 @@ def buy_quantity_message(bot, update):
             msg = 'That\'s more than the stock we currently have. Please try again.'
             bot.send_message(user_id, msg)
         else:
-            db.update_state(user_id, '_'.join(state_list[-1]) + '_confirm')
+            db.update_state(user_id, '_'.join(state_list[:-1]) + '_confirm')
             try:
                 if options:
                     price = float(item['items'][options]['price'])
@@ -1530,6 +1526,7 @@ def food_confirm(bot, update):
 def message_handler(bot, update):
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
+    print(state)
     if state.startswith('buy'):
         if state.endswith('_quantity'):
             buy_quantity_message(bot, update)
