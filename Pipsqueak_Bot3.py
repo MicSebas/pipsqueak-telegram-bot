@@ -788,7 +788,7 @@ def sell_item(bot, update):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            item = db.get_items({'itemId': item_id})
+            item = db.get_items({'item': item_id})
             db.update_state(user_id, 'sell_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
             msg = 'You want to sell %s' % item['itemName']
             msg += '\n\nHow many do you want to sell?'
@@ -851,7 +851,7 @@ def sell_options(bot, update, item_id, options_state):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            item = db.get_items({'itemId': item_id})
+            item = db.get_items({'item': item_id})
             options_state.reverse()  # TODO: Ray Y U Do Dis
             db.update_state(user_id, 'sell_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state, separators=(',', ':'))))
             msg = 'You want to sell %s: ' % item['itemName']
