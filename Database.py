@@ -52,28 +52,40 @@ class Database(object):
         if args:
             url += '?' + urlencode(args)
         r = requests.get(url)
-        r = json.loads(r.text)
-        return r
+        try:
+            r = json.loads(r.text)
+            return r
+        except json.decoder.JSONDecodeError:
+            return []
 
     def bought_item(self, args):
         url = self.url + '/ajax/b-cbuy?' + urlencode(args)
         r = requests.get(url)
-        r = json.loads(r.text)
-        return r
+        try:
+            r = json.loads(r.text)
+            return r
+        except json.decoder.JSONDecodeError:
+            return []
 
     def get_listings(self, args=None):
         url = self.url + '/ajax/items'
         if args:
             url += '?' + urlencode(args)
         r = requests.get(url)
-        r = json.loads(r.text)
-        return r
+        try:
+            r = json.loads(r.text)
+            return r
+        except json.decoder.JSONDecodeError:
+            return []
 
     def bought_listing(self, args):
         url = self.url + '/ajax/c-cbuy?' + urlencode(args)
         r = requests.get(url)
-        r = json.loads(r.text)
-        return r
+        try:
+            r = json.loads(r.text)
+            return r
+        except json.decoder.JSONDecodeError:
+            return []
 
     def add_mascot_name(self, user_id, user_name, submission):
         date = get_date()

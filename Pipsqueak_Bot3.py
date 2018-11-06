@@ -289,11 +289,7 @@ def buy_category(bot, update):
         args = {'category': data, 'page': 0}
         items = json.loads(db.get_items(args))
         print(items)
-        if items == 'No results':
-            query_id = update.callback_query.id
-            msg = 'There are currently no %s in stock.' % data.lower()
-            bot.answer_callback_query(query_id, msg)
-        else:
+        if items:
             db.update_state(user_id, 'buy_%s_0_item' % data)
             msg = 'What %s do you want to buy?' % data.lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
@@ -303,6 +299,10 @@ def buy_category(bot, update):
             keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            query_id = update.callback_query.id
+            msg = 'There are currently no %s in stock.' % data.lower()
+            bot.answer_callback_query(query_id, msg)
 
 
 def buy_item(bot, update):
