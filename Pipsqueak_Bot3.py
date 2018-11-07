@@ -1139,7 +1139,9 @@ def marketplace_item(bot, update):
         item_id = int(data.split('_')[1])
         item_id = 5
         category = db.get_state(user_id).split('_')[1]
+        print(category)
         item = db.get_items_marketplace({'item': item_id})
+        print(item)
         if item:
             db.update_state(user_id, 'marketplace_%s_%d_seller' % (category, item_id))
             msg = 'We have these listings for %s:\n\n' % item_name
