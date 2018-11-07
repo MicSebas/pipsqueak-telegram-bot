@@ -899,7 +899,7 @@ def sell_quantity_message(bot, update):
             msg = 'That\'s not a valid quantity. Please try again.'
             bot.send_message(user_id, msg)
         else:
-            db.update_state(user_id, '_'.join(state_list[-1]) + '_%d_price' % quantity)
+            db.update_state(user_id, '_'.join(state_list[:-1]) + '_%d_price' % quantity)
             if options != 'null':
                 price = float(item['items'][options]['price'])
             else:
