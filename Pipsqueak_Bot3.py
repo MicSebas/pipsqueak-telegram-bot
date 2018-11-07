@@ -1549,8 +1549,8 @@ def food_quantity_message(bot, update):
     item = db.get_food(item_id)
     print(item)
     item_name = item[1]
-    stock = item[2]
-    price = round(item[3], 2)
+    stock = int(item[2])
+    price = round(float(item[3]), 2)
     try:
         quantity = int(update.message.text)
         if quantity < 0:
