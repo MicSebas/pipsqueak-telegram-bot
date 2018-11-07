@@ -1136,6 +1136,7 @@ def marketplace_item(bot, update):
     else:
         item_name = data.split('_')[0]
         item_id = int(data.split('_')[1])
+        item_id = 5
         category = db.get_state(user_id).split('_')[1]
         item = db.get_items_marketplace({'item': item_id})
         if item:
@@ -1154,7 +1155,7 @@ def marketplace_item(bot, update):
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            db.update_state(user_id, 'marketplace_%s_%d_nostock' % (db.get_state(user_id).split('_')[1], item_id))
+            db.update_state(user_id, 'marketplace_%s_%d_nostock' % (category, item_id))
             msg = 'I\'m sorry, but we currently there are no listings for this item. You can check the official Pipsqueak store. Alternatively, would you like to be notified if your item becomes available?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Notify me', callback_data='true')],
                                              [InlineKeyboardButton('Check Pipsqueak store', callback_data='buy')],
@@ -1756,7 +1757,7 @@ def callback_query_handler(bot, update):
         bot.answer_callback_query(query_id, msg)
 
 
-def state(bot, update):
+def state_command(bot, update):
     global db
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
@@ -1779,7 +1780,7 @@ def main():
     dispatcher.add_handler(CommandHandler('help', help_command))
     dispatcher.add_handler(CommandHandler('food', food))
     dispatcher.add_handler(CommandHandler('_cancel', force_cancel))
-    dispatcher.add_handler(CommandHandler('_state', state))
+    dispatcher.add_handler(CommandHandler('_state', state_command))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
 
