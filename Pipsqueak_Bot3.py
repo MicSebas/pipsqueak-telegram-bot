@@ -1551,7 +1551,6 @@ def food_quantity_message(bot, update):
     item_name = item[1]
     stock = int(item[2])
     price = round(float(item[3]), 2)
-    print('hi')
     try:
         quantity = int(update.message.text)
         print(quantity)
@@ -1562,8 +1561,11 @@ def food_quantity_message(bot, update):
             msg = 'That\'s more than we have in stock right now. Please try again.'
             bot.send_message(user_id, msg)
         else:
+            print('hello')
             db.update_state(user_id, 'food_%d_%d_confirm', (item_id, quantity))
+            print('hi')
             msg = 'You\'re buying %s, %d for $%.2f each, total $%.2f. Is this correct?' % (item_name, quantity, price, quantity * price)
+            print(msg)
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm')],
                                              [InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
             bot.send_message(user_id, msg, reply_markup=keyboard)
