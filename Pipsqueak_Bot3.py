@@ -1088,6 +1088,7 @@ def marketplace_item(bot, update):
     user_id = update.callback_query.from_user.id
     msg_id = update.callback_query.message.message_id
     data = update.callback_query.data
+    print(data)
     if data == 'none':
         db.update_state(user_id, 'marketplace_request')
         msg = 'We\'re sorry you couldn\'t find what you want. You can check the official Pipsqueak store. Alternatively, would you like to be notified if your item becomes available?'
