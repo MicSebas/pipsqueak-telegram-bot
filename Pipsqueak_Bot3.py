@@ -1366,7 +1366,7 @@ def marketplace_quantity_callback_query(bot, update):
         category = state_list[1]
         item_id = int(state_list[2])
         options_state = json.loads(state_list[3])
-        item = json.loads(db.get_items_marketplace(item_id=item_id))
+        item = json.loads(db.get_listings({'item': item_id}))
         sellers = item['items'][options_state]
         db.update_state(user_id, 'marketplace_%s_%d_%s_seller' % (category, item_id, json.dumps(options_state)))
         msg = 'You want to buy %s: ' % item['itemName']
@@ -1547,6 +1547,7 @@ def food_quantity_message(bot, update):
     state_list = state.split('_')
     item_id = int(state_list[1])
     item = db.get_food(item_id)
+    print(item)
     item_name = item[1]
     stock = item[2]
     price = round(item[3], 2)
