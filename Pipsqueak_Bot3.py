@@ -203,11 +203,17 @@ def request(bot, update):
 
 def request_item(bot, update):
     global db
+    global admin_id
     user_id = update.message.from_user.id
     msg = 'Got it! We will notify you as soon as the item becomes available. Thank you for using Pipsqueak!'
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
     db.update_state(user_id, 'home')
     bot.send_message(user_id, msg, reply_markup=keyboard)
+    name = update.message.from_user.name
+    text = update.message.text
+    msg = 'Request: %s (%d) has requested to be notified for the following item: %s.' % (name, user_id, text)
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact %s' % name, callback_data='forward_%d' % user_id)]])
+    bot.send_message(admin_id, msg, reply_markup=keyboard)
 
 
 # Admin functions
@@ -1035,7 +1041,7 @@ def sell_request_item(bot, update):
     msg = 'Got it! We will notify you as soon as possible after an admin reviewed your listing. Thank you for using Pipsqueak!'
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
     bot.send_message(user_id, msg, reply_markup=keyboard)
-    msg = 'Request: %s (%d) has requested to be notified for the following item: %s.' % (name, user_id, text)
+    msg = 'Approval: %s (%d) has requested to be list the following item: %s.' % (name, user_id, text)
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Approve', callback_data='approve'), InlineKeyboardButton('Reject', callback_data='reject')],
                                      [InlineKeyboardButton('Contact %s' % name, callback_data='forward_%d' % user_id)]])
     bot.send_message(admin_id, msg, reply_markup=keyboard)
@@ -1680,9 +1686,9 @@ def callback_query_handler(bot, update):
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
     text = update.callback_query.message.text
-    if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: '):
+    if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: ') or text.startswith('Request: '):
         connect(bot, update)
-    elif text.startswith('Request: '):
+    elif text.startswith('Approval: '):
         data = update.callback_query.data
         if data.startswith('forward_'):
             connect(bot, update)
