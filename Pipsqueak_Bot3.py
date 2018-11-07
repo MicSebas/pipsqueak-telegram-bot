@@ -1551,8 +1551,10 @@ def food_quantity_message(bot, update):
     item_name = item[1]
     stock = int(item[2])
     price = round(float(item[3]), 2)
+    print('hi')
     try:
         quantity = int(update.message.text)
+        print(quantity)
         if quantity < 0:
             msg = 'That\'s not a valid quantity. Please try again.'
             bot.send_message(user_id, msg)
