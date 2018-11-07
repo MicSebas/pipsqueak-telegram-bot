@@ -221,8 +221,7 @@ def connect(bot, update):
         target_name = db.get_name(target_id)
         msg = update.callback_query.message.text
         msg += '\n\n%s is connecting to %s' % (admin_name, target_name)
-        print(type(update.callback_query.message.reply_markup))
-        bot.edit_message_text(msg, admin_id, msg_id, reply_markup=update.callback_query.message.reply_markup)
+        bot.edit_message_text(msg, admin_id, msg_id)
         db.update_state(user_id, data)
         msg = 'Waiting to connect to %s' % target_name
         bot.send_message(user_id, msg)
