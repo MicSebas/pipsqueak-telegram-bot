@@ -1140,7 +1140,7 @@ def marketplace_item(bot, update):
         item_id = 5
         category = db.get_state(user_id).split('_')[1]
         print(category)
-        item = db.get_items_marketplace({'item': item_id})
+        item = db.get_listings({'item': item_id})
         print(item)
         if item:
             db.update_state(user_id, 'marketplace_%s_%d_seller' % (category, item_id))
@@ -1258,7 +1258,7 @@ def marketplace_nostock(bot, update, state):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         bot.send_message(user_id, msg, reply_markup=keyboard)
         name = update.callback_query.from_user.name
-        item = json.loads(db.get_items_marketplace(item_id=item_id))['itemName']
+        item = json.loads(db.get_items({'item_id': item_id}))['itemName']
         msg = '%s (%d) has requested to be notified for the following item: %s.' % (name, user_id, item)
         bot.send_message(admin_id, msg)
     elif data == 'buy':
@@ -1342,7 +1342,8 @@ def marketplace_seller(bot, update, state):
             msg = 'You can\'t buy from yourself!'
             bot.answer_callback_query(query_id, msg)
         else:
-            item = json.loads(db.get_items_marketplace(item_id=item_id))
+            # TODO: Fix
+            item = json.loads(db.get_listings({'item': item_id}))
             options_state = json.loads(state_list[3])
             quantity = item['items'][options_state][seller_id]['quantity']
             price = item['items'][options_state][seller_id]['price']
