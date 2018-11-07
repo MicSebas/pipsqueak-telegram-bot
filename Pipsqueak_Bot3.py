@@ -1562,7 +1562,7 @@ def food_quantity_message(bot, update):
             bot.send_message(user_id, msg)
         else:
             print('hello')
-            db.update_state(user_id, 'food_%d_%d_confirm', (item_id, quantity))
+            db.update_state(user_id, 'food_%d_%d_confirm' % (item_id, quantity))
             print('hi')
             msg = 'You\'re buying %s, %d for $%.2f each, total $%.2f. Is this correct?' % (item_name, quantity, price, quantity * price)
             print(msg)
