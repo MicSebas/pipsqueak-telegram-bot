@@ -1769,6 +1769,8 @@ def callback_query_handler(bot, update):
             food_confirm(bot, update)
         else:
             food_item(bot, update)
+    elif state == 'help':
+        help_confirm(bot, update)
     elif state == 'home':
         if update.callback_query.data == 'buy':
             buy(bot, update)
