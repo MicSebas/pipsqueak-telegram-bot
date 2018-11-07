@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot3.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -41,14 +40,14 @@
           <entry key="Procfile" value="16" />
           <entry key="Python Console" value="3414" />
           <entry key="dummy" value="1" />
-          <entry key="py" value="86147" />
+          <entry key="py" value="86232" />
           <entry key="txt" value="22" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="39" />
-          <entry key="Python" value="89561" />
+          <entry key="Python" value="89646" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -72,19 +71,19 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="223" column="52" lean-forward="true" selection-start-line="223" selection-start-column="52" selection-end-line="223" selection-end-column="52" />
+            <state relative-caret-position="216">
+              <caret line="1602" column="33" lean-forward="true" selection-start-line="1602" selection-start-column="33" selection-end-line="1602" selection-end-column="33" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1541558561443" expanded="true" signature="1227:1230" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="3674:6549" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="5832:6549" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="6575:10381" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="9927:10381" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="25120:27711" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="72813:75031" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="86524:88396" ph="..." />
-                <marker date="1541558561443" expanded="true" signature="94580:94583" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="1227:1230" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="3674:6549" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="5832:6549" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="6575:10381" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="9927:10381" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="25120:27711" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="72813:75031" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="86524:88396" ph="..." />
+                <marker date="1541558825202" expanded="true" signature="94738:94741" ph="..." />
               </folding>
             </state>
           </provider>
@@ -325,19 +324,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="223" column="52" lean-forward="true" selection-start-line="223" selection-start-column="52" selection-end-line="223" selection-end-column="52" />
+        <state relative-caret-position="216">
+          <caret line="1602" column="33" lean-forward="true" selection-start-line="1602" selection-start-column="33" selection-end-line="1602" selection-end-column="33" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1541558561443" expanded="true" signature="1227:1230" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="3674:6549" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="5832:6549" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="6575:10381" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="9927:10381" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="25120:27711" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="72813:75031" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="86524:88396" ph="..." />
-            <marker date="1541558561443" expanded="true" signature="94580:94583" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="1227:1230" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="3674:6549" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="5832:6549" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="6575:10381" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="9927:10381" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="25120:27711" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="72813:75031" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="86524:88396" ph="..." />
+            <marker date="1541558825202" expanded="true" signature="94738:94741" ph="..." />
           </folding>
         </state>
       </provider>

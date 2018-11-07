@@ -1598,6 +1598,10 @@ def message_handler(bot, update):
         bot.forward_message(admin_id, user_id, msg_id)
         msg = 'Got it! Anything else you want to feedback to us? Please use /done when you\'re finished!'
         bot.send_message(user_id, msg)
+    elif state.startswith('forward'):
+        target_id = int(state.split('_')[1])
+        msg = update.message.text
+        bot.send_message(target_id, msg)
     else:
         msg = 'Please use /start to begin trading!'
         bot.send_message(user_id, msg)
