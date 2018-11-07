@@ -1530,7 +1530,7 @@ def food_quantity_callback_query(bot, update):
         keyboard = [[InlineKeyboardButton(item[1], callback_data=str(item[0]))] for item in foods]
         keyboard.append([InlineKeyboardButton('/cancel', callback_data='cancel')])
         keyboard = InlineKeyboardMarkup(keyboard)
-        bot.send_message(msg, user_id, msg_id, reply_markup=keyboard)
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
 
 def food_quantity_message(bot, update):
