@@ -385,7 +385,7 @@ def buy_item(bot, update):
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
                 msg = 'You want to buy %s' % item['itemName']
-                msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
+                msg += '\n\nHow many do you want to buy?'
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
                                                   InlineKeyboardButton('/cancel', callback_data='cancel')]])
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
@@ -462,7 +462,7 @@ def buy_options(bot, update, item_id, options_state):
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, options_state))
                 msg = 'You want to buy %s: ' % item['itemName']
                 msg += ', '.join(json.loads(options_state))
-                msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
+                msg += '\n\nHow many do you want to buy?'
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
             else:
@@ -681,7 +681,7 @@ def buy_confirm(bot, update, state):
             stock = item['items'][options]['quantity']
         else:
             stock = item['items']['quantity']
-        msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % stock
+        msg += '\n\nHow many do you want to buy?'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
@@ -1293,7 +1293,7 @@ def marketplace_nostock(bot, update, state):
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
                 msg = 'You want to buy %s' % item['itemName']
-                msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
+                msg += '\n\nHow many do you want to buy?'
                 keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
             else:
@@ -1468,7 +1468,7 @@ def marketplace_confirm(bot, update, state):
             db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options)))
             msg = 'You want to buy %s: ' % item['itemName']
             msg += ', '.join(options)
-            msg += '\n\nWe currently have %d in stock. How many do you want to buy?' % quantity
+            msg += '\n\nHow many do you want to buy?'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
                                               InlineKeyboardButton('/cancel', callback_data='cancel')]])
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
@@ -1533,7 +1533,7 @@ def food_item(bot, update):
         quantity = item[2]
         price = round(item[3], 2)
         db.update_state(user_id, 'food_%d_quantity' % item_id)
-        msg = 'We have %s, %d in stock for $%.2f each. How many do you want to buy?' % (item_name, quantity, price)
+        msg = 'We have %s for $%.2f each. How many do you want to buy?' % (item_name, price)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
@@ -1606,7 +1606,7 @@ def food_confirm(bot, update):
         quantity = item[2]
         price = round(item[3], 2)
         db.update_state(user_id, 'food_%d_quantity' % item_id)
-        msg = 'We have %s, %d in stock for $%.2f each. How many do you want to buy?' % (item_name, quantity, price)
+        msg = 'We have %s for $%.2f each. How many do you want to buy?' % (item_name, price)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'cancel':
