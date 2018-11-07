@@ -63,16 +63,19 @@ class Database(object):
         r = requests.get(url)
         return r.text
 
-    def get_listings(self, args=None):
-        url = self.url + '/ajax/items'
-        if args:
-            url += '?' + urlencode(args)
+    def get_listings(self, args):
+        url = self.url + '/ajax/getlistings?'
+        url += urlencode(args)
         r = requests.get(url)
         try:
             r = json.loads(r.text)
             return r
         except json.decoder.JSONDecodeError:
             return []
+
+    def get_seller(self, listing_id):
+        # TODO: Fill in
+        return 111914928
 
     def bought_listing(self, args):
         url = self.url + '/ajax/c-cbuy?' + urlencode(args)
