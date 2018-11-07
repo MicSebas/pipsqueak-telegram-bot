@@ -1564,7 +1564,10 @@ def food_quantity_message(bot, update):
             print('hello')
             db.update_state(user_id, 'food_%d_%d_confirm' % (item_id, quantity))
             print('hi')
-            msg = 'You\'re buying %s, %d for $%.2f each, total $%.2f. Is this correct?' % (item_name, quantity, price, quantity * price)
+            if quantity > 1:
+                msg = 'You\'re buying %s, %d for $%.2f each, total $%.2f. Is this correct?' % (item_name, quantity, price, quantity * price)
+            else:
+                msg = 'You\'re buying %s, %d for $%.2f. Is this correct?' % (item_name, quantity, price)
             print(msg)
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm')],
                                              [InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
