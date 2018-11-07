@@ -32,6 +32,8 @@ def pre_check(bot, update):
                 msg = 'You\'re in the middle of an operation. Please finish what you\'re doing first or use /cancel.'
                 bot.send_message(user_id, msg)
                 return False
+    else:
+        return False
 
 
 # General Commands
