@@ -217,7 +217,7 @@ def connect(bot, update):
         msg_id = update.callback_query.message.message_id
         admin_name = update.callback_query.from_user.name
         data = update.callback_query.data
-        target_id = int(data[1])
+        target_id = int(data.split('_')[1])
         target_name = db.get_name(target_id)
         msg = update.callback_query.message.text
         msg += '\n\n%s is connecting to %s' % (admin_name, target_name)
@@ -956,7 +956,7 @@ def sell_price_message(bot, update):
             db.update_state(user_id, '_'.join(state_list[:-1]) + '_%.2f_confirm' % price)
             msg = 'You want to sell %s' % item['itemName']
             if options != 'null':
-                msg += ': ' + ', '.join(options)
+                msg += ': ' + ', '.join(json.loads(options))
             msg += '. Selling %d for $%.2f each.\n\nIs this correct?' % (quantity, price)
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm')],
                                              [InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
