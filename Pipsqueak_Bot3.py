@@ -291,8 +291,7 @@ def buy_category(bot, update):
             db.update_state(user_id, 'buy_%s_0_item' % data)
             msg = 'What %s do you want to buy?' % data.lower()
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
-            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
-                             InlineKeyboardButton('Next >>', callback_data='next')])
+            keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
             keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
             keyboard = InlineKeyboardMarkup(keyboard)
@@ -1138,7 +1137,7 @@ def marketplace_item(bot, update):
         item_name = data.split('_')[0]
         item_id = int(data.split('_')[1])
         category = db.get_state(user_id).split('_')[1]
-        item = db.get_items_marketplace({'item_id': item_id})
+        item = db.get_items_marketplace({'item': item_id})
         if item:
             db.update_state(user_id, 'marketplace_%s_%d_seller' % (category, item_id))
             msg = 'We have these listings for %s:\n\n' % item_name
