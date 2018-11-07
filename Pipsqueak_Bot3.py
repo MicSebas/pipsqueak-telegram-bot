@@ -1495,6 +1495,9 @@ def food(bot, update):
         keyboard.append([InlineKeyboardButton('/cancel', callback_data='cancel')])
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.send_message(user_id, msg, reply_markup=keyboard)
+    else:
+        msg = 'You\'re in the middle of an operation. Please finish what you\'re doing first or use /cancel.'
+        bot.send_message(user_id, msg)
 
 
 def food_item(bot, update):
@@ -1754,6 +1757,13 @@ def callback_query_handler(bot, update):
         bot.answer_callback_query(query_id, msg)
 
 
+def state(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    state = db.get_state(user_id)
+    bot.send_message(user_id, state)
+
+
 # Main
 def main():
     updater = Updater(token=TOKEN)
@@ -1770,6 +1780,7 @@ def main():
     dispatcher.add_handler(CommandHandler('help', help_command))
     dispatcher.add_handler(CommandHandler('food', food))
     dispatcher.add_handler(CommandHandler('_cancel', force_cancel))
+    dispatcher.add_handler(CommandHandler('_state', state))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
 
