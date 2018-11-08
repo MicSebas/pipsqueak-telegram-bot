@@ -305,7 +305,7 @@ class Database(object):
         self.conn.commit()
 
     def get_feedback(self):
-        stmt = "SELECT * FROM feedback ORDER BY date, time"
+        stmt = "SELECT date, time, feedback FROM feedback ORDER BY date, time"
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         return rows
@@ -345,8 +345,8 @@ class Database(object):
 
 if __name__ == '__main__':
     db = Database()
-    # db.update_state(111914928, 'home')
     users = db.get_users(True)
+    print('Number of users:', len(users))
     # for user in users:
     #     print(user)
     # items = db._get_items_admin()
@@ -358,7 +358,7 @@ if __name__ == '__main__':
     # items = db.get_requests()
     # for item in items:
     #     print(item)
-    items = db.get_activities()
+    items = db.get_feedback()
+    # print_json(items)
     for item in items:
         print(item)
-    print(len(users))

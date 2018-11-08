@@ -1927,5 +1927,3 @@ if __name__ == '__main__':
     admin_id = -258851839
     admins = (111914928, 230937024, 255484909, 42010966)
     main()
-
-# TODO: Ask for email address to send receipt
