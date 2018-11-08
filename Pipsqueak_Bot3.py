@@ -38,7 +38,7 @@ def start(bot, update):
         global db
         user_id = update.message.from_user.id
         db.update_state(user_id, 'home')
-        msg = 'Hello, %s! Welcome to Pipsqueak, the first online parts marketplace in SUTD! My name is Mary Pippins. How can I help you today?' % update.message.from_user.first_name
+        msg = 'Hello, %s! Welcome to Pipsqueak, the first online parts marketplace in SUTD! How can I help you today?' % update.message.from_user.first_name
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('I want to /buy things', callback_data='buy')],
                                          [InlineKeyboardButton('I want to /sell things', callback_data='sell')]])
         bot.send_message(user_id, msg, reply_markup=keyboard)
@@ -114,12 +114,8 @@ def done(bot, update):
             db.update_state(user_id, 'home')
             msg = 'You are no longer connected. Thank you for using Pipsqueak!'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
-            if user_id not in admins:
-                bot.send_message(user_id, msg, reply_markup=keyboard)
-                bot.send_message(target_id, msg)
-            else:
-                bot.send_message(user_id, msg)
-                bot.send_message(target_id, msg, reply_markup=keyboard)
+            bot.send_message(user_id, msg, reply_markup=keyboard if user_id not in admins else None)
+            bot.send_message(target_id, msg, reply_markup=keyboard if target_id not in admins else None)
         else:
             msg = 'There\'s a time and place for everything. But now is not the time for this.'
             db.update_state(user_id, 'home')
@@ -147,7 +143,7 @@ def help_confirm(bot, update):
         msg = 'We are connecting you to an admin. Please hold.'
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         name = update.callback_query.from_user.name
-        msg = 'Help: %s (%d) is trying to connect to an admin.'
+        msg = 'Help: %s (%d) is trying to connect to an admin.' % (update.callback_query.from_user.name, user_id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect to %s' % name, callback_data='forward_%d' % user_id)]])
         bot.send_message(admin_id, msg, reply_markup=keyboard)
     else:
@@ -262,11 +258,11 @@ def buy(bot, update):
     if pre_check(bot, update):
         global db
         msg = 'What category of items do you want to buy?'
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Materials', callback_data='Materials')],
-                                         [InlineKeyboardButton('Electronics', callback_data='Electronics')],
-                                         [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
-                                         [InlineKeyboardButton('Stationery', callback_data='Stationery')],
-                                         [InlineKeyboardButton('Amenities', callback_data='Amenities')],
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Materials', callback_data='materials')],
+                                         [InlineKeyboardButton('Electronics', callback_data='electronics')],
+                                         [InlineKeyboardButton('Adhesives', callback_data='adhesives')],
+                                         [InlineKeyboardButton('Stationery', callback_data='stationery')],
+                                         [InlineKeyboardButton('IC chips', callback_data='ICs')],
                                          [InlineKeyboardButton('I can\'t find my item', callback_data='none')]])
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
@@ -296,7 +292,7 @@ def buy_category(bot, update):
         items = db.get_items(args)
         if items:
             db.update_state(user_id, 'buy_%s_0_item' % data)
-            msg = 'What %s do you want to buy?' % data.lower()
+            msg = 'What %s do you want to buy?' % data
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -691,11 +687,11 @@ def sell(bot, update):
     if pre_check(bot, update):
         global db
         msg = 'What category of items do you want to sell?'
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Materials', callback_data='Materials')],
-                                         [InlineKeyboardButton('Electronics', callback_data='Electronics')],
-                                         [InlineKeyboardButton('Adhesives', callback_data='Adhesives')],
-                                         [InlineKeyboardButton('Stationery', callback_data='Stationery')],
-                                         [InlineKeyboardButton('Amenities', callback_data='Amenities')],
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Materials', callback_data='materials')],
+                                         [InlineKeyboardButton('Electronics', callback_data='electronics')],
+                                         [InlineKeyboardButton('Adhesives', callback_data='adhesives')],
+                                         [InlineKeyboardButton('Stationery', callback_data='stationery')],
+                                         [InlineKeyboardButton('IC chips', callback_data='ICs')],
                                          [InlineKeyboardButton('I can\'t find my item', callback_data='none')]])
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
@@ -716,7 +712,7 @@ def sell_category(bot, update):
     if data != 'none':
         items = db.get_items({'category': data, 'page': 0})
         db.update_state(user_id, 'sell_%s_0_item' % data)
-        msg = 'What %s do you want to sell?' % data.lower()
+        msg = 'What %s do you want to sell?' % data
         keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
         keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
         keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])

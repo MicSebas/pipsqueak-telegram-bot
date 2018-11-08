@@ -342,7 +342,7 @@ if __name__ == '__main__':
     items = db.get_requests()
     for item in items:
         print(item)
-    items = db.get_food()
+    items = db.get_feedback()
     for item in items:
         print(item)
     print(len(users))
