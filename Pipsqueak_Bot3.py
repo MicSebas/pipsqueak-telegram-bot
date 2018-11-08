@@ -13,18 +13,17 @@ BOT.setWebhook(url='https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
 
 def pre_check(bot, update):
     global db
-    if update.callback_query is not None:
-        user_id = update.callback_query.from_user.id
-        name = update.callback_query.from_user.name
-    else:
-        user_id = update.message.from_user.id
-        name = update.message.from_user.name
+    user_id = update.message.from_user.id
+    name = update.message.from_user.name
     users_list = db.get_users()
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
+        db.track(user_id, name, 'home', 'Command', update.message.text)
         return True
     else:
-        if db.get_state(user_id).startswith('home'):
+        state = db.get_state(user_id)
+        db.track(user_id, name, state, 'Command', update.message.text)
+        if state.startswith('home'):
             return True
         else:
             msg = 'You\'re in the middle of an operation. Please finish what you\'re doing first or use /cancel.'
@@ -56,6 +55,10 @@ def cancel(bot, update):
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
     state = db.get_state(user_id)
+    if update.callback_query is not None:
+        db.track(user_id, name, state, 'Button', update.callback_query.data)
+    else:
+        db.track(user_id, name, state, 'Command', update.message.text)
     if state.startswith('home'):
         if state != 'home':
             db.update_state(user_id, 'home')
@@ -96,6 +99,7 @@ def done(bot, update):
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
     state = db.get_state(user_id)
+    db.track(user_id, name, state, 'Command', update.message.text)
     if state == 'home':
         msg = 'You\'re not in the middle of any operation. Please use /start to begin trading.'
         bot.send_message(user_id, msg)
@@ -1242,7 +1246,6 @@ def marketplace_item(bot, update):
     else:
         item_name = data.split('_')[0]
         item_id = int(data.split('_')[1])
-        item_id = 5
         category = db.get_state(user_id).split('_')[1]
         print(category)
         item = db.get_listings({'item': item_id})
@@ -1620,7 +1623,7 @@ def food_item(bot, update):
         item_id = int(data)
         item = db.get_food(item_id)
         item_name = item[1]
-        quantity = item[2]
+        # quantity = item[2]
         price = round(item[3], 2)
         db.update_state(user_id, 'food_%d_quantity' % item_id)
         msg = 'We have %s for $%.2f each. How many do you want to buy?' % (item_name, price)
@@ -1693,7 +1696,7 @@ def food_confirm(bot, update):
         item_id = int(state_list[1])
         item = db.get_food(item_id)
         item_name = item[1]
-        quantity = item[2]
+        # quantity = item[2]
         price = round(item[3], 2)
         db.update_state(user_id, 'food_%d_quantity' % item_id)
         msg = 'We have %s for $%.2f each. How many do you want to buy?' % (item_name, price)
@@ -1724,6 +1727,8 @@ def food_confirm(bot, update):
 def message_handler(bot, update):
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
+    if state != 'feedback' and not state.startswith('forward'):
+        db.track(user_id, update.message.from_user.name, state, 'Message', update.message.text)
     if state.startswith('buy'):
         if state.endswith('_quantity'):
             buy_quantity_message(bot, update)
@@ -1775,6 +1780,7 @@ def callback_query_handler(bot, update):
     global db
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
+    db.track(user_id, update.callback_query.from_user.name, state, 'Button', update.callback_query.data)
     text = update.callback_query.message.text
     if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: ') or text.startswith('Request: '):
         connect(bot, update)

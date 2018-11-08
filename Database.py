@@ -46,6 +46,9 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS food (item_id BIGINT NOT NULL, item_name TEXT NOT NULL, quantity BIGINT NOT NULL, price REAL NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
+        stmt = "CREATE TABLE IF NOT EXISTS activity (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, state TEXT NOT NULL, activity TEXT NOT NULL)"
+        self.cur.execute(stmt)
+        self.conn.commit()
 
     def get_items(self, args=None):
         url = self.url + '/ajax/items'
@@ -325,6 +328,19 @@ class Database(object):
         stmt = "UPDATE food SET quantity = %d WHERE item_id = %d" % (q - quantity, item_id)
         self.cur.execute(stmt)
         self.conn.commit()
+
+    def track(self, user_id, user_name, state, activity_type, activity):
+        date = get_date()
+        time = get_time()
+        stmt = "INSERT INTO activities VALUES ('%s', '%s', %d, '%s', '%s', '%s: %s')" % (date, time, user_id, user_name, state, activity_type, activity)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
+    def get_activities(self):
+        stmt = "SELECT * FROM activities ORDER BY date, time"
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        return rows
 
 
 if __name__ == '__main__':
