@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot3.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -73,19 +71,19 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-323">
-              <caret line="317" column="35" lean-forward="true" selection-start-line="317" selection-start-column="35" selection-end-line="317" selection-end-column="35" />
+            <state relative-caret-position="204">
+              <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1541658412211" expanded="true" signature="1139:1142" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="3510:6347" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="5580:6347" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="6373:10621" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="10167:10621" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="25232:28016" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="76514:79019" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="90887:92736" ph="..." />
-                <marker date="1541658412211" expanded="true" signature="99215:99345" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="1139:1142" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="3510:6347" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="5580:6347" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="6373:10621" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="10167:10621" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="25226:28008" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="76504:79009" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="90877:92726" ph="..." />
+                <marker date="1541658738039" expanded="true" signature="99205:99335" ph="..." />
               </folding>
             </state>
           </provider>
@@ -271,13 +269,13 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32907802" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32765958" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32765958" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32907802" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32907802" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32907802" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32855093" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -334,19 +332,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-323">
-          <caret line="317" column="35" lean-forward="true" selection-start-line="317" selection-start-column="35" selection-end-line="317" selection-end-column="35" />
+        <state relative-caret-position="204">
+          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1541658412211" expanded="true" signature="1139:1142" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="3510:6347" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="5580:6347" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="6373:10621" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="10167:10621" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="25232:28016" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="76514:79019" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="90887:92736" ph="..." />
-            <marker date="1541658412211" expanded="true" signature="99215:99345" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="1139:1142" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="3510:6347" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="5580:6347" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="6373:10621" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="10167:10621" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="25226:28008" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="76504:79009" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="90877:92726" ph="..." />
+            <marker date="1541658738039" expanded="true" signature="99205:99335" ph="..." />
           </folding>
         </state>
       </provider>

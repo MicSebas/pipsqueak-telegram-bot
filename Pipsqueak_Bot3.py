@@ -368,7 +368,7 @@ def buy_item(bot, update):
         if options:
             option_state = [list(d.keys())[0] for d in options]
             db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
-            msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+            msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
             keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -417,7 +417,7 @@ def buy_options(bot, update, item_id, options_state):
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
-        msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+        msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -441,7 +441,7 @@ def buy_options(bot, update, item_id, options_state):
             d = options[i + 1]
             k = list(d.keys())[0]
             db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
-            msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), k.lower())
+            msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), k.lower())
             keyboard = [[InlineKeyboardButton(choice, callback_data='%d_%s' % (i + 1, choice))] for choice in d[k]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -505,7 +505,7 @@ def buy_nostock(bot, update, state):
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (state_list[1], item_id, json.dumps(option_state)))
-        msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+        msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -530,7 +530,7 @@ def buy_quantity_callback_query(bot, update):
         if options:
             option_state = [list(d.keys())[0] for d in options]
             db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
-            msg = 'Buying a %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+            msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
             keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -672,9 +672,9 @@ def buy_confirm(bot, update, state):
         msg = 'You want to buy %s' % item['itemName']
         if options != 'null':
             msg += ': ' + ', '.join(json.loads(options))
-            stock = item['items'][options]['quantity']
-        else:
-            stock = item['items']['quantity']
+        #     stock = item['items'][options]['quantity']
+        # else:
+        #     stock = item['items']['quantity']
         msg += '\n\nHow many do you want to buy?'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
@@ -826,7 +826,7 @@ def sell_options(bot, update, item_id, options_state):
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'sell_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
-        msg = 'Selling a %s\n\nWhat %s is it?' % (item['itemName'].lower(), option_state[0].lower())
+        msg = 'Selling %s\n\nWhat %s is it?' % (item['itemName'].lower(), option_state[0].lower())
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -850,7 +850,7 @@ def sell_options(bot, update, item_id, options_state):
             d = options[i + 1]
             k = list(d.keys())[0]
             db.update_state(user_id, 'sell_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(options_state)))
-            msg = 'Selling a %s\n\nWhat %s is it?' % (item['itemName'].lower(), k.lower())
+            msg = 'Selling %s\n\nWhat %s is it?' % (item['itemName'].lower(), k.lower())
             keyboard = [[InlineKeyboardButton(choice, callback_data='%d_%s' % (i + 1, choice))] for choice in d[k]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
@@ -881,7 +881,7 @@ def sell_quantity_callback_query(bot, update):
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'sell_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
-        msg = 'Selling a %s\n\nWhat %s is it?' % (item['itemName'].lower(), option_state[0].lower())
+        msg = 'Selling %s\n\nWhat %s is it?' % (item['itemName'].lower(), option_state[0].lower())
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
