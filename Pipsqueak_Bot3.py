@@ -13,6 +13,7 @@ BOT.setWebhook(url='https://pipsqueak-sutd-bot.herokuapp.com/' + TOKEN)
 
 def pre_check(bot, update):
     global db
+    print('precheck')
     if update.callback_query is not None:
         user_id = update.callback_query.from_user.id
         name = update.callback_query.from_user.name
@@ -1923,6 +1924,7 @@ def main():
 
 
 if __name__ == '__main__':
+    print('running')
     db = Database()
     admin_id = -258851839
     admins = (111914928, 230937024, 255484909, 42010966)
