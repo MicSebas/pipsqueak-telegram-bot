@@ -358,7 +358,7 @@ if __name__ == '__main__':
     items = db.get_requests()
     for item in items:
         print(item)
-    items = db.get_feedback()
+    items = db.get_activities()
     for item in items:
         print(item)
     print(len(users))
