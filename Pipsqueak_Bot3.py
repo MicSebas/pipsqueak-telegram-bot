@@ -61,10 +61,10 @@ def cancel(bot, update):
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
     state = db.get_state(user_id)
-    # if update.callback_query is not None:
-    #     db.track(user_id, name, state, 'Button', update.callback_query.data)
-    # else:
-    #     db.track(user_id, name, state, 'Command', update.message.text)
+    if update.callback_query is not None:
+        db.track(user_id, name, state, 'Button', update.callback_query.data)
+    else:
+        db.track(user_id, name, state, 'Command', update.message.text)
     if state.startswith('home'):
         if state != 'home':
             db.update_state(user_id, 'home')
@@ -105,7 +105,7 @@ def done(bot, update):
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
     state = db.get_state(user_id)
-    # db.track(user_id, name, state, 'Command', update.message.text)
+    db.track(user_id, name, state, 'Command', update.message.text)
     if state == 'home':
         msg = 'You\'re not in the middle of any operation. Please use /start to begin trading.'
         bot.send_message(user_id, msg)
@@ -1733,8 +1733,8 @@ def food_confirm(bot, update):
 def message_handler(bot, update):
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
-    # if state != 'feedback' and not state.startswith('forward'):
-    #     db.track(user_id, update.message.from_user.name, state, 'Message', update.message.text)
+    if state != 'feedback' and not state.startswith('forward'):
+        db.track(user_id, update.message.from_user.name, state, 'Message', update.message.text)
     if state.startswith('buy'):
         if state.endswith('_quantity'):
             buy_quantity_message(bot, update)
@@ -1786,7 +1786,7 @@ def callback_query_handler(bot, update):
     global db
     user_id = update.callback_query.from_user.id
     state = db.get_state(user_id)
-    # db.track(user_id, update.callback_query.from_user.name, state, 'Button', update.callback_query.data)
+    db.track(user_id, update.callback_query.from_user.name, state, 'Button', update.callback_query.data)
     text = update.callback_query.message.text
     if text.startswith('Help: ') or text.startswith('Listing: ') or text.startswith('Purchase: ') or text.startswith('Request: '):
         connect(bot, update)

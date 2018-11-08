@@ -347,17 +347,17 @@ if __name__ == '__main__':
     db = Database()
     # db.update_state(111914928, 'home')
     users = db.get_users(True)
-    for user in users:
-        print(user)
-    items = db._get_items_admin()
-    for item in items:
-        print(item)
-    items = db.get_mascot_names()
-    for item in items:
-        print(item)
-    items = db.get_requests()
-    for item in items:
-        print(item)
+    # for user in users:
+    #     print(user)
+    # items = db._get_items_admin()
+    # for item in items:
+    #     print(item)
+    # items = db.get_mascot_names()
+    # for item in items:
+    #     print(item)
+    # items = db.get_requests()
+    # for item in items:
+    #     print(item)
     items = db.get_activities()
     for item in items:
         print(item)
