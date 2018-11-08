@@ -22,11 +22,11 @@ def pre_check(bot, update):
     users_list = db.get_users()
     if user_id not in users_list:
         db.add_new_user(user_id, name, 'home')
-        # db.track(user_id, name, 'home', 'Command', update.message.text)
+        db.track(user_id, name, 'home', 'Command', update.message.text)
         return True
     else:
         state = db.get_state(user_id)
-        # db.track(user_id, name, state, 'Command', update.message.text)
+        db.track(user_id, name, state, 'Command', update.message.text)
         if state.startswith('home'):
             return True
         else:
