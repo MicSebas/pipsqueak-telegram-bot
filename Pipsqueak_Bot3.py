@@ -332,7 +332,7 @@ def buy_item(bot, update):
             db.update_state(user_id, 'buy_%s_%d_item' % (state_list[1], page - 1))
             args = {'category': state_list[1], 'page': page - 1}
             items = db.get_items(args)
-            msg = 'What %s do you want to buy?' % state_list[1].lower()
+            msg = 'What %s do you want to buy?' % state_list[1]
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -347,7 +347,7 @@ def buy_item(bot, update):
         items = db.get_items(args)
         if items:
             db.update_state(user_id, 'buy_%s_%d_item' % (state_list[1], page + 1))
-            msg = 'What %s do you want to buy?' % state_list[1].lower()
+            msg = 'What %s do you want to buy?' % state_list[1]
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -418,7 +418,7 @@ def buy_options(bot, update, item_id, options_state):
         category = db.get_state(user_id).split('_')[1]
         items = db.get_items({'category': category, 'page': 0})
         db.update_state(user_id, 'buy_%s_0_item' % category)
-        msg = 'What %s do you want to buy?' % category.lower()
+        msg = 'What %s do you want to buy?' % category
         keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
         keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
         keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -617,7 +617,7 @@ def buy_quantity_callback_query(bot, update):
         else:
             items = db.get_items({'category': category, 'page': 0})
             db.update_state(user_id, 'buy_%s_0_item' % category)
-            msg = 'What %s do you want to buy?' % category.lower()
+            msg = 'What %s do you want to buy?' % category
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -850,7 +850,7 @@ def sell_item(bot, update):
         else:
             db.update_state(user_id, 'sell_%s_%d_item' % (state_list[1], page - 1))
             items = db.get_items({'category': state_list[1], 'page': page - 1})
-            msg = 'What %s do you want to sell?' % state_list[1].lower()
+            msg = 'What %s do you want to sell?' % state_list[1]
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=item['itemId'])] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -864,7 +864,7 @@ def sell_item(bot, update):
         items = db.get_items({'category': state_list[1], 'page': page + 1})
         if items:
             db.update_state(user_id, 'sell_%s_%d_item' % (state_list[1], page + 1))
-            msg = 'What %s do you want to sell?' % state_list[1].lower()
+            msg = 'What %s do you want to sell?' % state_list[1]
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=item['itemId'])] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -907,7 +907,7 @@ def sell_options(bot, update, item_id, options_state):
         category = db.get_state(user_id).split('_')[1]
         items = db.get_items({'category': category, 'page': 0})
         db.update_state(user_id, 'sell_%s_0_item' % category)
-        msg = 'What %s do you want to sell?' % category.lower()
+        msg = 'What %s do you want to sell?' % category
         keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
         keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'),
                          InlineKeyboardButton('Next >>', callback_data='next')])
@@ -1168,7 +1168,7 @@ def marketplace_category(bot, update):
         items = db.get_items({'category': data, 'page': 0})
         if items:
             db.update_state(user_id, 'marketplace_%s_0_item' % data)
-            msg = 'What %s do you want to buy?' % data.lower()
+            msg = 'What %s do you want to buy?' % data
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data='%s_%d' % (item['itemName'], int(item['itemId'])))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -1177,7 +1177,7 @@ def marketplace_category(bot, update):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             query_id = update.callback_query.id
-            msg = 'There are currently no listings of %s.' % data.lower()
+            msg = 'There are currently no listings of %s.' % data
             bot.answer_callback_query(query_id, msg)
     else:
         db.update_state(user_id, 'marketplace_request')
@@ -1214,7 +1214,7 @@ def marketplace_item(bot, update):
         else:
             db.update_state(user_id, 'marketplace_%s_%d_item' % (state_list[1], page - 1))
             items = db.get_items({'category': state_list[1], 'page': page - 1})
-            msg = 'What %s do you want to buy?' % state_list[1].lower()
+            msg = 'What %s do you want to buy?' % state_list[1]
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data='%s_%d' % (item['itemName'], int(item['itemId'])))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -1228,7 +1228,7 @@ def marketplace_item(bot, update):
         items = db.get_items({'category': state_list[1], 'page': page + 1})
         if items:
             db.update_state(user_id, 'marketplace_%s_%d_item' % (state_list[1], page + 1))
-            msg = 'What %s do you want to buy?' % state_list[1].lower()
+            msg = 'What %s do you want to buy?' % state_list[1]
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data='%s_%d' % (item['itemName'], int(item['itemId'])))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -1398,8 +1398,8 @@ def marketplace_nostock(bot, update, state):
         category = state_list[1]
         items = db.get_items({'category': category, 'page': 0})
         if items:
-            db.update_state(user_id, 'marketplace_%s_0_item' % data)
-            msg = 'What %s do you want to buy?' % data.lower()
+            db.update_state(user_id, 'marketplace_%s_0_item' % category)
+            msg = 'What %s do you want to buy?' % category
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data='%s_%d' % (item['itemName'], int(item['itemId'])))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -1408,7 +1408,7 @@ def marketplace_nostock(bot, update, state):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             query_id = update.callback_query.id
-            msg = 'There are currently no listings of %s.' % category.lower()
+            msg = 'There are currently no listings of %s.' % category
             bot.answer_callback_query(query_id, msg)
     else:
         cancel(bot, update)
@@ -1425,8 +1425,8 @@ def marketplace_seller(bot, update, state):
         category = state_list[1]
         items = db.get_items({'category': category, 'page': 0})
         if items:
-            db.update_state(user_id, 'marketplace_%s_0_item' % data)
-            msg = 'What %s do you want to buy?' % data.lower()
+            db.update_state(user_id, 'marketplace_%s_0_item' % category)
+            msg = 'What %s do you want to buy?' % category
             keyboard = [[InlineKeyboardButton(item['itemName'], callback_data='%s_%d' % (item['itemName'], int(item['itemId'])))] for item in items]
             keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
             keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
@@ -1435,7 +1435,7 @@ def marketplace_seller(bot, update, state):
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
             query_id = update.callback_query.id
-            msg = 'There are currently no listings of %s.' % category.lower()
+            msg = 'There are currently no listings of %s.' % category
             bot.answer_callback_query(query_id, msg)
     elif data == 'cancel':
         cancel(bot, update)
