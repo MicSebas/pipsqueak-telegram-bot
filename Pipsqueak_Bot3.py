@@ -365,6 +365,13 @@ def buy_item(bot, update):
         options = item['options']
         print(options)
         print(type(options))
+        try:
+            if 'placeholder' in item['imageUrl']:
+                img_url = None
+            else:
+                img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+        except KeyError:
+            img_url = None
         if options:
             option_state = [list(d.keys())[0] for d in options]
             db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
@@ -372,6 +379,10 @@ def buy_item(bot, update):
             keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+            if img_url:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+            else:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
@@ -380,8 +391,12 @@ def buy_item(bot, update):
                 db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
                 msg = 'You want to buy %s' % item['itemName']
                 msg += '\n\nHow many do you want to buy?'
-                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
-                                                  InlineKeyboardButton('/cancel', callback_data='cancel')]])
+                if img_url:
+                    keyboard = [[InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)]]
+                else:
+                    keyboard = [[InlineKeyboardButton('Description', callback_data='description')]]
+                keyboard.append([InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')])
+                keyboard = InlineKeyboardMarkup(keyboard)
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
             else:
                 db.update_state(user_id, 'buy_%s_%d_nostock' % (db.get_state(user_id).split('_')[1], item_id))
@@ -414,6 +429,13 @@ def buy_options(bot, update, item_id, options_state):
         state = db.get_state(user_id)
         item_id = int(state.split('_')[2])
         item = db.get_items({'item': item_id})
+        try:
+            if 'placeholder' in item['imageUrl']:
+                img_url = None
+            else:
+                img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+        except KeyError:
+            img_url = None
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (db.get_state(user_id).split('_')[1], item_id, json.dumps(option_state)))
@@ -421,6 +443,10 @@ def buy_options(bot, update, item_id, options_state):
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+        if img_url:
+            keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+        else:
+            keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'none':
@@ -430,6 +456,13 @@ def buy_options(bot, update, item_id, options_state):
                                          [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    elif data == 'description':
+        state = db.get_state(user_id)
+        item_id = int(state.split('_')[2])
+        item = db.get_items({'item': item_id})
+        msg = item['description']
+        query_id = update.callback_query.id
+        bot.answer_callback_query(query_id, msg)
     else:
         data_l = data.split('_')
         i = int(data_l[0])
@@ -437,6 +470,13 @@ def buy_options(bot, update, item_id, options_state):
         options_state[i] = option
         if i < len(options_state) - 1:
             item = db.get_items({'item': item_id})
+            try:
+                if 'placeholder' in item['imageUrl']:
+                    img_url = None
+                else:
+                    img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+            except KeyError:
+                img_url = None
             options = item['options']
             d = options[i + 1]
             k = list(d.keys())[0]
@@ -445,6 +485,10 @@ def buy_options(bot, update, item_id, options_state):
             keyboard = [[InlineKeyboardButton(choice, callback_data='%d_%s' % (i + 1, choice))] for choice in d[k]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+            if img_url:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+            else:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
@@ -453,11 +497,23 @@ def buy_options(bot, update, item_id, options_state):
             options_state = json.dumps(options_state, separators=(',', ':'))  # TODO: Delete this line later and complain to Ray
             quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
+                try:
+                    if 'placeholder' in item['imageUrl']:
+                        img_url = None
+                    else:
+                        img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+                except KeyError:
+                    img_url = None
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, options_state))
                 msg = 'You want to buy %s: ' % item['itemName']
                 msg += ', '.join(json.loads(options_state))
                 msg += '\n\nHow many do you want to buy?'
-                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
+                if img_url:
+                    keyboard = [[InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)]]
+                else:
+                    keyboard = [[InlineKeyboardButton('Description', callback_data='description')]]
+                keyboard.append([InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')])
+                keyboard = InlineKeyboardMarkup(keyboard)
                 bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
             else:
                 db.update_state(user_id, 'buy_%s_%d_nostock' % (db.get_state(user_id).split('_')[1], item_id))
@@ -502,6 +558,13 @@ def buy_nostock(bot, update, state):
         # bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'back':
         item = db.get_items({'item': item_id})
+        try:
+            if 'placeholder' in item['imageUrl']:
+                img_url = None
+            else:
+                img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+        except KeyError:
+            img_url = None
         options = item['options']
         option_state = [list(d.keys())[0] for d in options]
         db.update_state(user_id, 'buy_%s_%d_%s_options' % (state_list[1], item_id, json.dumps(option_state)))
@@ -509,6 +572,10 @@ def buy_nostock(bot, update, state):
         keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
         keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
         keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+        if img_url:
+            keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+        else:
+            keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
         keyboard = InlineKeyboardMarkup(keyboard)
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
@@ -528,12 +595,23 @@ def buy_quantity_callback_query(bot, update):
         item = db.get_items({'item': item_id})
         options = item['options']
         if options:
+            try:
+                if 'placeholder' in item['imageUrl']:
+                    img_url = None
+                else:
+                    img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+            except KeyError:
+                img_url = None
             option_state = [list(d.keys())[0] for d in options]
             db.update_state(user_id, 'buy_%s_%d_%s_options' % (category, item_id, json.dumps(option_state)))
             msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
             keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
             keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
             keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+            if img_url:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+            else:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
@@ -546,6 +624,12 @@ def buy_quantity_callback_query(bot, update):
             keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
             keyboard = InlineKeyboardMarkup(keyboard)
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    elif data == 'description':
+        item_id = int(state.split('_')[2])
+        item = db.get_items({'item': item_id})
+        msg = item['description']
+        query_id = update.callback_query.id
+        bot.answer_callback_query(query_id, msg)
     else:
         cancel(bot, update)
 
@@ -668,6 +752,13 @@ def buy_confirm(bot, update, state):
         # bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     elif data == 'back':
         item = db.get_items({'item': item_id})
+        try:
+            if 'placeholder' in item['imageUrl']:
+                img_url = None
+            else:
+                img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
+        except KeyError:
+            img_url = None
         db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (category, item_id, options))
         msg = 'You want to buy %s' % item['itemName']
         if options != 'null':
@@ -676,7 +767,12 @@ def buy_confirm(bot, update, state):
         # else:
         #     stock = item['items']['quantity']
         msg += '\n\nHow many do you want to buy?'
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        if img_url:
+            keyboard = [[InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)]]
+        else:
+            keyboard = [[InlineKeyboardButton('Description', callback_data='description')]]
+        keyboard.append([InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')])
+        keyboard = InlineKeyboardMarkup(keyboard)
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
         cancel(bot, update)
