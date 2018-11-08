@@ -46,7 +46,7 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS food (item_id BIGINT NOT NULL, item_name TEXT NOT NULL, quantity BIGINT NOT NULL, price REAL NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
-        stmt = "CREATE TABLE IF NOT EXISTS activity (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, state TEXT NOT NULL, activity TEXT NOT NULL)"
+        stmt = "CREATE TABLE IF NOT EXISTS activities (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, state TEXT NOT NULL, activity TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
 
