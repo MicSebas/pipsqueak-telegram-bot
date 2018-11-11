@@ -763,6 +763,8 @@ def buy_confirm(bot, update, state):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Complete registration', url=url)]])
         bot.send_message(user_id, msg, reply_markup=keyboard)
         msg = 'Purchase: %s (%d) has purchased the following item: %s (itemId: %d) (quantity: %d)' % (update.callback_query.from_user.name, user_id, item['itemName'], item_id, quantity)
+        if options != 'null':
+            msg += ' (properties: %s)' % str(options)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
         bot.send_message(admin_id, msg, reply_markup=keyboard)
     elif data == 'marketplace':
