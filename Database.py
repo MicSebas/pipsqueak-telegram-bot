@@ -347,8 +347,8 @@ if __name__ == '__main__':
     db = Database()
     users = db.get_users(True)
     print('Number of users:', len(users))
-    # for user in users:
-    #     print(user)
+    for user in users:
+        print(user)
     # items = db._get_items_admin()
     # for item in items:
     #     print(item)

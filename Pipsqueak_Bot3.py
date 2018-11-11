@@ -1926,6 +1926,6 @@ def main():
 if __name__ == '__main__':
     print('running')
     db = Database()
-    admin_id = -258851839
+    admin_id = -1001312124809
     admins = (111914928, 230937024, 255484909, 42010966)
     main()
