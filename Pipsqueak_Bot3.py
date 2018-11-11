@@ -1682,12 +1682,17 @@ def food_item(bot, update):
         item_id = int(data)
         item = db.get_food(item_id)
         item_name = item[1]
-        # quantity = item[2]
-        price = round(item[3], 2)
-        db.update_state(user_id, 'food_%d_quantity' % item_id)
-        msg = 'We have %s for $%.2f each. How many do you want to buy?' % (item_name, price)
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        quantity = item[2]
+        if quantity > 0:
+            price = round(item[3], 2)
+            db.update_state(user_id, 'food_%d_quantity' % item_id)
+            msg = 'We have %s for $%.2f each. How many do you want to buy?' % (item_name, price)
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'), InlineKeyboardButton('/cancel', callback_data='cancel')]])
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            query_id = update.callback_query.id
+            msg = 'Sorry, we\'re out of stock!'
+            bot.answer_callback_query(query_id, msg)
 
 
 def food_quantity_callback_query(bot, update):
