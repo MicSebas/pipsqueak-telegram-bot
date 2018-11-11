@@ -577,18 +577,36 @@ def buy_nostock(bot, update, state):
         except KeyError:
             img_url = None
         options = item['options']
-        option_state = [list(d.keys())[0] for d in options]
-        db.update_state(user_id, 'buy_%s_%d_%s_options' % (state_list[1], item_id, json.dumps(option_state)))
-        msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
-        keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
-        keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
-        keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
-        if img_url:
-            keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+        if options:
+            option_state = [list(d.keys())[0] for d in options]
+            db.update_state(user_id, 'buy_%s_%d_%s_options' % (state_list[1], item_id, json.dumps(option_state)))
+            msg = 'Buying %s\n\nWhat %s do you want?' % (item['itemName'].lower(), option_state[0].lower())
+            keyboard = [[InlineKeyboardButton(option, callback_data='0_%s' % option)] for option in options[0][option_state[0]]]
+            keyboard.append([InlineKeyboardButton('<< back', callback_data='0_back')])
+            keyboard.append([InlineKeyboardButton('I can\'t find my item', callback_data='none')])
+            if img_url:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)])
+            else:
+                keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
+            keyboard = InlineKeyboardMarkup(keyboard)
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         else:
-            keyboard.append([InlineKeyboardButton('Description', callback_data='description')])
-        keyboard = InlineKeyboardMarkup(keyboard)
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+            category = state_list[1]
+            args = {'category': category, 'page': 0}
+            items = db.get_items(args)
+            if items:
+                db.update_state(user_id, 'buy_%s_0_item' % category)
+                msg = 'What %s do you want to buy?' % category
+                keyboard = [[InlineKeyboardButton(item['itemName'], callback_data=str(item['itemId']))] for item in items]
+                keyboard.append([InlineKeyboardButton('<< Prev', callback_data='prev'), InlineKeyboardButton('Next >>', callback_data='next')])
+                keyboard.append([InlineKeyboardButton('Change category', callback_data='category')])
+                keyboard.append(([InlineKeyboardButton('I can\'t find my item', callback_data='none')]))
+                keyboard = InlineKeyboardMarkup(keyboard)
+                bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+            else:
+                query_id = update.callback_query.id
+                msg = 'There are currently no %s in stock!' % category
+                bot.answer_callback_query(query_id, msg)
     else:
         cancel(bot, update)
 
