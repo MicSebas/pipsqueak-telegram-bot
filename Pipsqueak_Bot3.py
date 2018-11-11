@@ -377,7 +377,7 @@ def buy_item(bot, update):
         print(options)
         print(type(options))
         try:
-            if 'placeholder' in item['imageUrl']:
+            if 'placeholder' in item['imageUrl'] or item['imageUrl'] == '0':
                 img_url = None
             else:
                 img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
@@ -400,7 +400,8 @@ def buy_item(bot, update):
             quantity = int(item['items']['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
-                msg = 'You want to buy %s' % item['itemName']
+                price = float(item['items']['quantity'])
+                msg = 'You want to buy %s. We are currently selling it for $%.2f each.' % (item['itemName'], price)
                 msg += '\n\nHow many do you want to buy?'
                 if img_url:
                     keyboard = [[InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)]]
@@ -509,16 +510,17 @@ def buy_options(bot, update, item_id, options_state):
             quantity = int(item['items'][options_state]['quantity'])
             if quantity > 0:
                 try:
-                    if 'placeholder' in item['imageUrl']:
+                    if 'placeholder' in item['imageUrl'] or item['imageUrl'] == '0':
                         img_url = None
                     else:
                         img_url = 'http://phpstack-212261-643485.cloudwaysapps.com/image?upload=' + item['imageUrl']
                 except KeyError:
                     img_url = None
+                price = float(item['items'][options_state]['price'])
                 db.update_state(user_id, 'buy_%s_%d_%s_quantity' % (db.get_state(user_id).split('_')[1], item_id, options_state))
                 msg = 'You want to buy %s: ' % item['itemName']
                 msg += ', '.join(json.loads(options_state))
-                msg += '\n\nHow many do you want to buy?'
+                msg += '\n\nWe are currently selling this for $%.2f each. How many do you want to buy?' % price
                 if img_url:
                     keyboard = [[InlineKeyboardButton('Description', callback_data='description'), InlineKeyboardButton('Image', url=img_url)]]
                 else:
