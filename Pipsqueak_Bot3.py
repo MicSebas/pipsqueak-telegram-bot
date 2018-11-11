@@ -222,6 +222,36 @@ def request_item(bot, update):
 
 
 # Admin functions
+def admin_forward(bot, update):
+    if pre_check(bot, update):
+        global db
+        user_id = update.message.from_user.id
+        msg = 'Who do you want to connect to?'
+        db.update_state(user_id, 'forward')
+        bot.send_message(user_id, msg)
+
+
+def forward_name(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    users = db.get_users(True)
+    text = update.message.text
+    found = False
+    for user in users:
+        if text.lower() == user[1].lower() or '@' + text.lower() == user[1].lower():
+            db.update_state(user_id, 'forward_%d' % user[0])
+            msg = 'Waiting to connect to %s.' % user[1]
+            bot.send_message(user_id, msg)
+            msg = 'An admin is connecting to you. Do note that connecting to an admin will override your current operations.'
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect now', callback_data='forward_%d' % user_id)]])
+            bot.send_message(user[0], msg, reply_markup=keyboard)
+            found = True
+            break
+    if not found:
+        msg = 'There is no user with that name. Please try again.'
+        bot.send_message(user_id, msg)
+
+
 def connect(bot, update):
     global db
     global admins
@@ -1795,6 +1825,8 @@ def message_handler(bot, update):
         bot.forward_message(admin_id, user_id, msg_id)
         msg = 'Got it! Anything else you want to feedback to us? Please use /done when you\'re finished!'
         bot.send_message(user_id, msg)
+    elif state == 'forward':
+        forward_name(bot, update)
     elif state.startswith('forward'):
         target_id = int(state.split('_')[1])
         msg = update.message.text
@@ -1935,6 +1967,7 @@ def main():
     dispatcher.add_handler(CommandHandler('food', food))
     dispatcher.add_handler(CommandHandler('_cancel', force_cancel))
     dispatcher.add_handler(CommandHandler('_state', state_command))
+    dispatcher.add_handler(CommandHandler('_forward', admin_forward))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
 
