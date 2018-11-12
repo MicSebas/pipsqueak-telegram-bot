@@ -1,7 +1,7 @@
 import telegram
 import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, TelegramError
 from Database import Database
 import json
 
@@ -292,6 +292,30 @@ def review_request(bot, update):
         query_id = update.callback_query.id
         msg = 'You are not authorized to use this function!'
         bot.answer_callback_query(query_id, msg)
+
+
+def admin_broadcast(bot, update):
+    if pre_check(bot, update):
+        global db
+        user_id = update.message.from_user.id
+        db.update_state(user_id, 'broadcast')
+        msg = 'Send me the message you want to broadcast.'
+        bot.send_message(user_id, msg)
+
+
+def broadcast_message(bot, update):
+    global db
+    sender_id = update.message.from_user.id
+    text = update.message.text
+    msg = 'BROADCAST MESSAGE FROM ADMINS:\n\n' + text
+    all_users = db.get_users()
+    for user_id in all_users:
+        try:
+            bot.send_message(user_id, msg)
+        except TelegramError:
+            bot.send_message(sender_id, 'Failed sending to %s (%d)' % (db.get_name(user_id), user_id))
+    db.update_state(sender_id, 'home')
+    bot.send_message(sender_id, 'Finished broadcasting message!')
 
 
 # Buy functions
@@ -1836,6 +1860,8 @@ def message_handler(bot, update):
         target_id = int(state.split('_')[1])
         msg = update.message.text
         bot.send_message(target_id, msg)
+    elif state == 'broadcast':
+        broadcast_message(bot, update)
     else:
         msg = 'Please use /start to begin trading!'
         bot.send_message(user_id, msg)
@@ -1973,6 +1999,7 @@ def main():
     dispatcher.add_handler(CommandHandler('_cancel', force_cancel))
     dispatcher.add_handler(CommandHandler('_state', state_command))
     dispatcher.add_handler(CommandHandler('_forward', admin_forward))
+    dispatcher.add_handler(CommandHandler('_broadcast', admin_broadcast))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
 
