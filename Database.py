@@ -305,7 +305,7 @@ class Database(object):
         self.conn.commit()
 
     def get_feedback(self):
-        stmt = "SELECT date, time, feedback FROM feedback ORDER BY date, time"
+        stmt = "SELECT * FROM feedback ORDER BY date, time"
         self.cur.execute(stmt)
         rows = self.cur.fetchall()
         return rows

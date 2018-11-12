@@ -1194,7 +1194,7 @@ def sell_request_item(bot, update):
     msg = 'Got it! We will notify you as soon as possible after an admin reviewed your listing. Thank you for using Pipsqueak!'
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
     bot.send_message(user_id, msg, reply_markup=keyboard)
-    msg = 'Approval: %s (%d) has requested to be list the following item: %s.' % (name, user_id, text)
+    msg = 'Approval: %s (%d) has requested to list the following item: %s.' % (name, user_id, text)
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Approve', callback_data='approve'), InlineKeyboardButton('Reject', callback_data='reject')],
                                      [InlineKeyboardButton('Contact %s' % name, callback_data='forward_%d' % user_id)]])
     bot.send_message(admin_id, msg, reply_markup=keyboard)
