@@ -2,7 +2,10 @@
   <dictionary name="micse">
     <words>
       <w>couldn</w>
+      <w>doesn</w>
       <w>nostock</w>
+      <w>precheck</w>
+      <w>substate</w>
     </words>
   </dictionary>
 </component>

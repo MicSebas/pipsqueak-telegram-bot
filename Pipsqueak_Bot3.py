@@ -1849,7 +1849,7 @@ def message_handler(bot, update):
         request_item(bot, update)
     elif state == 'feedback':
         global admin_id
-        db.add_feedback(user_id, update.message.from_user.name, ''.join(update.message.text.split(',')))
+        db.add_feedback(user_id, update.message.from_user.name, update.message.text)
         msg_id = update.message.message_id
         bot.forward_message(admin_id, user_id, msg_id)
         msg = 'Got it! Anything else you want to feedback to us? Please use /done when you\'re finished!'
