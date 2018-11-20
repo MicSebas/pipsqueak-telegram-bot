@@ -454,7 +454,7 @@ def buy_item(bot, update):
             quantity = int(item['items']['quantity'])
             if quantity > 0:
                 db.update_state(user_id, 'buy_%s_%d_null_quantity' % (db.get_state(user_id).split('_')[1], item_id))
-                price = float(item['items']['quantity'])
+                price = float(item['items']['price'])
                 msg = 'You want to buy %s. We are currently selling it for $%.2f each.' % (item['itemName'], price)
                 msg += '\n\nHow many do you want to buy?'
                 if img_url:
