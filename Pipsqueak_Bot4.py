@@ -1528,6 +1528,8 @@ def callback_query_handler(bot, update):
             sell(bot, update)
         elif data == 'feedback':
             feedback(bot, update)
+        elif data == 'help':
+            help_command(bot, update)
         else:
             query_id = update.callback_query.id
             msg = 'Please use /start to begin trading!'
