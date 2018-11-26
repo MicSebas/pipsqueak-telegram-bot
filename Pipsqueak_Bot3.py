@@ -149,8 +149,8 @@ def help_confirm(bot, update):
     user_id = update.callback_query.from_user.id
     msg_id = update.callback_query.message.message_id
     data = update.callback_query.data
-    db.update_state(user_id, 'home')
     if data == 'yes':
+        db.update_state(user_id, 'home')
         msg = 'We are connecting you to an admin. Please hold.'
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=None)
         name = update.callback_query.from_user.name
