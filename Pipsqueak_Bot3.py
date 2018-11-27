@@ -1847,6 +1847,7 @@ def tompang_command(bot, update):
 
 def tompang_store(bot, update):
     global db
+    global admin_id
     user_id = update.callback_query.from_user.id
     data = update.callback_query.data
     if data == 'cancel':
