@@ -1860,7 +1860,7 @@ def tompang_store(bot, update):
         msg_id = update.callback_query.message.message_id
         msg = 'Your tompang request has been deleted. Thank you for using Pipsqueak!'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
-        bot.edit_message_text(msg, user_id, msg_id, rpely_markup=keyboard)
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         msg = 'Tompang request deleted: %s (%d)' % (update.callback_query.from_user.name, user_id)
         bot.send_message(admin_id, msg)
     else:
