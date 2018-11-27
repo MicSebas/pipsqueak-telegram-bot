@@ -1911,7 +1911,7 @@ def tompang_confirm(bot, update, state):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         db.add_tompang(user_id, update.callback_query.from_user.name, store, link)
         bot.edit_message_text(msg, user_id, msg_id, rpely_markup=keyboard)
-        msg = 'Tompang request: %s from %s' % (link, store)
+        msg = 'Tompang request: %s (%d) requested from %s\n%s' % (update.callback_query.from_user.name, user_id, store, link)
         bot.send_message(admin_id, msg)
 
 

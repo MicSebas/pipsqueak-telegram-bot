@@ -354,7 +354,7 @@ class Database(object):
     def add_tompang(self, user_id, user_name, store, item):
         date = get_date()
         time = get_time()
-        stmt = "INSERT INTO activities VALUES ('%s', '%s', %d, '%s', '%s', '%s')" % (date, time, user_id, user_name, store, item)
+        stmt = "INSERT INTO tompang VALUES ('%s', '%s', %d, '%s', '%s', '%s')" % (date, time, user_id, user_name, store, item)
         self.cur.execute(stmt)
         self.conn.commit()
 
@@ -374,7 +374,7 @@ if __name__ == '__main__':
     # items = db.get_requests()
     # for item in items:
     #     print(item)
-    items = db.get_activities()
+    items = db.get_tompang()
     # print_json(items)
-    for item in items[-15:]:
+    for item in items:
         print(item)
