@@ -358,6 +358,11 @@ class Database(object):
         self.cur.execute(stmt)
         self.conn.commit()
 
+    def delete_tompang(self, user_id):
+        stmt = "DELETE FROM tompang WHERE user_id = %d" % user_id
+        self.cur.execute(stmt)
+        self.conn.commit()
+
 
 if __name__ == '__main__':
     db = Database()

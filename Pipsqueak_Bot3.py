@@ -46,7 +46,8 @@ def start(bot, update):
         db.update_state(user_id, 'home')
         msg = 'Hello, %s! Welcome to Pipsqueak, the first online parts marketplace in SUTD! How can I help you today?' % update.message.from_user.first_name
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('I want to /buy things', callback_data='buy')],
-                                         [InlineKeyboardButton('I want to /sell things', callback_data='sell')]])
+                                         [InlineKeyboardButton('I want to /sell things', callback_data='sell')],
+                                         [InlineKeyboardButton('I want to /tompang things (beta)', callback_data='tompang')]])
         bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
@@ -1825,15 +1826,23 @@ def food_confirm(bot, update):
 def tompang_command(bot, update):
     if pre_check(bot, update):
         global db
-        user_id = update.message.from_user.id
+        if update.callback_query is not None:
+            user_id = update.callback_query.from_user.id
+        else:
+            user_id = update.message.from_user.id
         db.update_state(user_id, 'tompang')
-        msg = 'Which store do you want to tompang from?'
+        msg = '(beta) Which store do you want to tompang from?'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
                                          [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
                                          [InlineKeyboardButton('Others', callback_data='others')],
+                                         [InlineKeyboardButton('Delete tompang', callback_data='delete')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
-        bot.send_message(user_id, msg, reply_markup=keyboard)
+        if update.callback_query is not None:
+            msg_id = update.callback_query.message.message_id
+            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        else:
+            bot.send_message(user_id, msg, reply_markup=keyboard)
 
 
 def tompang_store(bot, update):
@@ -1846,6 +1855,14 @@ def tompang_store(bot, update):
         query_id = update.callback_query.id
         msg = 'Tompang service from other stores currently not up.'
         bot.answer_callback_query(query_id, msg)
+    elif data == 'delete':
+        db.update_state(user_id, 'home')
+        msg_id = update.callback_query.message.message_id
+        msg = 'Your tompang request has been deleted. Thank you for using Pipsqueak!'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
+        bot.edit_message_text(msg, user_id, msg_id, rpely_markup=keyboard)
+        msg = 'Tompang request deleted: %s (%d)' % (update.callback_query.from_user.name, user_id)
+        bot.send_message(admin_id, msg)
     else:
         db.update_state(user_id, 'tompang_%s_item' % data)
         msg_id = update.callback_query.message.message_id
@@ -2075,6 +2092,8 @@ def callback_query_handler(bot, update):
             buy(bot, update)
         elif update.callback_query.data == 'sell':
             sell(bot, update)
+        elif update.callback_query.data == 'tompang':
+            tompang_command(bot, update)
         elif update.callback_query.data == 'feedback':
             feedback(bot, update)
         else:
