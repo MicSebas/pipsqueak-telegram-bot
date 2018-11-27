@@ -2100,12 +2100,14 @@ def main():
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('browse', browse))
     dispatcher.add_handler(CommandHandler('cancel', cancel))
     dispatcher.add_handler(CommandHandler('done', done))
     dispatcher.add_handler(CommandHandler('feedback', feedback))
     dispatcher.add_handler(CommandHandler('buy', buy))
     dispatcher.add_handler(CommandHandler('sell', sell))
     dispatcher.add_handler(CommandHandler('marketplace', marketplace))
+    dispatcher.add_handler(CommandHandler('tompang', tompang_command))
     dispatcher.add_handler(CommandHandler('request', request))
     dispatcher.add_handler(CommandHandler('help', help_command))
     dispatcher.add_handler(CommandHandler('food', food))
