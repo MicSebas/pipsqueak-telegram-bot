@@ -1836,7 +1836,7 @@ def tompang_command(bot, update):
                                          [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
                                          [InlineKeyboardButton('Others', callback_data='others')],
-                                         [InlineKeyboardButton('Delete tompang', callback_data='delete')],
+                                         [InlineKeyboardButton('Delete tompang request', callback_data='delete')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         if update.callback_query is not None:
             msg_id = update.callback_query.message.message_id
@@ -1885,6 +1885,7 @@ def tompang_item_callback_query(bot, update):
                                          [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
                                          [InlineKeyboardButton('Others', callback_data='others')],
+                                         [InlineKeyboardButton('Delete tompang request', callback_data='delete')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
     else:
