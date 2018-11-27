@@ -1894,7 +1894,7 @@ def tompang_confirm(bot, update, state):
         msg_id = update.callback_query.message.message_id
         store = state.split('_')[1]
         db.update_state(user_id, 'tompang_%s_item' % store)
-        msg = 'Please send me the link for the item you want from %d.' % data
+        msg = 'Please send me the link for the item you want from %s.' % data
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
                                           InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
