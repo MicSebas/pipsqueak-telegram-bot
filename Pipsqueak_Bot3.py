@@ -1831,9 +1831,9 @@ def tompang_command(bot, update):
         else:
             user_id = update.message.from_user.id
         db.update_state(user_id, 'tompang')
-        msg = '(beta) Which store do you want to tompang from?'
+        msg = 'Which store do you want to tompang from? Please note that the tompang service is in beta and we will currently place all orders by 11am the next day. Bulk discounts and free shipping may or may not apply depending on the demand that day, but we will not tax any purchases from here.'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
-                                         [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
+                                         [InlineKeyboardButton('Ban Heng Long', callback_data='Ban Heng Long')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
                                          [InlineKeyboardButton('Others', callback_data='others')],
                                          [InlineKeyboardButton('Delete tompang request', callback_data='delete')],
