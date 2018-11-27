@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot3.py" afterDir="false" />
-    </list>
+    <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +72,7 @@
         <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot3.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="221">
-              <caret line="1834" column="51" selection-start-line="1834" selection-start-column="51" selection-end-line="1834" selection-end-column="51" />
+              <caret line="1834" column="33" selection-start-line="1834" selection-start-column="33" selection-end-line="1834" selection-end-column="33" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
                 <marker date="1543323232013" expanded="true" signature="1433:1436" ph="..." />
@@ -384,7 +382,7 @@
     <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot3.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
-          <caret line="1834" column="51" selection-start-line="1834" selection-start-column="51" selection-end-line="1834" selection-end-column="51" />
+          <caret line="1834" column="33" selection-start-line="1834" selection-start-column="33" selection-end-line="1834" selection-end-column="33" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
             <marker date="1543323232013" expanded="true" signature="1433:1436" ph="..." />
