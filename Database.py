@@ -49,6 +49,9 @@ class Database(object):
         stmt = "CREATE TABLE IF NOT EXISTS activities (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, state TEXT NOT NULL, activity TEXT NOT NULL)"
         self.cur.execute(stmt)
         self.conn.commit()
+        stmt = "CREATE TABLE IF NOT EXISTS tompang (date TEXT NOT NULL, time TEXT NOT NULL, user_id BIGINT NOT NULL, user_name TEXT NOT NULL, store TEXT NOT NULL, item TEXT NOT NULL)"
+        self.cur.execute(stmt)
+        self.conn.commit()
 
     def get_items(self, args=None):
         url = self.url + '/ajax/items'
@@ -342,6 +345,19 @@ class Database(object):
         rows = self.cur.fetchall()
         return rows
 
+    def get_tompang(self):
+        stmt = "SELECT * FROM tompang ORDER BY date, time"
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        return rows
+
+    def add_tompang(self, user_id, user_name, store, item):
+        date = get_date()
+        time = get_time()
+        stmt = "INSERT INTO activities VALUES ('%s', '%s', %d, '%s', '%s', '%s')" % (date, time, user_id, user_name, store, item)
+        self.cur.execute(stmt)
+        self.conn.commit()
+
 
 if __name__ == '__main__':
     db = Database()
@@ -360,5 +376,5 @@ if __name__ == '__main__':
     #     print(item)
     items = db.get_activities()
     # print_json(items)
-    for item in items:
+    for item in items[-15:]:
         print(item)

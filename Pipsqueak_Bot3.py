@@ -133,6 +133,16 @@ def done(bot, update):
             bot.send_message(user_id, msg)
 
 
+def browse(bot, update):
+    if pre_check(bot, update):
+        global db
+        user_id = update.message.from_user.id
+        msg = 'You can visit our website to see the full inventory!\n\n'
+        msg += 'https://marketplace.pipsqueak.sg/'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Visit website', url='https://marketplace.pipsqueak.sg/')]])
+        bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
 def help_command(bot, update):
     if pre_check(bot, update):
         global db
@@ -1811,6 +1821,100 @@ def food_confirm(bot, update):
         bot.send_message(admin_id, msg, reply_markup=keyboard)
 
 
+# Tompang
+def tompang_command(bot, update):
+    if pre_check(bot, update):
+        global db
+        user_id = update.message.from_user.id
+        db.update_state(user_id, 'tompang')
+        msg = 'Which store do you want to tompang from?'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
+                                         [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
+                                         [InlineKeyboardButton('Dama', callback_data='Dama')],
+                                         [InlineKeyboardButton('Others', callback_data='others')],
+                                         [InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+def tompang_store(bot, update):
+    global db
+    user_id = update.callback_query.from_user.id
+    data = update.callback_query.data
+    if data == 'cancel':
+        cancel(bot, update)
+    elif data == 'others':
+        query_id = update.callback_query.id
+        msg = 'Tompang service from other stores currently not up.'
+        bot.answer_callback_query(query_id, msg)
+    else:
+        db.update_state(user_id, 'tompang_%s_item' % data)
+        msg_id = update.callback_query.message.message_id
+        msg = 'Please send me the link for the item you want from %d.' % data
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
+                                          InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+
+
+def tompang_item_callback_query(bot, update):
+    global db
+    user_id = update.callback_query.from_user.id
+    msg_id = update.callback_query.message.message_id
+    data = update.callback_query.data
+    if data == 'back':
+        db.update_state(user_id, 'tompang')
+        msg = 'Which store do you want to tompang from?'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
+                                         [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
+                                         [InlineKeyboardButton('Dama', callback_data='Dama')],
+                                         [InlineKeyboardButton('Others', callback_data='others')],
+                                         [InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    else:
+        cancel(bot, update)
+
+
+def tompang_item_message(bot, update, state):
+    global db
+    user_id = update.message.from_user.id
+    text = update.message.text
+    store = state.split('_')[1]
+    db.update_state(user_id, 'tompang_%s_confirm' % store)
+    msg = 'You want to order from %s\nItem: %s\n\nIs this correct?' % (store, text)
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data=text)],
+                                     [InlineKeyboardButton('<< back', callback_data='back'),
+                                      InlineKeyboardButton('/cancel', callback_data='cancel')]])
+    bot.send_message(user_id, msg, reply_markup=keyboard)
+
+
+def tompang_confirm(bot, update, state):
+    global db
+    user_id = update.callback_query.from_user.id
+    data = update.callback_query.data
+    if data == 'back':
+        msg_id = update.callback_query.message.message_id
+        store = state.split('_')[1]
+        db.update_state(user_id, 'tompang_%s_item' % store)
+        msg = 'Please send me the link for the item you want from %d.' % data
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
+                                          InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    elif data == 'cancel':
+        cancel(bot, update)
+    else:
+        global admin_id
+        link = data
+        store = state.split('_')[1]
+        msg_id = update.callback_query.message.message_id
+        db.update_state(user_id, 'home')
+        msg = 'Tompang successful!\nFrom %s: %s\n\n' % (store, link)
+        msg += 'Thank you for using Pipsqueak Tompang! We will inform you soon regarding pickup details.'
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
+        db.add_tompang(user_id, update.callback_query.from_user.name, store, link)
+        bot.edit_message_text(msg, user_id, msg_id, rpely_markup=keyboard)
+        msg = 'Tompang request: %s from %s' % (link, store)
+        bot.send_message(admin_id, msg)
+
+
 # Handlers
 def message_handler(bot, update):
     user_id = update.message.from_user.id
@@ -1845,6 +1949,8 @@ def message_handler(bot, update):
         else:
             msg = 'I don\'t understand. Please follow the instructions above.'
             bot.send_message(user_id, msg)
+    elif state.startswith('tompang') and state.endswith('item'):
+        tompang_item_message(bot, update, state)
     elif state == 'request_item':
         request_item(bot, update)
     elif state == 'feedback':
@@ -1955,6 +2061,13 @@ def callback_query_handler(bot, update):
             food_confirm(bot, update)
         else:
             food_item(bot, update)
+    elif state.startswith('tompang'):
+        if state.endswith('item'):
+            tompang_item_callback_query(bot, update)
+        elif state.endswith('confirm'):
+            tompang_confirm(bot, update, state)
+        else:
+            tompang_store(bot, update)
     elif state == 'help':
         help_confirm(bot, update)
     elif state == 'home':
