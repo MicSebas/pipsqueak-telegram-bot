@@ -1883,7 +1883,7 @@ def tompang_item_callback_query(bot, update):
         db.update_state(user_id, 'tompang')
         msg = 'Which store do you want to tompang from?'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
-                                         [InlineKeyboardButton('Banhenglong', callback_data='Banhenglong')],
+                                         [InlineKeyboardButton('Ban Heng Long', callback_data='Ban Heng Long')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
                                          [InlineKeyboardButton('Others', callback_data='others')],
                                          [InlineKeyboardButton('Delete tompang request', callback_data='delete')],
