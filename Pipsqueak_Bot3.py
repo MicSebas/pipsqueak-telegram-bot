@@ -1836,7 +1836,7 @@ def tompang_command(bot, update):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
                                          [InlineKeyboardButton('Ban Heng Long', callback_data='Ban Heng Long')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
-                                         [InlineKeyboardButton('Others', callback_data='others')],
+                                         # [InlineKeyboardButton('Others', callback_data='others')],
                                          [InlineKeyboardButton('Delete tompang request', callback_data='delete')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         if update.callback_query is not None:
@@ -1853,9 +1853,9 @@ def tompang_store(bot, update):
     data = update.callback_query.data
     if data == 'cancel':
         cancel(bot, update)
-    elif data == 'others':
+    elif data == 'others' or data == 'Ban Heng Long' or data == 'Dama':
         query_id = update.callback_query.id
-        msg = 'Tompang service from other stores currently not up.'
+        msg = 'Tompang service from %s currently not up.' % 'other stores' if data == 'others' else data
         bot.answer_callback_query(query_id, msg)
     elif data == 'delete':
         db.update_state(user_id, 'home')
@@ -1885,7 +1885,7 @@ def tompang_item_callback_query(bot, update):
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
                                          [InlineKeyboardButton('Ban Heng Long', callback_data='Ban Heng Long')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
-                                         [InlineKeyboardButton('Others', callback_data='others')],
+                                         # [InlineKeyboardButton('Others', callback_data='others')],
                                          [InlineKeyboardButton('Delete tompang request', callback_data='delete')],
                                          [InlineKeyboardButton('/cancel', callback_data='cancel')]])
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
