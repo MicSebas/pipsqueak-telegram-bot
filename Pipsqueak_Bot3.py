@@ -1855,7 +1855,7 @@ def tompang_store(bot, update):
         cancel(bot, update)
     elif data == 'others' or data == 'Ban Heng Long' or data == 'Dama':
         query_id = update.callback_query.id
-        msg = 'Tompang service from %s currently not up.' % 'other stores' if data == 'others' else data
+        msg = 'Tompang service from %s currently not up.' % ('other stores' if data == 'others' else data)
         bot.answer_callback_query(query_id, msg)
     elif data == 'delete':
         db.update_state(user_id, 'home')
