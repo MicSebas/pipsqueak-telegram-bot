@@ -318,7 +318,7 @@ def broadcast_message(bot, update):
     global db
     sender_id = update.message.from_user.id
     text = update.message.text
-    msg = 'BROADCAST MESSAGE FROM ADMINS:\n\n' + text
+    msg = 'Broadcasting Squeaks:\n\n' + text
     all_users = db.get_users()
     for user_id in all_users:
         try:
@@ -1930,7 +1930,7 @@ def tompang_confirm(bot, update, state):
         msg += 'Thank you for using Pipsqueak Tompang! We will inform you soon regarding pickup details.'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
         db.add_tompang(user_id, update.callback_query.from_user.name, store, link)
-        bot.edit_message_text(msg, user_id, msg_id, rpely_markup=keyboard)
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         msg = 'Tompang request: %s (%d) requested from %s\n%s' % (update.callback_query.from_user.name, user_id, store, link)
         bot.send_message(admin_id, msg)
 
