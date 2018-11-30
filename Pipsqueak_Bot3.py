@@ -315,16 +315,19 @@ def admin_broadcast(bot, update):
 
 
 def broadcast_message(bot, update):
+    from time import sleep
     global db
     sender_id = update.message.from_user.id
     text = update.message.text
     msg = 'Broadcasting Squeaks:\n\n' + text
     all_users = db.get_users()
     for user_id in all_users:
+        print(user_id)
         try:
             bot.send_message(user_id, msg)
         except TelegramError:
             bot.send_message(sender_id, 'Failed sending to %s (%d)' % (db.get_name(user_id), user_id))
+        sleep(0.1)
     db.update_state(sender_id, 'home')
     bot.send_message(sender_id, 'Finished broadcasting message!')
 
