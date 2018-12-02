@@ -115,8 +115,8 @@ def done(bot, update):
         global admin_id
         global admins
         if state == 'feedback':
-            msg = 'End of feedback from %s' % update.message.from_user.name
-            bot.send_message(admin_id, msg)
+            # msg = 'End of feedback from %s' % update.message.from_user.name
+            # bot.send_message(admin_id, msg)
             msg = 'Your feedback has been received. Thank you for using Pipsqueak!'
             db.update_state(user_id, 'home')
             bot.send_message(user_id, msg)
@@ -178,17 +178,15 @@ def feedback(bot, update):
     if pre_check(bot, update):
         if update.callback_query is not None:
             user_id = update.callback_query.from_user.id
-            name = update.callback_query.from_user.name
             msg_id = update.callback_query.message.message_id
             bot.edit_message_reply_markup(user_id, msg_id, reply_markup=None)
         else:
             user_id = update.message.from_user.id
-            name = update.message.from_user.name
         db.update_state(user_id, 'feedback')
         msg = 'Your feedback is very valuable to us! Please tell us how we can improve to serve you better, be as specific as you like!\n\nUse /done when you\'re finished.'
         bot.send_message(user_id, msg)
-        msg = 'Feedback from %s:' % name
-        bot.send_message(admin_id, msg)
+        # msg = 'Feedback from %s:' % name
+        # bot.send_message(admin_id, msg)
 
 
 def request(bot, update):
@@ -317,15 +315,10 @@ def admin_broadcast(bot, update):
 def broadcast_message(bot, update):
     global db
     sender_id = update.message.from_user.id
-    print(sender_id)
     text = update.message.text
-    print(text)
     msg = "Broadcasting Squeaks:\n\n" + text
     all_users = db.get_users()
-    print(len(all_users))
-    print(all_users[0])
     for user_id in all_users:
-        print(user_id)
         try:
             bot.send_message(user_id, msg)
         except TelegramError:
@@ -1982,8 +1975,9 @@ def message_handler(bot, update):
     elif state == 'feedback':
         global admin_id
         db.add_feedback(user_id, update.message.from_user.name, update.message.text)
-        msg_id = update.message.message_id
-        bot.forward_message(admin_id, user_id, msg_id)
+        msg = 'Feedback from %s (%d): ' % (update.message.from_user.name, user_id)
+        msg += update.message.text
+        bot.send_message(admin_id, msg)
         msg = 'Got it! Anything else you want to feedback to us? Please use /done when you\'re finished!'
         bot.send_message(user_id, msg)
     elif state == 'forward':
