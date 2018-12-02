@@ -318,9 +318,13 @@ def broadcast_message(bot, update):
     from time import sleep
     global db
     sender_id = update.message.from_user.id
+    print(sender_id)
     text = update.message.text
+    print(text)
     msg = 'Broadcasting Squeaks:\n\n' + text
     all_users = db.get_users()
+    print(len(all_users))
+    print(all_users[0])
     for user_id in all_users:
         print(user_id)
         try:
