@@ -320,7 +320,7 @@ def broadcast_message(bot, update):
     print(sender_id)
     text = update.message.text
     print(text)
-    msg = 'Broadcasting Squeaks:\n\n' + text
+    msg = "Broadcasting Squeaks:\n\n" + text
     all_users = db.get_users()
     print(len(all_users))
     print(all_users[0])
@@ -1942,6 +1942,7 @@ def tompang_confirm(bot, update, state):
 
 # Handlers
 def message_handler(bot, update):
+    global db
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
     if state != 'feedback' and not state.startswith('forward') and state != 'broadcast':
