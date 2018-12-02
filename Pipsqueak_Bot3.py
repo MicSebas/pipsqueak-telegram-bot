@@ -315,7 +315,6 @@ def admin_broadcast(bot, update):
 
 
 def broadcast_message(bot, update):
-    from time import sleep
     global db
     sender_id = update.message.from_user.id
     print(sender_id)
@@ -331,7 +330,6 @@ def broadcast_message(bot, update):
             bot.send_message(user_id, msg)
         except TelegramError:
             bot.send_message(sender_id, 'Failed sending to %s (%d)' % (db.get_name(user_id), user_id))
-        sleep(0.1)
     db.update_state(sender_id, 'home')
     bot.send_message(sender_id, 'Finished broadcasting message!')
 
@@ -1946,7 +1944,7 @@ def tompang_confirm(bot, update, state):
 def message_handler(bot, update):
     user_id = update.message.from_user.id
     state = db.get_state(user_id)
-    if state != 'feedback' and not state.startswith('forward'):
+    if state != 'feedback' and not state.startswith('forward') and state != 'broadcast':
         db.track(user_id, update.message.from_user.name, state, 'Message', update.message.text)
     if state.startswith('buy'):
         if state.endswith('_quantity'):
