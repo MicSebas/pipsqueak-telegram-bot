@@ -248,7 +248,7 @@ def forward_name(bot, update):
     try:
         target_id = int(text)
         users_id = [user[0] for user in users]
-        if target_id in users:
+        if target_id in users_id:
             db.update_state(user_id, 'forward_%d' % target_id)
             msg = 'Waiting to connect to %s.' % users[users_id.index(target_id)][1]
             bot.send_message(user_id, msg)
