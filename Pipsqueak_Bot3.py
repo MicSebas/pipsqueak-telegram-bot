@@ -235,7 +235,7 @@ def admin_forward(bot, update):
     if pre_check(bot, update):
         global db
         user_id = update.message.from_user.id
-        msg = 'Who do you want to connect to?'
+        msg = 'Who do you want to connect to?\nPlease send me their name or telegram ID.'
         db.update_state(user_id, 'forward')
         bot.send_message(user_id, msg)
 
@@ -245,20 +245,34 @@ def forward_name(bot, update):
     user_id = update.message.from_user.id
     users = db.get_users(True)
     text = update.message.text
-    found = False
-    for user in users:
-        if text.lower() == user[1].lower() or '@' + text.lower() == user[1].lower():
-            db.update_state(user_id, 'forward_%d' % user[0])
-            msg = 'Waiting to connect to %s.' % user[1]
+    try:
+        target_id = int(text)
+        users_id = [user[0] for user in users]
+        if target_id in users:
+            db.update_state(user_id, 'forward_%d' % target_id)
+            msg = 'Waiting to connect to %s.' % users[users_id.index(target_id)][1]
             bot.send_message(user_id, msg)
             msg = 'An admin is connecting to you. Do note that connecting to an admin will override your current operations.'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect now', callback_data='forward_%d' % user_id)]])
-            bot.send_message(user[0], msg, reply_markup=keyboard)
-            found = True
-            break
-    if not found:
-        msg = 'There is no user with that name. Please try again.'
-        bot.send_message(user_id, msg)
+            bot.send_message(target_id, msg, reply_markup=keyboard)
+        else:
+            msg = 'There is no user with that telegram ID. Please try again.'
+            bot.send_message(user_id, msg)
+    except ValueError:
+        found = False
+        for user in users:
+            if text.lower() == user[1].lower() or '@' + text.lower() == user[1].lower():
+                db.update_state(user_id, 'forward_%d' % user[0])
+                msg = 'Waiting to connect to %s.' % user[1]
+                bot.send_message(user_id, msg)
+                msg = 'An admin is connecting to you. Do note that connecting to an admin will override your current operations.'
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Connect now', callback_data='forward_%d' % user_id)]])
+                bot.send_message(user[0], msg, reply_markup=keyboard)
+                found = True
+                break
+        if not found:
+            msg = 'There is no user with that name. Please try again.'
+            bot.send_message(user_id, msg)
 
 
 def connect(bot, update):
@@ -2151,5 +2165,5 @@ if __name__ == '__main__':
     print('running')
     db = Database()
     admin_id = -1001312124809
-    admins = (111914928, 230937024, 255484909, 42010966)
+    admins = (111914928, 230937024, 255484909, 42010966, 712083139)
     main()
