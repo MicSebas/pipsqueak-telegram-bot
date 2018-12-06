@@ -231,6 +231,33 @@ def request_item(bot, update):
 
 
 # Admin functions
+def whodis(bot, update):
+    if pre_check(bot, update):
+        global db
+        user_id = update.message.from_user.id
+        msg = 'Please send me the telegram ID you want to know.'
+        db.update_state(user_id, 'whodis')
+        bot.send_message(user_id, msg)
+
+
+def whodis_id(bot, update):
+    global db
+    user_id = update.message.from_user.id
+    text = update.message.text
+    try:
+        target_id = int(text)
+        name = db.get_name(target_id)
+        if name:
+            db.update_state(user_id, 'home')
+            msg = 'Telegram ID %d belongs to:\n%s' % (target_id, name)
+        else:
+            msg = 'I can\'t find a user with that telegram ID. Please try again.'
+        bot.send_message(user_id, msg)
+    except ValueError:
+        msg = 'That\'s not a valid ID. Please try again.'
+        bot.send_message(user_id, msg)
+
+
 def admin_forward(bot, update):
     if pre_check(bot, update):
         global db
@@ -2002,6 +2029,8 @@ def message_handler(bot, update):
         bot.send_message(target_id, msg)
     elif state == 'broadcast':
         broadcast_message(bot, update)
+    elif state == 'whodis':
+        whodis_id(bot, update)
     else:
         msg = 'Please use /start to begin trading!'
         bot.send_message(user_id, msg)
@@ -2151,6 +2180,7 @@ def main():
     dispatcher.add_handler(CommandHandler('_state', state_command))
     dispatcher.add_handler(CommandHandler('_forward', admin_forward))
     dispatcher.add_handler(CommandHandler('_broadcast', admin_broadcast))
+    dispatcher.add_handler(CommandHandler('_whodis', whodis))
 
     dispatcher.add_handler(MessageHandler(filters.Filters.text, message_handler))
 
