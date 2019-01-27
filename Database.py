@@ -367,19 +367,12 @@ class Database(object):
 if __name__ == '__main__':
     db = Database()
     users = db.get_users(True)
+    # home_state = {'state': 'home', 'substate': 'home', 'item_state': None}
+    # home_state = json.dumps(home_state)
     print('Number of users:', len(users))
     for user in users:
+        # db.update_state(user[0], home_state)
         print(user)
-    # items = db._get_items_admin()
-    # for item in items:
-    #     print(item)
-    # items = db.get_mascot_names()
-    # for item in items:
-    #     print(item)
-    # items = db.get_requests()
-    # for item in items:
-    #     print(item)
-    items = db.get_tompang()
-    # print_json(items)
-    for item in items:
+    items = db.get_activities()
+    for item in items[-5:]:
         print(item)
