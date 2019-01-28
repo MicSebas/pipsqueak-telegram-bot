@@ -1273,10 +1273,10 @@ def stock(bot, update, state):
     db.update_state(user_id, state)
     if state['state'] == 'buy':
         msg = 'Sorry, we are currently out of stock. Would you like to be notified when it becomes available?\n\n'
-        msg += 'Alternatively, you can check the marketplace for student-listed items. '
-        msg += 'Please note that we will not be issuing receipts for marketplace purchases.'
+        # msg += 'Alternatively, you can check the marketplace for student-listed items. '
+        # msg += 'Please note that we will not be issuing receipts for marketplace purchases.'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Notify me', callback_data='notify')],
-                                         [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
+                                         # [InlineKeyboardButton('Check marketplace', callback_data='marketplace')],
                                          [InlineKeyboardButton('<< back', callback_data='back'),
                                           InlineKeyboardButton('/cancel', callback_data='cancel')]])
     else:
