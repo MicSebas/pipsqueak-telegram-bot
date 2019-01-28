@@ -54,6 +54,8 @@ def start(bot, update):
     if state['state'] == 'home':
         state = {'state': 'home', 'substate': 'home', 'item_state': None}
         db.update_state(user_id, state)
+        sticker_id = 'CAADBQADLwADwNHDDaiYY4_3p1ujAg'
+        bot.send_sticker(user_id, sticker_id)
         msg = 'Hello, %s! Welcome to Pipsqueak, the first online parts marketplace in SUTD! How can I help you today?' % update.message.from_user.first_name
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('I want to /buy things', callback_data='buy')],
                                          # [InlineKeyboardButton('I want to /sell things', callback_data='sell')],
