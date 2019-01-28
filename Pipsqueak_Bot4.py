@@ -1717,7 +1717,7 @@ def tompang_command(bot, update):
         new_state = {'state': 'tompang', 'substate': 'store', 'item_state': None}
         db.update_state(user_id, new_state)
         msg = 'Which store do you want to tompang from?\n\nPlease note that the tompang service is currently in beta.\n'
-        msg += 'Cut off orders is at 11am every day. Bulk discounts and free shipping may apply depending on the demand that day, but we will not tax any purchases from here.'
+        msg += 'Orders will be collated on Monday of week 4, and items should arrive that week.'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
                                          # [InlineKeyboardButton('Ban Heng Long', callback_data='Ban Heng Long')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
@@ -1764,18 +1764,13 @@ def tompang_store(bot, update, state):
         cancel(bot, update)
     else:
         # TODO: Update after BHL and Dama confirmed
-        if data == 'Ban Heng Long' or data == 'Dama':
-            query_id = update.callback_query.id
-            msg = 'Tompang from %s currently not up.' % data
-            bot.answer_callback_query(query_id, msg)
-        else:
-            state['substate'] = 'item'
-            state['item_state'] = {'store': data}
-            db.update_state(user_id, state)
-            msg = 'Please send me the link for the item you want from %s.' % data
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
-                                              InlineKeyboardButton('/cancel', callback_data='cancel')]])
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        state['substate'] = 'item'
+        state['item_state'] = {'store': data}
+        db.update_state(user_id, state)
+        msg = 'Please send me the link for the item you want from %s.' % data
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('<< back', callback_data='back'),
+                                          InlineKeyboardButton('/cancel', callback_data='cancel')]])
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
 
 def tompang_item_callback_query(bot, update):
@@ -1787,7 +1782,7 @@ def tompang_item_callback_query(bot, update):
         new_state = {'state': 'tompang', 'substate': 'store', 'item_state': None}
         db.update_state(user_id, new_state)
         msg = 'Which store do you want to tompang from?\n\nPlease note that the tompang service is currently in beta.\n'
-        msg += 'Cut off orders is at 11am every day. Bulk discounts and free shipping may apply depending on the demand that day, but we will not tax any purchases from here.'
+        msg += 'Orders will be collated on Monday of week 4, and items should arrive that week.'
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Element14', callback_data='Element14')],
                                          # [InlineKeyboardButton('Ban Heng Long', callback_data='Ban Heng Long')],
                                          [InlineKeyboardButton('Dama', callback_data='Dama')],
