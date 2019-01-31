@@ -1644,8 +1644,7 @@ def drop_final(bot, update, state):
         msg += 'Locker no: %d' % order_details['locker_no']
         msg_id = update.callback_query.message.message_id
         bot.edit_message_text(msg, user_id, msg_id)
-        # buyer_id = int(order_details['telegramId'])  # TODO: Update
-        buyer_id = 111914928
+        buyer_id = int(order_details['telegramId'])
         msg = 'You can collect your item from locker %d.\n\n' % order_details['locker_no']
         msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
         if 'properties' in order_details['itemsBought'][0]:
