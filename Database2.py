@@ -296,7 +296,7 @@ if __name__ == '__main__':
     # state_1 = {'state': 'home', 'substate': 'home', 'item_state': None}
     # db.update_state(111914928, state_1)
     users = db.get_users(True)
-    print_json(users)
+    # print_json(users)
     print('Number of users:', len(users))
-    foods = db.get_foods()
-    print_json(foods)
+    # foods = db.get_foods()
+    # print_json(foods)

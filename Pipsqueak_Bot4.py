@@ -1003,7 +1003,7 @@ def confirm(bot, update, state):
             if properties:
                 msg += 'Properties: %s\n' % ', '.join(json.loads(properties))
             msg += 'Quantity: %d\n' % quantity
-            msg += 'Total price: $%.2f\n\n' % price * quantity
+            msg += 'Total price: $%.2f\n\n' % (price * quantity)
             msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
             msg_id = update.callback_query.message.message_id
@@ -1020,7 +1020,7 @@ def confirm(bot, update, state):
             if properties:
                 msg += 'Properties: %s\n' % ', '.join(json.loads(properties))
             msg += 'Quantity: %d\n' % quantity
-            msg += 'Total price: $%.2f\n\n' % price * quantity
+            msg += 'Total price: $%.2f\n\n' % (price * quantity)
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Locker drop-off', callback_data='drop_%d' % order_id)],
                                              [InlineKeyboardButton('Immediate collection', callback_data='collect_%d' % order_id)],
                                              [InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
