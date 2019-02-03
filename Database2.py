@@ -91,6 +91,7 @@ class Database(object):
 
     def update_state(self, user_id, state):
         state_json = json.dumps(state)
+        state_json = ''.join(state_json.split("'"))
         stmt = "UPDATE user_database SET state = '%s' WHERE user_id = %d" % (state_json, user_id)
         self.commit(stmt)
 
