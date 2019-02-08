@@ -997,34 +997,41 @@ def confirm(bot, update, state):
             if properties:
                 args['properties'] = properties
             order_id = db.bought_item(args)
-            msg = 'Purchase successful!\n\n'
-            msg += 'Order ID: %d\n' % order_id
-            msg += 'Item: %s\n' % item_name
-            if properties:
-                msg += 'Properties: %s\n' % ', '.join(json.loads(properties))
-            msg += 'Quantity: %d\n' % quantity
-            msg += 'Total price: $%.2f\n\n' % (price * quantity)
-            msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
-            msg_id = update.callback_query.message.message_id
-            bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
-            registered = db.is_registered(user_id)
-            if not registered:
-                msg = 'To receive receipts you need to complete registration from the link below. '
-                msg += 'Once your order has been processed, the receipt will be emailed to you.'
-                url = db.url + '/logon/register?telegramId=' + str(user_id)
-                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Complete registration', url=url)]])
-                bot.send_message(user_id, msg, reply_markup=keyboard)
-            msg = 'Purchase: %s (%d) has purchased the following item:\n\n' % (update.callback_query.from_user.name, user_id)
-            msg += '%s (itemId: %d)\n' % (item_name, item_state['item_id'])
-            if properties:
-                msg += 'Properties: %s\n' % ', '.join(json.loads(properties))
-            msg += 'Quantity: %d\n' % quantity
-            msg += 'Total price: $%.2f\n\n' % (price * quantity)
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Locker drop-off', callback_data='drop_%d' % order_id)],
-                                             [InlineKeyboardButton('Immediate collection', callback_data='collect_%d' % order_id)],
-                                             [InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
-            bot.send_message(admin_id, msg, reply_markup=keyboard)
+            if order_id != 0:
+                msg = 'Purchase successful!\n\n'
+                msg += 'Order ID: %d\n' % order_id
+                msg += 'Item: %s\n' % item_name
+                if properties:
+                    msg += 'Properties: %s\n' % ', '.join(json.loads(properties))
+                msg += 'Quantity: %d\n' % quantity
+                msg += 'Total price: $%.2f\n\n' % (price * quantity)
+                msg += 'We will contact you soon for pickup details. Thank you for using Pipsqueak!'
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
+                msg_id = update.callback_query.message.message_id
+                bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+                registered = db.is_registered(user_id)
+                if not registered:
+                    msg = 'To receive receipts you need to complete registration from the link below. '
+                    msg += 'Once your order has been processed, the receipt will be emailed to you.'
+                    url = db.url + '/logon/register?telegramId=' + str(user_id)
+                    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Complete registration', url=url)]])
+                    bot.send_message(user_id, msg, reply_markup=keyboard)
+                msg = 'Purchase: %s (%d) has purchased the following item:\n\n' % (update.callback_query.from_user.name, user_id)
+                msg += '%s (itemId: %d)\n' % (item_name, item_state['item_id'])
+                msg += 'Order ID: %d\n' % order_id
+                if properties:
+                    msg += 'Properties: %s\n' % ', '.join(json.loads(properties))
+                msg += 'Quantity: %d\n' % quantity
+                msg += 'Total price: $%.2f\n\n' % (price * quantity)
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Locker drop-off', callback_data='drop_%d' % order_id)],
+                                                 [InlineKeyboardButton('Immediate collection', callback_data='collect_%d' % order_id)],
+                                                 [InlineKeyboardButton('Contact %s' % update.callback_query.from_user.name, callback_data='forward_%d' % user_id)]])
+                bot.send_message(admin_id, msg, reply_markup=keyboard)
+            else:
+                msg = 'Purchase unsuccessful. Please try again later. You can use /help if you want to contact an admin.'
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
+                msg_id = update.callback_query.message.message_id
+                bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
         elif state['state'] == 'sell':
             item_state = state['item_state']
             item = db.get_item_details(item_state['item_id'])
