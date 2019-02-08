@@ -1581,8 +1581,7 @@ def drop_command(bot, update):
         data = update.callback_query.data
         order_id = int(data.split('_')[1])
         order_details = db.get_order_details(order_id)
-        # buyer_id = int(order_details['telegramId'])  # TODO: Update to get Telegram ID
-        buyer_id = 111914928
+        buyer_id = int(order_details['telegramId'])
         items_from_buyer = db.get_locker_items(buyer_id=buyer_id)
         if items_from_buyer:
             locker_no = items_from_buyer[0][1]
