@@ -1551,7 +1551,7 @@ def generate_passcode(bot, update):
             try:
                 new_pass = int(update.message.text)
                 new_pass = new_pass % 10000
-            except TypeError:
+            except ValueError:
                 new_pass = random.randint(1, 9999)
         msg = 'Passcode generated: %04d\n' % new_pass
         msg += 'You can also send your preferred passcode to generate your own.'
