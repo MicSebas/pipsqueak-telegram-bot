@@ -171,11 +171,11 @@ class Database(object):
         if rows:
             return rows[0][0]
         else:
-            return 0
+            return -1
 
     def set_passcode(self, locker_no, passcode):
         current_passcode = self.get_passcode(locker_no)
-        if current_passcode:
+        if current_passcode != -1:
             stmt = "UPDATE locker_passcodes SET passcode = %d WHERE locker_no = %d" % (passcode, locker_no)
         else:
             stmt = "INSERT INTO locker_passcodes VALUES (%d, %d)" % (locker_no, passcode)
@@ -201,8 +201,7 @@ class Database(object):
         return rows
 
     def add_locker_item(self, order_details):
-        # TODO: Fix this with proper telegramId
-        args = (int(order_details['orderId']), order_details['locker_no'], 111914928, self.get_name(111914928), order_details['itemsBought'][0]['itemName'], int(order_details['itemsBought'][0]['quantity']))
+        args = (int(order_details['orderId']), order_details['locker_no'], order_details['telegramId'], self.get_name(order_details['telegramId']), ''.join(order_details['itemsBought'][0]['itemName'].split("'")), int(order_details['itemsBought'][0]['quantity']))
         stmt = "INSERT INTO locker VALUES (%d, %d, %d, '%s', '%s', %d)" % args
         self.commit(stmt)
 

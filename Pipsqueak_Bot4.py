@@ -1545,12 +1545,20 @@ def generate_passcode(bot, update):
     global lockers
     user_id, state = precheck(update)
     if user_id in admins:
-        new_pass = random.randint(1, 9999)
-        msg = 'Random passcode generated: %04d' % new_pass
-        keyboard = [[InlineKeyboardButton('New passcode', callback_data='new')]]
+        if update.callback_query is not None:
+            new_pass = random.randint(1, 9999)
+        else:
+            new_pass = int(update.message.text)
+            new_pass = new_pass % 10000
+        msg = 'Passcode generated: %04d\n' % new_pass
+        msg += 'You can also send your preferred passcode to generate your own.'
+        keyboard = [[InlineKeyboardButton('New random passcode', callback_data='new')]]
         for locker in lockers:
             keyboard.append([InlineKeyboardButton('Set to %d' % locker, callback_data='%d_%d' % (locker, new_pass))])
+        keyboard.append([InlineKeyboardButton('/cancel', callback_data='cancel')])
         keyboard = InlineKeyboardMarkup(keyboard)
+        state = {'state': 'genpass', 'substate': 'genpass', 'item_state': None}
+        db.update_state(user_id, state)
         if update.callback_query is not None:
             msg_id = update.callback_query.message.message_id
             bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
@@ -1565,6 +1573,8 @@ def set_passcode(bot, update):
     global admins
     user_id = update.callback_query.from_user.id
     if user_id in admins:
+        state = {'state': 'home', 'substate': 'home', 'item_state': None}
+        db.update_state(user_id, state)
         msg_id = update.callback_query.message.message_id
         data = update.callback_query.data
         data = data.split('_')
@@ -2029,6 +2039,8 @@ def message_handler(bot, update):
             text = update.message.text
             target_id = state['substate']
             bot.send_message(target_id, text)
+    elif state['state'] == 'genpass' and state['substate'] == 'genpass':
+        generate_passcode(bot, update)
     elif state['state'] == 'broadcast':
         broadcast_message(bot, update)
     elif state['state'] == 'feedback':
@@ -2087,17 +2099,24 @@ def callback_query_handler(bot, update):
             forward_connect(bot, update, state)
         else:
             review_request(bot, update, data)
-    elif text.startswith('Random passcode generated:'):
-        data = update.callback_query.data
-        if data == 'new':
-            generate_passcode(bot, update)
-        else:
-            set_passcode(bot, update)
+    # elif text.startswith('Random passcode generated:'):
+    #     data = update.callback_query.data
+    #     if data == 'new':
+    #         generate_passcode(bot, update)
+    #     else:
+    #         set_passcode(bot, update)
     elif text.startswith('Which locker passcode do you want to see?'):
         if data == 'done':
             done(bot, update)
         else:
             see_passcode(bot, update)
+    elif state['state'] == 'genpass' and state['substate'] == 'genpass':
+        if data == 'new':
+            generate_passcode(bot, update)
+        elif data == 'cancel':
+            cancel(bot, update)
+        else:
+            set_passcode(bot, update)
     elif state['state'] == 'home':
         if state['substate'] == 'request':
             request_callback_query(bot, update, state)
@@ -2218,5 +2237,5 @@ if __name__ == '__main__':
     admin_id = -1001312124809
     # admin_id = -324762075
     admins = (111914928, 230937024, 255484909, 42010966, 712083139)
-    lockers = (47, 48, 49)
+    lockers = (1,)
     main()
