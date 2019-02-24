@@ -1548,8 +1548,11 @@ def generate_passcode(bot, update):
         if update.callback_query is not None:
             new_pass = random.randint(1, 9999)
         else:
-            new_pass = int(update.message.text)
-            new_pass = new_pass % 10000
+            try:
+                new_pass = int(update.message.text)
+                new_pass = new_pass % 10000
+            except TypeError:
+                new_pass = random.randint(1, 9999)
         msg = 'Passcode generated: %04d\n' % new_pass
         msg += 'You can also send your preferred passcode to generate your own.'
         keyboard = [[InlineKeyboardButton('New random passcode', callback_data='new')]]
