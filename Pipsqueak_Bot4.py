@@ -2156,6 +2156,8 @@ def callback_query_handler(bot, update):
     elif state['substate'] == 'confirm':
         if state['state'] == 'tompang':
             tompang_confirm(bot, update, state)
+        elif state['state'] == 'help':
+            help_confirm(bot, update)
         else:
             confirm(bot, update, state)
     elif state['substate'] == 'request':
