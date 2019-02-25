@@ -1699,8 +1699,7 @@ def collect_command(bot, update):
         #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
         msg += 'Quantity: %d' % int(order_details['itemsBought'][0]['quantity'])
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm_collect_%d' % int(order_details['orderId']))]])
-        msg_id = update.callback_query.message.message_id
-        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        bot.edit_message_text(user_id, msg, reply_markup=keyboard)
     elif user_id == buyer_id:
         msg = 'Please confirm that you have collected the item from the locker. You won\'t be able to see the passcode anymore after that.\n\n'
         msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
