@@ -1604,7 +1604,7 @@ def drop_command(bot, update):
         buyer_id = int(order_details['telegramId'])
         items_from_buyer = db.get_locker_items(buyer_id=buyer_id)
         if items_from_buyer:
-            locker_no = items_from_buyer[0][1]
+            locker_no = items_from_buyer[0]['locker_no']
         else:
             locker_no = random.choice(lockers)
         order_details['locker_no'] = locker_no

@@ -187,9 +187,11 @@ class Database(object):
             stmt += " WHERE order_id = %d" % order_id
             rows = self.fetch(stmt)
             if rows:
-                return rows[0]
+                rows = rows[0]
+                out = {'orderId': rows[0], 'locker_no': rows[1], 'telegramId': rows[2], 'itemsBought': [{'itemName': rows[4], 'quantity': rows[5]}]}
+                return out
             else:
-                return []
+                return {}
         elif locker_no and buyer_id:
             stmt += " WHERE locker_no = %d AND buyer_id = %d" % (locker_no, buyer_id)
         elif locker_no:
@@ -198,7 +200,9 @@ class Database(object):
             stmt += " WHERE buyer_id = %d" % buyer_id
         stmt += " ORDER BY locker_no, order_id"
         rows = self.fetch(stmt)
-        out = {'orderId': rows[0], 'locker_no': rows[1], 'telegramId': rows[2], 'itemsBought': [{'itemName': rows[4], 'quantity': rows[5]}]}
+        out = []
+        for r in rows:
+            out.append({'orderId': r[0], 'locker_no': r[1], 'telegramId': r[2], 'itemsBought': [{'itemName': r[4], 'quantity': r[5]}]})
         return out
 
     def add_locker_item(self, order_details):
