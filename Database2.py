@@ -198,7 +198,8 @@ class Database(object):
             stmt += " WHERE buyer_id = %d" % buyer_id
         stmt += " ORDER BY locker_no, order_id"
         rows = self.fetch(stmt)
-        return rows
+        out = {'orderId': rows[0], 'locker_no': rows[1], 'telegramId': rows[2], 'itemsBought': [{'itemName': rows[4], 'quantity': rows[5]}]}
+        return out
 
     def add_locker_item(self, order_details):
         args = (int(order_details['orderId']), order_details['locker_no'], int(order_details['telegramId']), self.get_name(int(order_details['telegramId'])), ''.join(order_details['itemsBought'][0]['itemName'].split("'")), int(order_details['itemsBought'][0]['quantity']))

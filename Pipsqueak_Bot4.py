@@ -1664,7 +1664,7 @@ def drop_final(bot, update, state):
         msg_id = update.callback_query.message.message_id
         bot.edit_message_text(msg, user_id, msg_id)
         buyer_id = int(order_details['telegramId'])
-        msg = 'You can collect your item from locker %d.\n\n' % order_details['locker_no']
+        msg = 'You can collect your item from locker %d at SAC (5.401).\n\n' % order_details['locker_no']
         msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
         if 'properties' in order_details['itemsBought'][0]:
             msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
@@ -1682,30 +1682,39 @@ def collect_command(bot, update):
     user_id = update.callback_query.from_user.id
     data = update.callback_query.data
     order_id = int(data.split('_')[1])
-    order_details = db.get_locker_items(order_id=order_id)
+    if user_id in admins:
+        order_details = db.get_order_details(order_id)
+        buyer_id = int(order_details['telegramId'])
+    else:
+        order_details = db.get_locker_items(order_id=order_id)
+        buyer_id = order_details['telegramId']
     new_state = {'state': 'collect', 'substate': 'confirm', 'item_state': order_details}
     db.update_state(user_id, new_state)
-    if user_id == order_details[2]:
-        msg = 'Please confirm that you have collected the item from the locker. You won\'t be able to see the passcode anymore after that.\n\n'
-        msg += 'Item name: %s\n' % order_details[4]
-        # TODO: Fix this
-        # if 'properties' in order_details['itemsBought'][0]:
-        #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
-        msg += 'Quantity: %d\n' % order_details[5]
-        msg += 'Locker no: %d' % order_details[1]
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('See passcode', callback_data='passcode_%d' % order_details[1])],
-                                         [InlineKeyboardButton('Confirm', callback_data='confirm_collect_%d' % order_details[0])]])
-    else:
+    if user_id in admins:
         msg = 'Please confirm that the item has been collected.\n\n'
-        msg += 'Buyer: %s (%d)\n' % (order_details[3], int(order_details[2]))
-        msg += 'Item name: %s\n' % order_details[4]
+        msg += 'Buyer: %s (%d)\n' % (db.get_name(buyer_id), buyer_id)
+        msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
         # TODO: Fix this
         # if 'properties' in order_details['itemsBought'][0]:
         #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
-        msg += 'Quantity: %d' % order_details[5]
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm_collect_%d' % order_details[0])]])
-    msg_id = update.callback_query.message.message_id
-    bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+        msg += 'Quantity: %d' % order_details['itemsBought'][0]['quantity']
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm_collect_%d' % int(order_details['orderId']))]])
+        msg_id = update.callback_query.message.message_id
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    elif user_id == buyer_id:
+        msg = 'Please confirm that you have collected the item from the locker. You won\'t be able to see the passcode anymore after that.\n\n'
+        msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
+        # TODO: Fix this
+        # if 'properties' in order_details['itemsBought'][0]:
+        #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
+        msg += 'Quantity: %d\n' % order_details['itemsBought'][0]['quantity']
+        msg += 'Locker no: %d' % order_details['locker_no']
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('See passcode', callback_data='passcode_%d' % order_details['locker_no'])],
+                                         [InlineKeyboardButton('Confirm', callback_data='confirm_collect_%d' % order_details['orderId'])]])
+        msg_id = update.callback_query.message.message_id
+        bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
+    else:
+        admin_block(bot, update)
 
 
 def collect_confirm(bot, update, state):
@@ -1718,14 +1727,15 @@ def collect_confirm(bot, update, state):
     new_state = {'state': 'home', 'substate': 'home', 'item_state': None}
     db.update_state(user_id, new_state)
     db.delete_locker_item(order_id)
+    buyer_id = int(order_details['telegramId'])
     msg = 'Collection successful! Thank you for using Pipsqueak!\n\n'
     if user_id != order_details[2]:
-        msg += 'Buyer: %s (%d)\n' % (order_details[3], int(order_details[2]))
-    msg += 'Item name: %s\n' % order_details[4]
+        msg += 'Buyer: %s (%d)\n' % (db.get_name(buyer_id), buyer_id)
+    msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
     # TODO: Fix this
     # if 'properties' in order_details['itemsBought'][0]:
     #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
-    msg += 'Quantity: %d' % order_details[5]
+    msg += 'Quantity: %d' % order_details['itemsBought'][0]['quantity']
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
     bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
@@ -2103,12 +2113,6 @@ def callback_query_handler(bot, update):
             forward_connect(bot, update, state)
         else:
             review_request(bot, update, data)
-    # elif text.startswith('Random passcode generated:'):
-    #     data = update.callback_query.data
-    #     if data == 'new':
-    #         generate_passcode(bot, update)
-    #     else:
-    #         set_passcode(bot, update)
     elif text.startswith('Which locker passcode do you want to see?'):
         if data == 'done':
             done(bot, update)
