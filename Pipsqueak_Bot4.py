@@ -1687,7 +1687,7 @@ def collect_command(bot, update):
         buyer_id = int(order_details['telegramId'])
     else:
         order_details = db.get_locker_items(order_id=order_id)
-        buyer_id = order_details['telegramId']
+        buyer_id = int(order_details['telegramId'])
     new_state = {'state': 'collect', 'substate': 'confirm', 'item_state': order_details}
     db.update_state(user_id, new_state)
     if user_id in admins:
@@ -1697,7 +1697,7 @@ def collect_command(bot, update):
         # TODO: Fix this
         # if 'properties' in order_details['itemsBought'][0]:
         #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
-        msg += 'Quantity: %d' % order_details['itemsBought'][0]['quantity']
+        msg += 'Quantity: %d' % int(order_details['itemsBought'][0]['quantity'])
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Confirm', callback_data='confirm_collect_%d' % int(order_details['orderId']))]])
         msg_id = update.callback_query.message.message_id
         bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
