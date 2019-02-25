@@ -1713,10 +1713,11 @@ def collect_confirm(bot, update, state):
     global admins
     user_id = update.callback_query.from_user.id
     order_details = state['item_state']
+    order_id = int(order_details['orderId'])
     msg_id = update.callback_query.message.message_id
     new_state = {'state': 'home', 'substate': 'home', 'item_state': None}
     db.update_state(user_id, new_state)
-    # TODO: Update inventory
+    db.delete_locker_item(order_id)
     msg = 'Collection successful! Thank you for using Pipsqueak!\n\n'
     if user_id != order_details[2]:
         msg += 'Buyer: %s (%d)\n' % (order_details[3], int(order_details[2]))

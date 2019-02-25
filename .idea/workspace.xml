@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="810904b1-1c5f-45c9-adbf-1baf99ecdce2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Database2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipsqueak_Bot4.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pipsqueak_Bot4.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -47,16 +46,16 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Procfile" value="17" />
-          <entry key="Python Console" value="4836" />
+          <entry key="Python Console" value="4875" />
           <entry key="dummy" value="1" />
-          <entry key="py" value="127011" />
+          <entry key="py" value="127073" />
           <entry key="txt" value="22" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="40" />
-          <entry key="Python" value="131847" />
+          <entry key="Python" value="131948" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -67,8 +66,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot4.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="1663" column="57" lean-forward="true" selection-start-line="1663" selection-start-column="57" selection-end-line="1663" selection-end-column="57" />
+            <state relative-caret-position="170">
+              <caret line="1717" column="31" selection-start-line="1717" selection-start-column="31" selection-end-line="1717" selection-end-column="31" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -79,7 +78,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
+            <state relative-caret-position="239">
               <caret line="205" column="25" lean-forward="true" selection-start-line="205" selection-start-column="25" selection-end-line="205" selection-end-column="25" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -164,8 +163,8 @@
         <option value="$PROJECT_DIR$/Pipsqueak_Bot3.py" />
         <option value="$PROJECT_DIR$/Database.py" />
         <option value="$PROJECT_DIR$/Procfile" />
-        <option value="$PROJECT_DIR$/Pipsqueak_Bot4.py" />
         <option value="$PROJECT_DIR$/Database2.py" />
+        <option value="$PROJECT_DIR$/Pipsqueak_Bot4.py" />
       </list>
     </option>
   </component>
@@ -266,9 +265,9 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32907802" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32907802" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32907802" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32765958" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.32765958" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -342,7 +341,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Database2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
+        <state relative-caret-position="239">
           <caret line="205" column="25" lean-forward="true" selection-start-line="205" selection-start-column="25" selection-end-line="205" selection-end-column="25" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
@@ -352,8 +351,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Pipsqueak_Bot4.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="1663" column="57" lean-forward="true" selection-start-line="1663" selection-start-column="57" selection-end-line="1663" selection-end-column="57" />
+        <state relative-caret-position="170">
+          <caret line="1717" column="31" selection-start-line="1717" selection-start-column="31" selection-end-line="1717" selection-end-column="31" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
