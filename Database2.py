@@ -201,7 +201,7 @@ class Database(object):
         return rows
 
     def add_locker_item(self, order_details):
-        args = (int(order_details['orderId']), order_details['locker_no'], order_details['telegramId'], self.get_name(order_details['telegramId']), ''.join(order_details['itemsBought'][0]['itemName'].split("'")), int(order_details['itemsBought'][0]['quantity']))
+        args = (int(order_details['orderId']), order_details['locker_no'], int(order_details['telegramId']), self.get_name(int(order_details['telegramId'])), ''.join(order_details['itemsBought'][0]['itemName'].split("'")), int(order_details['itemsBought'][0]['quantity']))
         stmt = "INSERT INTO locker VALUES (%d, %d, %d, '%s', '%s', %d)" % args
         self.commit(stmt)
 

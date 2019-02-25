@@ -1530,7 +1530,7 @@ def see_passcode(bot, update):
     items = db.get_locker_items(locker_no=locker_no, buyer_id=user_id)
     if user_id in admins or bool(items):
         passcode = db.get_passcode(locker_no)
-        if passcode:
+        if passcode != -1:
             msg = '%04d' % passcode
         else:
             msg = 'No record'
