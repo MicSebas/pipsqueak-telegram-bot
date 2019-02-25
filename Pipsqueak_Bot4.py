@@ -1691,6 +1691,8 @@ def collect_command(bot, update):
     new_state = {'state': 'collect', 'substate': 'confirm', 'item_state': order_details}
     db.update_state(user_id, new_state)
     if user_id in admins:
+        msg = '%s (%d) is handling collection for order %d.' % (update.callback_query.from_user.name, user_id, order_id)
+        bot.send_message(admin_id, msg)
         msg = 'Please confirm that the item has been collected.\n\n'
         msg += 'Buyer: %s (%d)\n' % (db.get_name(buyer_id), buyer_id)
         msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
@@ -1728,7 +1730,7 @@ def collect_confirm(bot, update, state):
     db.delete_locker_item(order_id)
     buyer_id = int(order_details['telegramId'])
     msg = 'Collection successful! Thank you for using Pipsqueak!\n\n'
-    if user_id != int(order_details['telegramId']):
+    if user_id != buyer_id:
         msg += 'Buyer: %s (%d)\n' % (db.get_name(buyer_id), buyer_id)
     msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
     # TODO: Fix this
