@@ -1728,7 +1728,7 @@ def collect_confirm(bot, update, state):
     db.delete_locker_item(order_id)
     buyer_id = int(order_details['telegramId'])
     msg = 'Collection successful! Thank you for using Pipsqueak!\n\n'
-    if user_id != order_details[2]:
+    if user_id != int(order_details['telegramId']):
         msg += 'Buyer: %s (%d)\n' % (db.get_name(buyer_id), buyer_id)
     msg += 'Item name: %s\n' % order_details['itemsBought'][0]['itemName']
     # TODO: Fix this
