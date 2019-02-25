@@ -1734,7 +1734,7 @@ def collect_confirm(bot, update, state):
     # TODO: Fix this
     # if 'properties' in order_details['itemsBought'][0]:
     #     msg += 'Properties: %s\n' % json.dumps(order_details['itemsBought'][0]['properties'])
-    msg += 'Quantity: %d' % order_details['itemsBought'][0]['quantity']
+    msg += 'Quantity: %d' % int(order_details['itemsBought'][0]['quantity'])
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('Leave /feedback', callback_data='feedback')]])
     bot.edit_message_text(msg, user_id, msg_id, reply_markup=keyboard)
 
