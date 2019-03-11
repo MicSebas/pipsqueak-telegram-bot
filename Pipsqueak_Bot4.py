@@ -2214,7 +2214,7 @@ def main():
 
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('buy', buy))
-    dispatcher.add_handler(CommandHandler('sell', sell))
+    # dispatcher.add_handler(CommandHandler('sell', sell))
     dispatcher.add_handler(CommandHandler('tompang', tompang_command))
     dispatcher.add_handler(CommandHandler('request', request))
     dispatcher.add_handler(CommandHandler('help', help_command))
