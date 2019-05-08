@@ -322,6 +322,7 @@ def forward_connect(bot, update, state):
                     target_id = user[0]
                     break
     if target_id in [user[0] for user in users]:
+        state['state'] = 'forward'
         state['substate'] = target_id
         name = db.get_name(target_id)
         db.update_state(user_id, state)
